@@ -1,0 +1,5 @@
+[user]
+	email = 
+	name = Sam Stavinoha
+[alias]
+        branches = branch -a -v --color
