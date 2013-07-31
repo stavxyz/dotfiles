@@ -9,6 +9,9 @@ au BufNewFile,BufRead *.rst set filetype=rst
 " This shows what you are typing as a command.  I love this!
 set showcmd
 
+" trying to get yy, D and P to work with system clipboard
+set clipboard=unnamed
+
 " Who doesn't like autoindent?
 "set autoindent
 
@@ -39,6 +42,10 @@ set mouse=a
 set cmdheight=2
 
 set ls=2	"always show status line (filename)
+
+" Add the cool little dots for spaces while in Insert mode
+set list
+set listchars=tab:·\ ,trail:·
 
 colorscheme wombat256mod
 
