@@ -1,5 +1,12 @@
 [user]
-	email = 
 	name = Sam Stavinoha
+	email = samuel.stavinoha@rackspace.com
+[push]
+	default = current
+[hub]
+	host = github.rackspace.com
+	protocol = https
 [alias]
         branches = branch -a -v --color
+[github]
+	host = https://github.rackspace.com
