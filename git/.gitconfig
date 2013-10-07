@@ -10,3 +10,5 @@
         branches = branch -a -v --color
 [github]
 	host = https://github.rackspace.com
+[format]
+	pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
