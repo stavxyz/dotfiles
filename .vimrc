@@ -6,6 +6,12 @@ syntax on
 filetype on
 au BufNewFile,BufRead *.rst set filetype=rst
 
+"highlight search terms
+set hlsearch
+
+"show search matches as you type
+set incsearch
+
 " This shows what you are typing as a command.  I love this!
 set showcmd
 
