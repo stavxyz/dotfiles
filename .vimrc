@@ -29,8 +29,8 @@ set smarttab
 set shiftwidth=4
 set softtabstop=4
 
-
-set number	"display line numbers on the left
+" display line numbers
+set number
 
 " Use case insensitive search, except when using capital letters
 set ignorecase
@@ -47,11 +47,12 @@ set mouse=a
 " 'press <Enter> to continue'
 set cmdheight=2
 
-set ls=2	"always show status line (filename)
+"always show status line (filename)
+set ls=2
 
 " Add the cool little dots for spaces while in Insert mode
 set list
-set listchars=tab:·\ ,trail:·
+set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 
 colorscheme wombat256mod
 
