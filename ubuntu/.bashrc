@@ -20,6 +20,7 @@ alias ls="ls --color=auto"
 # Tell grep to highlight matches
 alias grep="grep --color=auto"
 
+#yep
 force_color_prompt=yes
 
 #####################################################
