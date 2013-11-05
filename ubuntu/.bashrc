@@ -2,7 +2,7 @@
 
 #virtualenvwrapper
 #source /usr/local/bin/virtualenvwrapper.sh
-# installed as /etc/bash_completion.d/virtualenvwrapper in debian
+# installed as /etc/bash_completion.d/virtualenvwrapper on debian-based
 export WORKON_HOME=$HOME/.virtualenvs
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
@@ -19,6 +19,8 @@ alias ls="ls --color=auto"
 
 # Tell grep to highlight matches
 alias grep="grep --color=auto"
+
+export GIT_EDITOR=vim
 
 #yep
 force_color_prompt=yes
