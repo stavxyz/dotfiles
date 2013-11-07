@@ -14,13 +14,21 @@ export PYTHONSTARTUP=~/.pystartup/.pythonrc
 export VISUAL=vim
 export GIT_EDITOR=vim
 
+#autocomplete
+if [ -f ~/.git-completion.bash ]; then
+  . ~/.git-completion.bash
+fi
+
+if [ -f ~/.hg/.hg-completion.bash ]; then
+ . ~/.hg/.hg-completion.bash
+fi
+
 # Tell ls to be colourful
+alias la="ls -als --color=auto"
 alias ls="ls --color=auto"
 
 # Tell grep to highlight matches
 alias grep="grep --color=auto"
-
-export GIT_EDITOR=vim
 
 #yep
 force_color_prompt=yes
