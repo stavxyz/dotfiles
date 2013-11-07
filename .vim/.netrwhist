@@ -1,8 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
-let g:netrw_dirhist_1='/Users/samu1044/repos/UserExperienceLogger/source'
-let g:netrw_dirhist_2='/Users/samu1044/repos/UserExperienceLogger/lib/rscloud/packaging/RSCloud/lib'
-let g:netrw_dirhist_3='/Users/smlstvnh/projects/RSCloud/.git'
-let g:netrw_dirhist_4='/Users/smlstvnh/.ssh'
-let g:netrw_dirhist_5='/Users/smlstvnh/projects/RSCloud/docs/source/_templates'
-let g:netrw_dirhist_6='/Users/smlstvnh/projects/UserExperienceLogger/logger/alerts'
