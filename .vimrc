@@ -1,5 +1,4 @@
 "PEP standards vimrc
-"so /Users/samu1044/.vim/vimrcs/.pyPEPvimrc
 
 "set syntax for sphinx (restructured text) when extension = .rst
 syntax on
