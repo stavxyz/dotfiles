@@ -1,5 +1,3 @@
-"PEP standards vimrc
-
 "set syntax for sphinx (restructured text) when extension = .rst
 syntax on
 filetype on
