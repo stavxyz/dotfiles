@@ -3,6 +3,10 @@ syntax on
 filetype on
 au BufNewFile,BufRead *.rst set filetype=rst
 
+" map F9 to toggle line numbers
+nnoremap <F9> :<C-U>exe "set invnumber"<CR>
+vnoremap <F9> :<C-U>exe "set invnumber"<CR>
+
 "highlight search terms
 set hlsearch
 
@@ -38,7 +42,7 @@ set smartcase
 set confirm
 
 " Enable use of the mouse for all modes
-set mouse=a
+set mouse=n
 
 " Set the command window height to 2 lines, to avoid many cases of having to
 " 'press <Enter> to continue'
