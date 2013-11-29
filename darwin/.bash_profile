@@ -23,6 +23,10 @@ export PIP_RESPECT_VIRTUALENV=true
 export CLICOLOR=1
 export LSCOLORS=Exfxcxdxbxegedabagacad
 
+## git aliases
+alias gitst='git status'
+alias gits='git status'
+
 # Tell grep to highlight matches
 export GREP_OPTIONS='--color=auto'
 
