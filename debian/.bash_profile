@@ -23,6 +23,10 @@ if [ -f ~/.hg/.hg-completion.bash ]; then
  . ~/.hg/.hg-completion.bash
 fi
 
+## git aliases
+alias gitst='git status'
+alias gits='git status'
+
 # Tell ls to be colourful
 alias la="ls -als --color=auto"
 alias ls="ls --color=auto"
