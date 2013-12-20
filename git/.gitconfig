@@ -8,7 +8,9 @@
 	protocol = https
 [alias]
         branches = branch -a -v --color
+[format]
+        pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
 [github]
 	host = https://github.rackspace.com
-[format]
-	pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+[color]
+        ui = auto

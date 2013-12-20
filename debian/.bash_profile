@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #virtualenvwrapper
-#source /usr/local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
 # installed as /etc/bash_completion.d/virtualenvwrapper on debian-based
 export WORKON_HOME=$HOME/.virtualenvs
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
