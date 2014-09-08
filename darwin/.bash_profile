@@ -1,19 +1,7 @@
-export PATH=/usr/local/bin:/usr/local/mysql/bin:/usr/local/sbin:/usr/local/lib:/Users/smlstvnh/executables:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
 
 #for pythonrc
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
-
-################
-## ANDROID
-################
-export ANDROID_HOME=/usr/local/opt/android-sdk
-export ANDROID_SDK=/usr/local/opt/android-sdk
-export ANDROID_NDK=/usr/local/opt/android-ndk
-#source /Users/smlstvnh/projects/android-dev/ignifuga/tools/schafer
-#source /Users/smlstvnh/projects/android-dev/ignifuga/tools/grossman
-
-export PATH=$PATH:/Users/smlstvnh/projects/android-dev/ignifuga/tools
-################
 
 export WORKON_HOME=$HOME/.virtualenvs
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
@@ -34,27 +22,15 @@ export GREP_OPTIONS='--color=auto'
 #export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
-# C
-export CC=gcc-4.8
-
 # autocomplete scm
-source ~/.git-completion.bash
-source ~/.hg/.hg-completion.bash
+source ~/.autocomplete/vcs/.git-completion.bash
+source ~/.autocomplete/vcs/.hg-completion.bash
 
 # tell me more
 alias la="ls -alsG"
 
 source /usr/local/bin/virtualenvwrapper.sh
 #export WORKON_HOME=~/.virtualenvs
-
-# show me the... realpath
-realpath() {
-    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
-}
-
-#REMOTES
-alias rodeo='ssh sam@rodeo'
-alias toro='ssh sam@toro'
 
 ########################
 ## COLOR/CUSTOMIZE PROMPT
@@ -70,4 +46,3 @@ export RESET="\[\e[0m\]"
 export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}$ ${RESET}"
 #################
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
