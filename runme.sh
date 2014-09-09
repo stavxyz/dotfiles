@@ -13,23 +13,23 @@ curl http://www.selenic.com/hg/raw-file/tip/contrib/bash_completion \
 
 # links
 
-
 # git
-ln -v -i -s ~/dotfiles/git/.gitconfig ~/.gitconfig
+ln -v -hf -s ~/dotfiles/git/.gitconfig ~/.gitconfig
 
 # python
-ln -v -i -s ~/dotfiles/.pystartup ~/.pystartup
+ln -v -hf -s ~/dotfiles/.pystartup ~/.pystartup
 
 # profile
 #for f in ~/dotfiles/bashrc/.bash*; do
-ln -v -i -s ~/dotfiles/bashrc/.bash* ~
+ln -v -hf -s ~/dotfiles/bashrc/.bash* ~
 
 # vim
-ln -v -i -s ~/dotfiles/.vim ~/.vim
+ln -v -hf -s ~/dotfiles/.vim ~/.vim
 git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 # install Vundle plugins
 vim +PluginInstall +qall
 
-ln -v -i -s ~/dotfiles/.vimrc ~/.vimrc
+ln -v -hf -s ~/dotfiles/.vimrc ~/.vimrc
 
+source ~/.bash_profile
