@@ -3,9 +3,21 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbi
 #for pythonrc
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
 
-export WORKON_HOME=$HOME/.virtualenvs
-export PIP_VIRTUALENV_BASE=$WORKON_HOME
-export PIP_RESPECT_VIRTUALENV=true
+#################################################
+##### python virtualenv & virtualenvwrapper #####
+#################################################
+                                                #
+if [ -f /usr/local/bin/virtualenvwrapper.sh ];  #
+  then                                          #
+    source /usr/local/bin/virtualenvwrapper.sh  #
+  else                                          #
+    echo "Didn't find virtualenvwrapper.sh"     #
+fi                                              #
+export WORKON_HOME=$HOME/.virtualenvs           #
+export PIP_VIRTUALENV_BASE=$WORKON_HOME         #
+export PIP_RESPECT_VIRTUALENV=true              #
+                                                #
+#################################################
 
 # Tell ls to be colourful
 export CLICOLOR=1
@@ -23,14 +35,14 @@ export GREP_OPTIONS='--color=auto'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
 # autocomplete scm
-source ~/.autocomplete/vcs/.git-completion.bash
-source ~/.autocomplete/vcs/.hg-completion.bash
+for f in ~/.autocomplete/*; do source $f; done
 
 # tell me more
 alias la="ls -alsG"
+alias ls="ls -AG"
 
-source /usr/local/bin/virtualenvwrapper.sh
-#export WORKON_HOME=~/.virtualenvs
+# install Vundle plugins
+vim +PluginInstall +qall
 
 ########################
 ## COLOR/CUSTOMIZE PROMPT

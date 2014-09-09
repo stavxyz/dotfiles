@@ -1,8 +1,8 @@
 [user]
-	name = Sam Stavinoha
-	email = smlstvnh@gmail.com
+        name = Sam Stavinoha
+        email = smlstvnh@gmail.com
 [alias]
         branches = branch -a -v --color
-	remotes = remote --verbose show
+        remotes = remote --verbose show
 [format]
         pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
