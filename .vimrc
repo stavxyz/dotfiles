@@ -13,8 +13,8 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
-
 Bundle 'https://github.com/altercation/vim-colors-solarized.git'
+Bundle 'https://github.com/nvie/vim-flake8.git'
 
 
 
