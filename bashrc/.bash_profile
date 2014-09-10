@@ -1,4 +1,4 @@
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/bin
 
 #for pythonrc
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
@@ -34,7 +34,7 @@ export GREP_OPTIONS='--color=auto'
 #export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
-# autocomplete scm
+# autocomplete scm, tmux
 for f in ~/.autocomplete/*; do source $f; done
 
 # tell me more
@@ -42,7 +42,7 @@ alias la="ls -alsG"
 alias ls="ls -AG"
 
 # install Vundle plugins
-vim +PluginInstall +qall
+#vim +PluginInstall +qall
 
 ########################
 ## COLOR/CUSTOMIZE PROMPT
@@ -59,3 +59,5 @@ export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE
 #################
 
 alias reset='. ~/dotfiles/runme.sh && reset'
+
+eval "$(rbenv init -)"
