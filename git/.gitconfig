@@ -6,3 +6,11 @@
         remotes = remote --verbose show
 [format]
         pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+[color]
+        ui = auto
+[gitreview]
+        username = samstav
+[push]
+        default = current
+[url "https://github.com/"]
+	insteadOf = git://github.com/

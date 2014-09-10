@@ -1,2 +1,5 @@
-.pyhistory
+doc/tags
+.netrwhist
 .DS_Store
+
+.vim/bundle
