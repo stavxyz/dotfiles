@@ -2,6 +2,7 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbi
 
 #for pythonrc
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
+alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
 
 #################################################
 ##### python virtualenv & virtualenvwrapper #####
@@ -19,6 +20,8 @@ export PIP_RESPECT_VIRTUALENV=true              #
                                                 #
 #################################################
 
+force_color_prompt=yes
+
 # Tell ls to be colourful
 export CLICOLOR=1
 export LSCOLORS=Exfxcxdxbxegedabagacad
@@ -33,6 +36,10 @@ export GREP_OPTIONS='--color=auto'
 #name terminal tabs
 #export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
+
+# vim plz
+export VISUAL=vim
+export GIT_EDITOR=vim
 
 # autocomplete scm, tmux
 for f in ~/.autocomplete/*; do source $f; done
