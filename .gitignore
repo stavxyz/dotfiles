@@ -3,3 +3,5 @@ doc/tags
 .DS_Store
 
 .vim/bundle
+.bash_history
+*history*
