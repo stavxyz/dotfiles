@@ -1,6 +1,3 @@
-"set syntax for sphinx (restructured text) when extension = .rst
-syntax on
-filetype on
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -13,10 +10,8 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
 
-Bundle 'https://github.com/altercation/vim-colors-solarized.git'
-Bundle 'https://github.com/nvie/vim-flake8.git'
-
-
+Plugin 'https://github.com/altercation/vim-colors-solarized.git'
+Plugin 'https://github.com/nvie/vim-flake8.git'
 
 
 " All of your Plugins must be added before the following line
@@ -35,10 +30,10 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 
-
-
 " ... EVERYTHING ELSE ...
 
+syntax on
+filetype on
 
 " map F9 to toggle line numbers
 nnoremap <F9> :<C-U>exe "set invnumber"<CR>
