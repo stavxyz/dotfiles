@@ -58,6 +58,4 @@ export RESET="\[\e[0m\]"
 export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}$ ${RESET}"
 #################
 
-alias reset='. ~/dotfiles/runme.sh && reset'
-
 eval "$(rbenv init -)"
