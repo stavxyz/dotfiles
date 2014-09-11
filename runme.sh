@@ -21,6 +21,10 @@ curl https://raw.githubusercontent.com/ThomasAdam/tmux/master/examples/bash_comp
 
 # links
 
+# tmux
+echo "Creating link ~/.tmux.conf"
+ln -v -hf -s ~/dotfiles/tmux/tmux.conf ~/.tmux.conf
+
 # git
 echo "Creating link ~/.gitconfig"
 ln -v -hf -s ~/dotfiles/git/.gitconfig ~/.gitconfig
