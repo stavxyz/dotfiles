@@ -35,22 +35,21 @@ echo "Linking autocomplete scripts."
 ln -v -hf -s ~/dotfiles/bashrc/.bash* ~
 
 # vim & vundle
-VUNDLEPATH='~/.vim/bundle'
+VUNDLEPATH=~/.vim/bundle
 echo "Creating link ~/.vim"
 ln -v -hf -s ~/dotfiles/.vim ~/.vim
 echo "Cloning gmarik/Vundle.vim"
 git clone https://github.com/gmarik/Vundle.vim.git ${VUNDLEPATH}/Vundle.vim.temp
-rm -vrf ${VUNDLEPATH}/Vundle.vim
+rm -rf ${VUNDLEPATH}/Vundle.vim
 mv -v -f ${VUNDLEPATH}/Vundle.vim.temp ${VUNDLEPATH}/Vundle.vim
 echo "Fetching Vundle versions..."
 git --work-tree ${VUNDLEPATH}/Vundle.vim --git-dir ${VUNDLEPATH}/Vundle.vim/.git fetch --all
 echo "Checking out Vundle $VUNDLE_VERSION"
 git --work-tree ${VUNDLEPATH}/Vundle.vim --git-dir ${VUNDLEPATH}/Vundle.vim/.git reset --hard $VUNDLE_VERSION
 
-# install Vundle plugins
-echo "Installing Vundle plugins"
-vim +PluginInstall +qall
-
 ln -v -hf -s ~/dotfiles/.vimrc ~/.vimrc
 
-source ~/.bash_profile
+# install Vundle plugins
+vim +PluginInstall +qall
+
+exec bash -l
