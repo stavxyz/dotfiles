@@ -39,6 +39,12 @@ filetype on
 nnoremap <F9> :<C-U>exe "set invnumber"<CR>
 vnoremap <F9> :<C-U>exe "set invnumber"<CR>
 
+"easier split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
 "highlight search terms
 set hlsearch
 
@@ -96,3 +102,8 @@ set statusline+=%c,     "cursor column
 set statusline+=%l/%L   "cursor line/total lines
 set statusline+=\ %P    "percent through file
 
+if $TMUX == ''
+    set clipboard+=unnamed
+else
+    set clipboard=unnamed
+endif
