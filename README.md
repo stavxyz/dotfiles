@@ -11,16 +11,16 @@ cd dotfiles
 ```
 
 Links:
-* ~/.bash_aliases
-* ~/.bash_profile
-* ~/.bashrc
-* ~/.gitconfig
-* ~/.pystartup
-* ~/.tmux.conf
-* ~/.vim
-* ~/.vimrc
+* `~/.bash_aliases -> ~/dotfiles/bashrc/.bash_aliases`
+* `~/.bash_profile -> ~/dotfiles/bashrc/.bash_profile`
+* `~/.bashrc -> ~/dotfiles/bashrc/.bashrc`
+* `~/.gitconfig -> ~/dotfiles/git/.gitconfig`
+* `~/.pystartup -> ~/dotfiles/.pystartup`
+* `~/.tmux.conf ~/dotfiles/tmux/tmux.conf`
+* `~/.vim -> ~/dotfiles/.vim`
+* `~/.vimrc -> ~/dotfiles/.vimrc`
 
 Creates:
-~/.autocomplete/git-completion.bash
-~/.autocomplete/hg-completion.bash
-~/.autocomplete/tmux-completion.bash
+* `~/.autocomplete/git-completion.bash`
+* `~/.autocomplete/hg-completion.bash`
+* `~/.autocomplete/tmux-completion.bash`
