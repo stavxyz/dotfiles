@@ -21,6 +21,9 @@ Links:
 * `~/.vimrc -> ~/dotfiles/.vimrc`
 
 Creates:
+
+`~/.bash_profile` looks for the following autocomplete scripts.
+
 * `~/.autocomplete/git-completion.bash`
 * `~/.autocomplete/hg-completion.bash`
 * `~/.autocomplete/tmux-completion.bash`
