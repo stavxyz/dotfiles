@@ -4,6 +4,10 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbi
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
 alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
 
+# bash history
+export HISTCONTROL=ignoreboth
+export HISTFILESIZE=500000
+
 #################################################
 ##### python virtualenv & virtualenvwrapper #####
 #################################################
@@ -65,4 +69,9 @@ export RESET="\[\e[0m\]"
 export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}$ ${RESET}"
 #################
 
-eval "$(rbenv init -)"
+# rbenv
+# eval "$(rbenv init -)"
+
+# docker
+# eval $(dvm env)
+
