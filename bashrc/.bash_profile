@@ -52,6 +52,10 @@ for f in ~/.autocomplete/*; do source $f; done
 alias la="ls -alsG"
 alias ls="ls -AG"
 
+if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    alias ls="ls -AG --color=auto"
+fi
+
 # install Vundle plugins
 #vim +PluginInstall +qall
 
