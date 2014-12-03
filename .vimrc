@@ -34,6 +34,7 @@ filetype plugin indent on    " required
 
 syntax on
 filetype on
+set synmaxcol=10000
 
 " map F9 to toggle line numbers
 nnoremap <F9> :<C-U>exe "set invnumber"<CR>
