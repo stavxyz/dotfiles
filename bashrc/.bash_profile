@@ -24,6 +24,10 @@ export PIP_RESPECT_VIRTUALENV=true              #
                                                 #
 #################################################
 
+# go
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
 force_color_prompt=yes
 
 # Tell ls to be colourful
