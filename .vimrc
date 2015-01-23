@@ -46,6 +46,11 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
+" syntax highlighting - try harder
+autocmd BufEnter * :syntax sync fromstart
+let c_minlines=1000
+syntax sync minlines=1000
+
 "highlight search terms
 set hlsearch
 

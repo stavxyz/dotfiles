@@ -5,7 +5,7 @@ export PYTHONSTARTUP=~/.pystartup/.pythonrc
 alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
 
 # bash history
-export HISTCONTROL=ignoreboth
+#export HISTCONTROL=ignoreboth
 export HISTFILESIZE=500000
 
 #################################################
@@ -56,9 +56,9 @@ for f in ~/.autocomplete/*; do source $f; done
 alias la="ls -alsG"
 alias ls="ls -AG"
 
-if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    alias ls="ls -AG --color=auto"
-fi
+#if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+#    alias ls="ls -AG --color=auto"
+#fi
 
 # install Vundle plugins
 #vim +PluginInstall +qall
