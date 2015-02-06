@@ -4,26 +4,6 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbi
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
 alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
 
-# bash history
-#export HISTCONTROL=ignoreboth
-export HISTFILESIZE=500000
-
-#################################################
-##### python virtualenv & virtualenvwrapper #####
-#################################################
-                                                #
-if [ -f /usr/local/bin/virtualenvwrapper.sh ];  #
-  then                                          #
-    source /usr/local/bin/virtualenvwrapper.sh  #
-  else                                          #
-    echo "Didn't find virtualenvwrapper.sh"     #
-fi                                              #
-export WORKON_HOME=$HOME/.virtualenvs           #
-export PIP_VIRTUALENV_BASE=$WORKON_HOME         #
-export PIP_RESPECT_VIRTUALENV=true              #
-                                                #
-#################################################
-
 # go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
@@ -78,8 +58,31 @@ export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE
 #################
 
 # rbenv
-# eval "$(rbenv init -)"
+eval "$(rbenv init -)"
 
 # docker
 # eval $(dvm env)
 
+#################################################
+##### python virtualenv & virtualenvwrapper #####
+#################################################
+                                                #
+if [ -f /usr/local/bin/virtualenvwrapper.sh ];  #
+  then                                          #
+    source /usr/local/bin/virtualenvwrapper.sh  #
+  else                                          #
+    echo "Didn't find virtualenvwrapper.sh"     #
+fi                                              #
+export WORKON_HOME=$HOME/.virtualenvs           #
+export PIP_VIRTUALENV_BASE=$WORKON_HOME         #
+export PIP_RESPECT_VIRTUALENV=true              #
+                                                #
+#################################################
+
+# bash history
+export HISTCONTROL=ignoredups:erasedups
+export HISTSIZE=100000
+export HISTFILESIZE=100000
+shopt -s histappend
+# Save and reload the history after each command finishes
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
