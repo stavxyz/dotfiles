@@ -51,6 +51,10 @@ autocmd BufEnter * :syntax sync fromstart
 let c_minlines=1000
 syntax sync minlines=1000
 
+"dont ask me about changes when I switch buffers
+"automatically set the file with changes as 'hidden'
+set hidden
+
 "highlight search terms
 set hlsearch
 
