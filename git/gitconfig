@@ -4,8 +4,10 @@
 [alias]
         branches = branch -a -v --color
         remotes = remote --verbose show
+        tags = "!f() { git tag --list -n$1; }; f"
+        changelog = "!f() { git log --date=short --no-color --no-merges --pretty=format:'%h :heavy_minus_sign: %s :small_blue_diamond: %an' $1..HEAD; }; f"
 [format]
-        pretty = '%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+        pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
 [color]
         ui = auto
 [gitreview]
