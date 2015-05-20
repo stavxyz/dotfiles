@@ -4,6 +4,13 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbi
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
 alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
 
+# misc. aliases
+alias rgrep='grep -I -r -n -i -e'
+findfile () {
+  echo -e "Looking for regular file $1, ignoring hidden directories.\n"
+  find . -not -path '*/\.*' -type f -iname $1
+}
+
 # go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
@@ -62,6 +69,8 @@ eval "$(rbenv init -)"
 
 # docker
 # eval $(dvm env)
+export DOCKER_HOST=tcp://localhost:4243
+#eval $(boot2docker shellinit)
 
 #################################################
 ##### python virtualenv & virtualenvwrapper #####
