@@ -32,6 +32,9 @@ export GREP_OPTIONS='--color=auto'
 #export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
+# homebrew
+export HOMEBREW_GITHUB_API_TOKEN=`keyring get homebrew github_api_token`
+
 # vim plz
 export VISUAL=vim
 export GIT_EDITOR=vim
