@@ -9,10 +9,12 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
+Plugin 'avakhov/vim-yaml'
 
 Plugin 'https://github.com/altercation/vim-colors-solarized.git'
 Plugin 'https://github.com/nvie/vim-flake8.git'
-
+Plugin 'fatih/vim-go'
+Plugin 'mutewinter/nginx.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -46,6 +48,8 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
+" highlight .ipy files
+au BufRead,BufNewFile *.ipy set filetype=python
 " syntax highlighting - try harder
 autocmd BufEnter * :syntax sync fromstart
 let c_minlines=1000
@@ -103,7 +107,7 @@ set ls=2
 set list
 set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 
-set background=dark
+set background=light
 colorscheme solarized
 
 set statusline=%t       "tail of the filename
