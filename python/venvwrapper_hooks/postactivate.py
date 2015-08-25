@@ -14,12 +14,27 @@ This script should live in $VIRTUALENVWRAPPER_HOOK_DIR
 from __future__ import print_function
 
 import datetime
+import errno
 import os
+import pprint
 import subprocess
 import sys
+import time
 
 VIRTUAL_ENV = os.environ.get('VIRTUAL_ENV')
+MARKERS_DIR = os.path.join(
+    os.environ.get('VIRTUALENVWRAPPER_HOOK_DIR') or '', 'markers')
+
+try:
+    os.makedirs(MARKERS_DIR)
+except OSError as exc:
+    if exc.errno == errno.EEXIST and os.path.isdir(MARKERS_DIR):
+        pass
+    else:
+        raise
+
 MARKER = '.postactivate_{}'.format(str(hash(VIRTUAL_ENV)).strip(' -'))
+MARKER = os.path.join(MARKERS_DIR, MARKER)
 SUNFLOWER = u'\U0001F33B'
 INSTALL = ('pip install --retries 1 --disable-pip-version-check '
            '--exists-action w --timeout 1 --upgrade {pkg}')
@@ -62,12 +77,15 @@ def touch(pth, times=None):
 
 def install_packages():
     updated = []
+    errors = set()
     for i, pkg in enumerate(PACKAGES):
         out, err, code = pip_install(pkg)
         if code != 0:
-            import pdb;pdb.set_trace()
-        elif err and err.strip():
-            #print(err, file=sys.stderr)
+            import pdb
+            pdb.set_trace()
+        if err and err.strip():
+            errors.add(err.strip())
+            # print(err, file=sys.stderr)
             if i == (len(PACKAGES) - 1):
                 print('!', file=sys.stderr)
             else:
@@ -80,6 +98,9 @@ def install_packages():
                 sys.stdout.write('.')
             sys.stdout.flush()
             updated.append(pkg)
+    if errors:
+        pprint.pprint(list(errors), stream=sys.stderr)
+        import pdb;pdb.set_trace()
     return updated
 
 
@@ -88,8 +109,8 @@ def main():
     if not os.path.exists(MARKER):
         new = True
         too_old = (datetime.datetime.now() -
-                   datetime.timedelta(seconds=LIMIT-1))
-        atime, mtime = [too_old.toordinal()] * 2
+                   datetime.timedelta(seconds=LIMIT+37))
+        atime, mtime = [time.mktime(too_old.timetuple())] * 2
         touch(MARKER, times=(atime, mtime))
 
     modified = os.stat(MARKER).st_mtime
@@ -100,7 +121,12 @@ def main():
         # all is well, dont touch the file
         print(SUNFLOWER)
     else:
-        updated = install_packages()
+        hrsago = datetime.datetime.now() - updated
+        hrsago = hrsago.total_seconds() / float(3600)
+        msg = ('Virtual Environment %s last checked {0:.2f} hours ago. Checking.'
+               % os.path.split(VIRTUAL_ENV)[-1])
+        print(msg.format(hrsago))
+        install_packages()
         touch(MARKER)
 
 
