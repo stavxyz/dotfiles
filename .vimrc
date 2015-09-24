@@ -15,6 +15,7 @@ Plugin 'https://github.com/altercation/vim-colors-solarized.git'
 Plugin 'https://github.com/nvie/vim-flake8.git'
 Plugin 'fatih/vim-go'
 Plugin 'mutewinter/nginx.vim'
+Plugin 'pangloss/vim-javascript'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -55,6 +56,28 @@ autocmd BufEnter * :syntax sync fromstart
 let c_minlines=1000
 syntax sync minlines=1000
 
+
+"
+" change indent depending on filetype
+" -----------------------------------
+
+" Default to 4 char tabs. Probably gets overridden.
+set shiftwidth=4
+set softtabstop=4
+
+autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType coffeescript setlocal shiftwidth=2 tabstop=2
+autocmd FileType xhtml setlocal shiftwidth=2 tabstop=2
+autocmd FileType html setlocal shiftwidth=2 tabstop=2
+autocmd FileType htm setlocal shiftwidth=2 tabstop=2
+autocmd FileType php setlocal shiftwidth=2 tabstop=2
+autocmd FileType xml setlocal shiftwidth=2 tabstop=2
+autocmd FileType ipython setlocal shiftwidth=4 tabstop=4
+autocmd FileType ipy setlocal shiftwidth=4 tabstop=4
+autocmd FileType python setlocal shiftwidth=4 tabstop=4
+autocmd FileType c setlocal cindent
+autocmd FileType h setlocal cindent
+
 "dont ask me about changes when I switch buffers
 "automatically set the file with changes as 'hidden'
 set hidden
@@ -77,10 +100,6 @@ set clipboard=unnamed
 " Spaces are better than a tab character
 set expandtab
 set smarttab
-
-" Who wants an 8 character tab?  Not me!
-set shiftwidth=4
-set softtabstop=4
 
 " display line numbers
 set number
