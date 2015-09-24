@@ -17,13 +17,16 @@ import datetime
 import errno
 import os
 import pprint
+import re
 import subprocess
 import sys
 import time
 
+
 VIRTUAL_ENV = os.environ.get('VIRTUAL_ENV')
-MARKERS_DIR = os.path.join(
-    os.environ.get('VIRTUALENVWRAPPER_HOOK_DIR') or '', 'markers')
+HERE = os.path.dirname(os.path.realpath(__file__))
+MARKERS_DIR = os.path.realpath(os.path.join(
+    os.environ.get('VIRTUALENVWRAPPER_HOOK_DIR') or HERE, 'markers'))
 
 try:
     os.makedirs(MARKERS_DIR)
@@ -33,7 +36,9 @@ except OSError as exc:
     else:
         raise
 
-MARKER = '.postactivate_{}'.format(str(hash(VIRTUAL_ENV)).strip(' -'))
+assert VIRTUAL_ENV
+MARKER = '.postactivate_update_marker_for_venv__{}'.format(
+    re.sub(r'\W+', '_', VIRTUAL_ENV.lower()))
 MARKER = os.path.join(MARKERS_DIR, MARKER)
 SUNFLOWER = u'\U0001F33B'
 INSTALL = ('pip install --retries 1 --disable-pip-version-check '
@@ -42,18 +47,26 @@ HOUR = 60*60  # seconds
 LIMIT = 24*HOUR
 
 PACKAGES = [
+    # these go first
     'pip',
     'setuptools',
-    'ipython',
-    'ipdb',
-    'pdbpp',  # this is a maybe, causes problems.
-    'funcsigs',
-    'pygments',
+    # alphabetical
     'fancycompleter',
-    'nose',
     'flake8',
+    'funcsigs',
+    'httpie',
+    'ipdb',
+    'ipython',
+    'nose',
+    'pygments',
     'pylint',
+    'requests',
+    'requests[security]',
 ]
+
+if sys.version_info < (3, 0, 0):
+    PACKAGES.append('pdbpp')
+
 
 
 def run(cmd):
@@ -108,20 +121,20 @@ def main():
     new = False
     if not os.path.exists(MARKER):
         new = True
-        too_old = (datetime.datetime.now() -
+        too_old = (datetime.datetime.utcnow() -
                    datetime.timedelta(seconds=LIMIT+37))
         atime, mtime = [time.mktime(too_old.timetuple())] * 2
         touch(MARKER, times=(atime, mtime))
 
     modified = os.stat(MARKER).st_mtime
     updated = datetime.datetime.fromtimestamp(modified)
-    ago = datetime.datetime.now() - datetime.timedelta(seconds=LIMIT)
+    ago = datetime.datetime.utcnow() - datetime.timedelta(seconds=LIMIT)
     if updated > ago:
         assert not new
         # all is well, dont touch the file
         print(SUNFLOWER)
     else:
-        hrsago = datetime.datetime.now() - updated
+        hrsago = datetime.datetime.utcnow() - updated
         hrsago = hrsago.total_seconds() / float(3600)
         msg = ('Virtual Environment %s last checked {0:.2f} hours ago. Checking.'
                % os.path.split(VIRTUAL_ENV)[-1])
