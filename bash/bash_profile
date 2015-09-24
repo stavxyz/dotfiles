@@ -1,8 +1,26 @@
 export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/bin
 
+
+##################################################
+##### python, virtualenv & virtualenvwrapper #####
+##################################################
+                                                 #
+if [ -f /usr/local/bin/virtualenvwrapper.sh ];   #
+  then                                           #
+    source /usr/local/bin/virtualenvwrapper.sh   #
+  else                                           #
+    echo "Didn't find virtualenvwrapper.sh"      #
+fi                                               #
+export WORKON_HOME=$HOME/.virtualenvs            #
+export PIP_VIRTUALENV_BASE=$WORKON_HOME          #
+export PIP_RESPECT_VIRTUALENV=true               #
+                                                 #
+
 #for pythonrc
 export PYTHONSTARTUP=~/.pystartup/.pythonrc
 alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
+alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
+##################################################
 
 # misc. aliases
 alias rgrep='grep -I -r -n -i -e'
@@ -75,21 +93,6 @@ eval "$(rbenv init -)"
 export DOCKER_HOST=tcp://localhost:4243
 #eval $(boot2docker shellinit)
 
-#################################################
-##### python virtualenv & virtualenvwrapper #####
-#################################################
-                                                #
-if [ -f /usr/local/bin/virtualenvwrapper.sh ];  #
-  then                                          #
-    source /usr/local/bin/virtualenvwrapper.sh  #
-  else                                          #
-    echo "Didn't find virtualenvwrapper.sh"     #
-fi                                              #
-export WORKON_HOME=$HOME/.virtualenvs           #
-export PIP_VIRTUALENV_BASE=$WORKON_HOME         #
-export PIP_RESPECT_VIRTUALENV=true              #
-                                                #
-#################################################
 
 # bash history
 export HISTCONTROL=ignoredups:erasedups
@@ -98,3 +101,6 @@ export HISTFILESIZE=100000
 shopt -s histappend
 # Save and reload the history after each command finishes
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+# etc
+export CELERY_REDIRECT_STDOUTS=false
