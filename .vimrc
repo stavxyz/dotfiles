@@ -129,11 +129,16 @@ set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 set background=light
 colorscheme solarized
 
-set statusline=%t       "tail of the filename
-set statusline+=%=      "left/right separator
-set statusline+=%c,     "cursor column
-set statusline+=%l/%L   "cursor line/total lines
-set statusline+=\ %P    "percent through file
+
+" ************ Status Line *************
+
+"set statusline=%t       "tail of the filename
+"set statusline+=%=      "left/right separator
+"set statusline+=%c,     "cursor column
+"set statusline+=%l/%L   "cursor line/total lines
+"set statusline+=\ %P    "percent through file
+
+" ************************************
 
 if $TMUX == ''
     set clipboard+=unnamed
