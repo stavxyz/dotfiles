@@ -102,7 +102,17 @@ eval "$(rbenv init -)"
 # docker
 # eval $(dvm env)
 export DOCKER_HOST=tcp://localhost:4243
-#eval $(boot2docker shellinit)
+function _dockermachineshellinit {
+    local MACHINE_NAME=${1}
+    local MACHINE_NAME_SIZE=${#MACHINE_NAME}
+    local MACHINE_NAME_DASHES=$(printf "%0.s-" $(seq 1 $MACHINE_NAME_SIZE))
+    local OUTPUT=`docker-machine env $MACHINE_NAME`
+    eval $OUTPUT
+    echo "Exported the following docker environment variables for docker machine named '"${MACHINE_NAME}"':"
+    echo '--------------------------------------------------------------------------------'${MACHINE_NAME_DASHES}
+    echo "$OUTPUT" | grep -e "DOCKER"
+}
+alias docker-machine-shellinit='_dockermachineshellinit'
 
 
 # bash history
