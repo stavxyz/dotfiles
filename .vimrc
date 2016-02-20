@@ -12,10 +12,10 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'avakhov/vim-yaml'
 
 Plugin 'https://github.com/altercation/vim-colors-solarized.git'
-Plugin 'https://github.com/nvie/vim-flake8.git'
 Plugin 'fatih/vim-go'
 Plugin 'mutewinter/nginx.vim'
 Plugin 'pangloss/vim-javascript'
+Plugin 'bling/vim-airline'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -126,7 +126,7 @@ set ls=2
 set list
 set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 
-set background=light
+set background=dark
 colorscheme solarized
 
 
