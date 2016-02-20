@@ -44,6 +44,7 @@ echo -e "\n *** Linking autocomplete scripts. ***"
 ln -v -nf -s ~/dotfiles/bash/bash_profile ~/.bash_profile
 ln -v -nf -s ~/dotfiles/bash/bashrc ~/.bashrc
 ln -v -nf -s ~/dotfiles/bash/bash_aliases ~/.bash_aliases
+ln -v -nf -s ~/dotfiles/bash/bash_gpg ~/.bash_gpg
 
 # vim & vundle
 VUNDLEPATH=~/.vim/bundle
