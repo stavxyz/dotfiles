@@ -6,17 +6,7 @@ VUNDLE_VERSION='v0.10.2'
 mkdir -v -p ~/.autocomplete
 
 # fetch autocomplete scripts
-echo -e "\n *** Fetching git autocomplete script. ***"
-curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash \
-  -o ~/.autocomplete/git-completion.bash
-
-echo -e "\n *** Fetching mercurial autocomplete script. ***"
-curl http://www.selenic.com/hg/raw-file/tip/contrib/bash_completion \
-  -o ~/.autocomplete/hg-completion.bash
-
-echo -e "\n *** Fetching tmux autocomplete script. ***"
-curl https://raw.githubusercontent.com/ThomasAdam/tmux/master/examples/bash_completion_tmux.sh \
-  -o ~/.autocomplete/tmux-completion.bash
+./bash/fetch_autocompleters.sh
 
 #
 # links
