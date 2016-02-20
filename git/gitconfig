@@ -14,8 +14,9 @@
 [color]
         ui = auto
 [gitreview]
-	username = samstav
+        username = samstav
 [push]
         default = current
 [url "https://github.com/"]
-	insteadOf = git://github.com/
+        insteadOf = git://github.com/
+
