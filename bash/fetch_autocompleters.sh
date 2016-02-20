@@ -14,7 +14,7 @@ curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/completio
   -o ~/.autocomplete/docker-completion.bash
 
 echo -e "\n *** Fetching docker-compose autocomplete script. ***"
-curl -L https://raw.githubusercontent.com/docker/compose/$(docker-compose --version | awk 'NR==1{print $NF}')/contrib/completion/bash/docker-compose \
+curl -L https://raw.githubusercontent.com/docker/compose/1.6.0/contrib/completion/bash/docker-compose \
   -o ~/.autocomplete/docker-compose-completion.bash
 
 echo -e "\n *** Fetching docker-machine autocomplete script. ***"
