@@ -40,6 +40,9 @@ findfile () {
   find . -not -path '*/\.*' -type f -iname $1
 }
 
+# generate a 4096 rsa key
+# ssh-keygen -t rsa -b 4096 -N ''
+
 # go
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
@@ -63,6 +66,10 @@ export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
 # homebrew
 export HOMEBREW_GITHUB_API_TOKEN=`keyring get homebrew github_api_token`
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+. $(brew --prefix)/etc/bash_completion
+fi
+######################
 
 # vim plz
 export VISUAL=vim
