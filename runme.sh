@@ -39,7 +39,7 @@ ln -v -nf -s ~/dotfiles/bash/bash_gpg ~/.bash_gpg
 # vim & vundle
 VUNDLEPATH=~/.vim/bundle
 echo -e "\n *** Creating link ~/.vim ***"
-ln -v -nf -s ~/dotfiles/.vim ~/.vim
+ln -v -nf -s ~/dotfiles/vim/vim ~/.vim
 echo -e "\n *** Cloning git repo: gmarik/Vundle.vim ***"
 git clone --progress --verbose https://github.com/gmarik/Vundle.vim.git \
     ${VUNDLEPATH}/Vundle.vim.temp
@@ -52,7 +52,7 @@ git --work-tree ${VUNDLEPATH}/Vundle.vim --git-dir ${VUNDLEPATH}/Vundle.vim/.git
 
 
 echo -e "\n *** Creating link ~/.vimrc ***"
-ln -v -nf -s ~/dotfiles/.vimrc ~/.vimrc
+ln -v -nf -s ~/dotfiles/vim/vimrc ~/.vimrc
 
 # install Vundle plugins
 echo -e "\n *** Installing Vundle plugins and restarting session... ***"
