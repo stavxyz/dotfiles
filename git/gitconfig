@@ -9,6 +9,7 @@
         changelog = "!f() { git log --date=short --no-color --no-merges --pretty=format:'%h :heavy_minus_sign: %s :small_blue_diamond: %an' $1..HEAD; }; f"
         diffc = diff --cached
         dc = diff --cached
+        fa = fetch --all
 [format]
         pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
 [color]
