@@ -23,6 +23,11 @@ alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
 ##################################################
 
 
+######### npm ####################
+alias npm-exec='PATH=$(npm bin):$PATH'
+##################################
+
+
 ######### GPG ####################
 GPG_AGENT=$(which gpg-agent)
 GPG_TTY=`tty`
@@ -34,7 +39,7 @@ fi
 ##################################
 
 # misc. aliases
-alias rgrep='grep --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
+alias rgrep='grep --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
 findfile () {
   echo -e "Looking for regular file $1, ignoring hidden directories.\n"
   find . -not -path '*/\.*' -type f -iname $1
@@ -50,12 +55,19 @@ export PATH=$PATH:$GOPATH/bin
 force_color_prompt=yes
 
 # Tell ls to be colourful
+alias ls='ls -aGFh'
+alias la="ls -alsG"
 export CLICOLOR=1
-export LSCOLORS=Exfxcxdxbxegedabagacad
+export LSCOLORS=exFxCxDxBxegedabagaced
+
+#export LSCOLORS=ExFxBxDxCxegedabagacad
+
 
 ## git aliases
 alias gitst='git status'
 alias gits='git status'
+alias gs='git status'
+alias g='git'
 
 # Tell grep to highlight matches
 export GREP_OPTIONS='--color=auto'
@@ -78,10 +90,6 @@ export GIT_EDITOR=vim
 # autocomplete scm, tmux
 for f in ~/.autocomplete/*; do source $f; done
 
-# tell me more
-alias la="ls -alsG"
-alias ls="ls -AG"
-
 #if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 #    alias ls="ls -AG --color=auto"
 #fi
@@ -100,15 +108,32 @@ export PURPLE="\[\e[35m\]"
 export LTBLUE="\[\e[36m\]"
 export WHITE="\[\e[37m\]"
 export RESET="\[\e[0m\]"
-export PS1="${PURPLE}[${BLUE}\W${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}$ ${RESET}"
-#################
 
-# rbenv
-eval "$(rbenv init -)"
+cd () { builtin cd "$@" && chpwd; }
+pushd () { builtin pushd "$@" && chpwd; }
+popd () { builtin popd "$@" && chpwd; }
+chpwd () {
+  case $PWD in
+    $HOME) HPWD="~";;
+    $HOME/*/*) HPWD="${PWD#"${PWD%/*/*}/"}";;
+    $HOME/*) HPWD="~/${PWD##*/}";;
+    /*/*/*) HPWD="${PWD#"${PWD%/*/*}/"}";;
+    *) HPWD="$PWD";;
+  esac
+}
+#PS1='$HPWD \$'
+
+function hpwd {
+    echo $HPWD
+}
+
+export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}\n\$ ${RESET}"
+cd  # this is to trigger evaluation of chpwd when shell comes up
+#################
 
 # docker
 # eval $(dvm env)
-export DOCKER_HOST=tcp://localhost:4243
+#export DOCKER_HOST=tcp://localhost:4243
 function _dockermachineshellinit {
     local MACHINE_NAME=${1}
     local MACHINE_NAME_SIZE=${#MACHINE_NAME}
@@ -127,15 +152,21 @@ export HISTCONTROL=ignoredups:erasedups
 export HISTSIZE=100000
 export HISTFILESIZE=100000
 shopt -s histappend
-# Save and reload the history after each command finishes
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+# Save and reload the history with the `h` command
+function h {
+    history -a
+    history -c
+    history -r
+}
 
 # etc
 export CELERY_REDIRECT_STDOUTS=false
 
-if [ -f ~/.aliases ];
+# aliases!
+if [ -d ~/.aliases ];
   then
-    source ~/.aliases
+    for f in ~/.aliases/*; do source $f; done
   else
-    echo "Found no ~/.aliases"
+    echo "Found no ~/.aliases directory"
 fi
