@@ -15,6 +15,7 @@ Plugin 'https://github.com/altercation/vim-colors-solarized.git'
 Plugin 'fatih/vim-go'
 Plugin 'mutewinter/nginx.vim'
 Plugin 'pangloss/vim-javascript'
+Plugin 'mxw/vim-jsx'
 Plugin 'bling/vim-airline'
 
 " All of your Plugins must be added before the following line
@@ -35,6 +36,10 @@ filetype plugin indent on    " required
 
 " ... EVERYTHING ELSE ...
 
+" jsx and es6
+
+let g:jsx_ext_required = 0
+
 syntax on
 filetype on
 set synmaxcol=10000
@@ -48,6 +53,9 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
+" map :Q! to quit
+command! -bar -bang Q quit<bang>
 
 " highlight .ipy files
 au BufRead,BufNewFile *.ipy set filetype=python
@@ -114,6 +122,9 @@ set confirm
 
 " Enable use of the mouse for all modes
 set mouse=n
+
+" make backspace work like most other apps
+set backspace=2
 
 " Set the command window height to 2 lines, to avoid many cases of having to
 " 'press <Enter> to continue'
