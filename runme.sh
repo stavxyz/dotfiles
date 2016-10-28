@@ -30,7 +30,7 @@ ln -v -nf -s ~/dotfiles/python/pdbrc.py ~/.pdbrc.py
 
 # profile
 #for f in ~/dotfiles/bash/.bash*; do
-echo -e "\n *** Linking autocomplete scripts. ***"
+echo -e "\n *** Linking bash scripts. ***"
 ln -v -nf -s ~/dotfiles/bash/bash_profile ~/.bash_profile
 ln -v -nf -s ~/dotfiles/bash/bashrc ~/.bashrc
 ln -v -nf -s ~/dotfiles/bash/bash_aliases ~/.bash_aliases
