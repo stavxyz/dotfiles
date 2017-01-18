@@ -23,8 +23,12 @@ alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
 ##################################################
 
 
-######### npm ####################
+######### node ####################
 alias npm-exec='PATH=$(npm bin):$PATH'
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" # This loads nvm
+
 ##################################
 
 
