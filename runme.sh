@@ -19,6 +19,8 @@ ln -v -nf -s ~/dotfiles/tmux/tmux.conf ~/.tmux.conf
 # git
 echo -e "\n *** Creating link ~/.gitconfig ***"
 ln -v -nf -s ~/dotfiles/git/gitconfig ~/.gitconfig
+echo -e "\n *** Creating link ~/.gitignore_global ***"
+ln -v -nf -s ~/dotfiles/git/gitignore_global ~/.gitignore_global
 
 # python
 echo -e "\n *** Creating link ~/.pystartup ***"
