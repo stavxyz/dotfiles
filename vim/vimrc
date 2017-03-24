@@ -137,7 +137,8 @@ set ls=2
 set list
 set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 
-set background=dark
+"set background=dark
+set background=light
 colorscheme solarized
 
 

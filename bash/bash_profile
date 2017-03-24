@@ -25,6 +25,7 @@ alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
 
 ######### node ####################
 alias npm-exec='PATH=$(npm bin):$PATH'
+alias nom="rm -rf node_modules && npm cache clear && npm install"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" # This loads nvm
@@ -165,6 +166,9 @@ _apex()  {
 complete -F _apex apex
 ############################
 
+
+# LaTeX
+export PATH=$PATH:/usr/local/texlive/2016basic/bin/x86_64-darwin
 
 # bash history
 export HISTCONTROL=ignoredups:erasedups
