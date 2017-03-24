@@ -43,3 +43,8 @@ Thumbs.db
 # Python
 ######################
 *.pyc
+
+*.swp
+
+
+.ash_history
