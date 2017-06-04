@@ -1,0 +1,10 @@
+
+dotfiles: ~/dotfiles
+
+links:
+    bash/bash_profile: ~/.bash_profile
+    bash/bash_aliases: ~/.bash_aliases
+    bash/bashrc:       ~/.bashrc
+    vim/vimrc:         ~/.vimrc
+    vim/vimrc:         ~/.config/nvim/init.vim
+    vim/samstav-vimrc: ~/.vim/vimrc
