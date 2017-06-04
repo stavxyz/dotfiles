@@ -1,22 +1,27 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# fetch autocomplete scripts
-echo -e "\n *** Fetching git autocomplete script. ***"
-curl -L https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash \
-  -o ~/.autocomplete/git-completion.bash
+errcho() {
+  >&2 echo $@
+}
 
-echo -e "\n *** Fetching mercurial autocomplete script. ***"
-curl -L https://selenic.com/hg/raw-file/tip/contrib/bash_completion \
-  -o ~/.autocomplete/hg-completion.bash
+DOTFILES_GIT_DIR=$(git rev-parse --show-toplevel | true)
+DOTFILES_DIR=${DOTFILES_GIT_DIR:-${DOTFILES_DIR}}
 
-echo -e "\n *** Fetching docker autocomplete script. ***"
-curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/completion/bash/docker \
-  -o ~/.autocomplete/docker-completion.bash
+if [ ! -d "${DOTFILES_DIR}" ]; then
+  errcho 'dotfiles directory not found (not sure where to put autocomplete scripts)'
+else
+  curl -L https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash \
+    -o $DOTFILES_DIR/autocomplete/git-completion.bash
 
-echo -e "\n *** Fetching docker-compose autocomplete script. ***"
-curl -L https://raw.githubusercontent.com/docker/compose/1.6.0/contrib/completion/bash/docker-compose \
-  -o ~/.autocomplete/docker-compose-completion.bash
+  echo -e "\n *** Fetching docker autocomplete script. ***"
+  curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/completion/bash/docker \
+    -o $DOTFILES_DIR/autocomplete/docker-completion.bash
 
-echo -e "\n *** Fetching docker-machine autocomplete script. ***"
-curl -L https://raw.githubusercontent.com/docker/machine/master/contrib/completion/bash/docker-machine.bash \
-  -o ~/.autocomplete/docker-machine-completion.bash
+  echo -e "\n *** Fetching docker-compose autocomplete script. ***"
+  curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose \
+    -o $DOTFILES_DIR/autocomplete/docker-compose-completion.bash
+
+  echo -e "\n *** Fetching virtualenvwrapper autocomplete script. ***"
+  curl -L https://bitbucket.org/virtualenvwrapper/virtualenvwrapper/raw/master/virtualenvwrapper.sh \
+    -o $DOTFILES_DIR/autocomplete/virtualenvwrapper-completion.bash
+fi

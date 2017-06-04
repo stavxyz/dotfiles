@@ -1,195 +1,35 @@
+#!/usr/bin/env bash
+
 export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/bin
 
+# https://github.com/samstav/dotfiles
+export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
 
-##################################################
-##### python, virtualenv & virtualenvwrapper #####
-##################################################
-                                                 #
-if [ -f /usr/local/bin/virtualenvwrapper.sh ];   #
-  then                                           #
-    source /usr/local/bin/virtualenvwrapper.sh   #
-  else                                           #
-    echo "Didn't find virtualenvwrapper.sh"      #
-fi                                               #
-export WORKON_HOME=$HOME/.virtualenvs            #
-export PIP_VIRTUALENV_BASE=$WORKON_HOME          #
-export PIP_RESPECT_VIRTUALENV=true               #
-                                                 #
-
-#for pythonrc
-export PYTHONSTARTUP=~/.pystartup/.pythonrc
-alias plint="pylint --msg-template='{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}' --output-format=colorized -r n"
-alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
-##################################################
-
-
-######### node ####################
-alias npm-exec='PATH=$(npm bin):$PATH'
-alias nom="rm -rf node_modules && npm cache clear && npm install"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" # This loads nvm
-
-##################################
-
-
-######### GPG ####################
-GPG_AGENT=$(which gpg-agent)
-GPG_TTY=`tty`
-export GPG_TTY
-
-if [ -f ${GPG_AGENT} ]; then
-    . ~/.bash_gpg
+if ! git -C ${DOTFILES_DIR} diff-index --quiet HEAD --; then
+  # remind me that I have dotfiles changes
+  echo '...............'
 fi
-##################################
 
-# misc. aliases
-alias rgrep='grep --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
-findfile () {
-  echo -e "Looking for regular file $1, ignoring hidden directories.\n"
-  find . -not -path '*/\.*' -type f -iname $1
+errcho() {
+  >&2 echo $@
 }
 
-# generate a 4096 rsa key
-# ssh-keygen -t rsa -b 4096 -N ''
-
-# go
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-
-force_color_prompt=yes
-
-# Tell ls to be colourful
-alias ls='ls -aGFh'
-alias la="ls -alsG"
-export CLICOLOR=1
-export LSCOLORS=exFxCxDxBxegedabagaced
-
-#export LSCOLORS=ExFxBxDxCxegedabagacad
-
-
-## git aliases
-alias gitst='git status'
-alias gits='git status'
-alias gs='git status'
-alias g='git'
-
-# Tell grep to highlight matches
-export GREP_OPTIONS='--color=auto'
-
-#name terminal tabs
-#export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
-export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
-
-# homebrew
-export HOMEBREW_GITHUB_API_TOKEN=`keyring get homebrew github_api_token`
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-. $(brew --prefix)/etc/bash_completion
+if [ ! -d "${DOTFILES_DIR}" ]; then
+  errcho 'dotfiles directory not found'
+else
+  source "${DOTFILES_DIR}/lang/python/python.sh"
+  source "${DOTFILES_DIR}/lang/node/node.sh"
+  source "${DOTFILES_DIR}/lang/go/go.sh"
+  source "${DOTFILES_DIR}/bash/shell.sh"
+  source "${DOTFILES_DIR}/bash/aliases.sh"
+  source "${DOTFILES_DIR}/bash/history.sh"
+  # autocomplete scm, tmux
+  for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
+    # run ./bash/fetch_autocompleters.sh to fetch these
+    source $f;
+  done
 fi
-######################
 
-# vim plz
+# vim please
 export VISUAL=vim
 export GIT_EDITOR=vim
-
-# autocomplete scm, tmux
-for f in ~/.autocomplete/*; do source $f; done
-
-#if [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-#    alias ls="ls -AG --color=auto"
-#fi
-
-# install Vundle plugins
-#vim +PluginInstall +qall
-
-########################
-## COLOR/CUSTOMIZE PROMPT
-########################
-export RED="\[\e[31m\]"
-export GREEN="\[\e[32m\]"
-export YELLOW="\[\e[33m\]"
-export BLUE="\[\e[34m\]"
-export PURPLE="\[\e[35m\]"
-export LTBLUE="\[\e[36m\]"
-export WHITE="\[\e[37m\]"
-export RESET="\[\e[0m\]"
-
-cd () { builtin cd "$@" && chpwd; }
-pushd () { builtin pushd "$@" && chpwd; }
-popd () { builtin popd "$@" && chpwd; }
-chpwd () {
-  case $PWD in
-    $HOME) HPWD="~";;
-    $HOME/*/*) HPWD="${PWD#"${PWD%/*/*}/"}";;
-    $HOME/*) HPWD="~/${PWD##*/}";;
-    /*/*/*) HPWD="${PWD#"${PWD%/*/*}/"}";;
-    *) HPWD="$PWD";;
-  esac
-}
-#PS1='$HPWD \$'
-
-function hpwd {
-    echo $HPWD
-}
-
-export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}\n\$ ${RESET}"
-cd  # this is to trigger evaluation of chpwd when shell comes up
-#################
-
-# docker
-# eval $(dvm env)
-#export DOCKER_HOST=tcp://localhost:4243
-function _dockermachineshellinit {
-    local MACHINE_NAME=${1}
-    local MACHINE_NAME_SIZE=${#MACHINE_NAME}
-    local MACHINE_NAME_DASHES=$(printf "%0.s-" $(seq 1 $MACHINE_NAME_SIZE))
-    local OUTPUT=`docker-machine env $MACHINE_NAME`
-    eval $OUTPUT
-    echo "Exported the following docker environment variables for docker machine named '"${MACHINE_NAME}"':"
-    echo '--------------------------------------------------------------------------------'${MACHINE_NAME_DASHES}
-    echo "$OUTPUT" | grep -e "DOCKER"
-}
-alias docker-machine-shellinit='_dockermachineshellinit'
-
-
-############################
-### github.com/apex/apex ###
-############################
-_apex()  {
-  COMPREPLY=()
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  local opts="$(apex autocomplete -- ${COMP_WORDS[@]:1})"
-  COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-  return 0
-}
-
-complete -F _apex apex
-############################
-
-
-# LaTeX
-export PATH=$PATH:/usr/local/texlive/2016basic/bin/x86_64-darwin
-
-# bash history
-export HISTCONTROL=ignoredups:erasedups
-export HISTSIZE=100000
-export HISTFILESIZE=100000
-shopt -s histappend
-
-# Save and reload the history with the `h` command
-function h {
-    history -a
-    history -c
-    history -r
-}
-
-# etc
-export CELERY_REDIRECT_STDOUTS=false
-
-# aliases!
-if [ -d ~/.aliases ];
-  then
-    for f in ~/.aliases/*; do source $f; done
-  else
-    echo "Found no ~/.aliases directory"
-fi
