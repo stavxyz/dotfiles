@@ -1,13 +1,32 @@
 
-dotfiles: ~/dotfiles
 
 # python's glob module filters files and dirs that start
 # with dots, so to glob on those matches you will need
 # to use a pattern like this:
+#
 # links:
 #    <target>: <source>
-#    ~/:  configs/.*
+#    ~/:       configs/.*
+#
+# globbing, tildes, and environment variables are allowed
+# in the source values, e.g.
+#
+# links:
+#     # This will link contents of vim/ into ~/.vim
+#     # Again, mind the leading dot, needs to be explicit
+#     ~/.vim: configs/vim/*
+#     ~/.vim: configs/vim/.*
+#
+# environment variables, tildes (but no globbing)
+# are allowed in the targets. globbing is only
+# allowed in the source value (for creating a link
+# for every file in a dir into a target dir as we did above)
+#
+# links:
+#     $HOME/.alink:  configs/$LINKS/alink
+#     $HOME/.links/: moar/$LINKS/*
 
+dotfiles: ~/dotfiles
 links: 
     ~/.bash_profile:           bash/bash_profile
     ~/.bash_aliases:           bash/bash_aliases
