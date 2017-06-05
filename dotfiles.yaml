@@ -1,5 +1,3 @@
-
-
 # python's glob module filters files and dirs that start
 # with dots, so to glob on those matches you will need
 # to use a pattern like this:
