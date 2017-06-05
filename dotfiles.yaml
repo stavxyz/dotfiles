@@ -1,10 +1,23 @@
 
 dotfiles: ~/dotfiles
 
-links:
-    bash/bash_profile: ~/.bash_profile
-    bash/bash_aliases: ~/.bash_aliases
-    bash/bashrc:       ~/.bashrc
-    vim/vimrc:         ~/.vimrc
-    vim/vimrc:         ~/.config/nvim/init.vim
-    vim/samstav-vimrc: ~/.vim/vimrc
+# python's glob module filters files and dirs that start
+# with dots, so to glob on those matches you will need
+# to use a pattern like this:
+# links:
+#    <target>: <source>
+#    ~/:  configs/.*
+
+links: 
+    ~/.bash_profile:           bash/bash_profile
+    ~/.bash_aliases:           bash/bash_aliases
+    ~/.bashrc:                 bash/bashrc               
+    ~/.vimrc:                  vim/vimrc                     
+    ~/.config/nvim/init.vim:   vim/vimrc                     
+    ~/.vim/samstav-vimrc:      vim/samstav-vimrc
+    ~/.tmux.conf:              tmux/tmux.conf               
+    ~/.pdbrc.py:               lang/python/pdbrc.py
+    ~/.pystartup/.pythonrc:    lang/python/pystartup/pythonrc
+    ~/.gitignore_global:       git/gitignore_global  
+    ~/.gitconfig:              git/gitconfig            
+                  
