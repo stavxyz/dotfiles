@@ -1,11 +1,14 @@
 dotfiles
 ========
 
-scripts expect this repo to live in ~/
+requirements:
 
-```bash
-cd
-git clone https://github.com/samstav/dotfiles
-cd dotfiles
-./runme.sh
-```
+[homebrew](https://brew.sh/)
+[vim-plug](https://github.com/junegunn/vim-plug)
+python
+
+
+setup:
+
+pip install -U -r requirements.txt
+./bin/dotfiles.py --debug link
