@@ -10,6 +10,8 @@ python
 
 ### setup:
 
+```
 pip install -U -r requirements.txt
 ./bin/dotfiles.py --debug unlink
 ./bin/dotfiles.py --debug link
+```
