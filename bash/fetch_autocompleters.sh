@@ -24,4 +24,9 @@ else
   echo -e "\n *** Fetching virtualenvwrapper autocomplete script. ***"
   curl -L https://bitbucket.org/virtualenvwrapper/virtualenvwrapper/raw/master/virtualenvwrapper.sh \
     -o $DOTFILES_DIR/autocomplete/virtualenvwrapper-completion.bash
+
+  echo -e "\n *** Fetching homebrew autocomplete script. ***"
+  curl -L https://raw.githubusercontent.com/Homebrew/brew/master/completions/bash/brew \
+    -o $DOTFILES_DIR/autocomplete/homebrew-completion.bash
+
 fi
