@@ -23,6 +23,12 @@
 # links:
 #     $HOME/.alink:  configs/$LINKS/alink
 #     $HOME/.links/: moar/$LINKS/*
+#
+# if your dotfiles are placed in your dotfiles repo
+# just as they should be dropped into your home directory..
+#
+# links:
+#     ~/: dotfiles_repo/*
 
 dotfiles: ~/dotfiles
 links: 
