@@ -10,6 +10,8 @@
         diffc = diff --cached
         dc = diff --cached
         fa = fetch --all
+        rebase-ours = rebase --interactive --autostash --merge --strategy recursive --strategy-option ours
+        reup = rebase --interactive --autostash origin/master
 [format]
         pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
 [color]
