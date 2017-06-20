@@ -31,16 +31,16 @@
 #     ~/: dotfiles_repo/*
 
 dotfiles: ~/dotfiles
-links: 
-    ~/.bash_profile:           bash/bash_profile
-    ~/.bash_aliases:           bash/bash_aliases
-    ~/.bashrc:                 bash/bashrc               
-    ~/.vimrc:                  vim/vimrc                     
-    ~/.config/nvim/init.vim:   vim/vimrc                     
-    ~/.vim/samstav-vimrc:      vim/samstav-vimrc
-    ~/.tmux.conf:              tmux/tmux.conf               
-    ~/.pdbrc.py:               lang/python/pdbrc.py
-    ~/.pystartup/.pythonrc:    lang/python/pystartup/pythonrc
-    ~/.gitignore_global:       git/gitignore_global  
-    ~/.gitconfig:              git/gitconfig            
-                  
+links:
+    ~/.bash_profile:                        bash/bash_profile
+    ~/.bash_aliases:                        bash/bash_aliases
+    ~/.bashrc:                              bash/bashrc
+    ~/.vimrc:                               vim/vimrc
+    ~/.config/nvim/init.vim:                vim/vimrc
+    ~/.vim/samstav-vimrc:                   vim/samstav-vimrc
+    ~/.tmux.conf:                           tmux/tmux.conf
+    ~/.pdbrc.py:                            lang/python/pdbrc.py
+    ~/.pystartup/.pythonrc:                 lang/python/pystartup/pythonrc
+    ~/.gitignore_global:                    git/gitignore_global
+    ~/.gitconfig:                           git/gitconfig
+    ~/.config/karabiner/karabiner.json:     karabiner/karabiner.json
