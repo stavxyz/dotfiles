@@ -22,24 +22,11 @@
       },
       "name": "Default profile",
       "selected": true,
+      "simple_modifications": {
+        "caps_lock": "right_control"
+      },
       "complex_modifications": {
         "rules": [
-          {
-            "manipulators": [
-              {
-                "description": "Change caps_lock to left_control.",
-                "from": {
-                  "key_code": "caps_lock"
-                },
-                "to": [
-                  {
-                    "key_code": "right_control"
-                  }
-                ],
-                "type": "basic"
-              }
-            ]
-          },
           {
             "manipulators": [
               {

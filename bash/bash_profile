@@ -23,6 +23,7 @@ else
   source "${DOTFILES_DIR}/bash/shell.sh"
   source "${DOTFILES_DIR}/bash/aliases.sh"
   source "${DOTFILES_DIR}/bash/history.sh"
+  source "${DOTFILES_DIR}/osx/osx.sh"
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
     # run ./bash/fetch_autocompleters.sh to fetch these

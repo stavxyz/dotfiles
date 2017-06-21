@@ -1,0 +1,23 @@
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+"\e[5~": history-search-backward
+"\e[6~": history-search-forward
+"\e[3~": delete-char
+"\e[2~": quoted-insert
+
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for char moving
+"\e[1;5C": forward-char
+"\e[1;5D": backward-char
+"\e[1;5C": forward-char
+"\e[1;5D": backward-char
+"\e\e[C": forward-char
+"\e\e[D": backward-char
+
+set completion-ignore-case On
+set expand-tilde on
+set convert-meta off
+set input-meta on
+set output-meta on
+set show-all-if-ambiguous on
+set visible-stats on
+set -o vi
