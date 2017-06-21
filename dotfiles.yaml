@@ -44,3 +44,20 @@ links:
     ~/.gitignore_global:                    git/gitignore_global
     ~/.gitconfig:                           git/gitconfig
     ~/.config/karabiner/karabiner.json:     karabiner/karabiner.json
+    ~/.inputrc:                             osx/inputrc
+
+brew:
+    tap:
+        jpbochi/tap
+    install:
+        - pyenv
+        - jq
+        - git
+        - tmux
+        - vim --with-override-system-vi
+        - neovim
+        - macvim
+        - node
+        - yarn
+        - reattach-to-user-namespace
+        - drun
