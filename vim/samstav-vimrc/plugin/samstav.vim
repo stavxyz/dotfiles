@@ -5,8 +5,8 @@ let g:jsx_ext_required = 0
 set synmaxcol=10000
 
 " map F9 to toggle line numbers
-nnoremap <F9> :<C-U>exe "set invnumber"<CR>
-vnoremap <F9> :<C-U>exe "set invnumber"<CR>
+nnoremap <L> :<C-U>exe "set invnumber"<CR>
+vnoremap <L> :<C-U>exe "set invnumber"<CR>
 
 "easier split navigations
 nnoremap <C-J> <C-W><C-J>
@@ -96,6 +96,9 @@ set ls=2
 " Add the cool little dots for spaces while in Insert mode
 set list
 set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
+
+" show line/column
+set ruler
 
 " ************ Status Line *************
 

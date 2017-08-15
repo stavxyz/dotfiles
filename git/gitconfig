@@ -12,6 +12,7 @@
         fa = fetch --all
         rebase-ours = rebase --interactive --autostash --merge --strategy recursive --strategy-option ours
         reup = rebase --interactive --autostash origin/master
+        master = "!f() { git checkout master && git fetch origin master && git reset --hard origin/master; }; f"
 [format]
         pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
 [color]
