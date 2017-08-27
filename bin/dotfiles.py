@@ -57,7 +57,7 @@ def _filetype(path):
 @click.option('--config', '-c', type=click.File(mode='r'), show_default=True,
               help='dotfiles config file',
               default=_DF if os.path.isfile(_DF) else None)
-@click.option('--debug/--no-debug', default=True)
+@click.option('--debug/--no-debug', default=False)
 @click.option('--home-dir', 'home',
               type=click.Path(exists=True, file_okay=False, dir_okay=True),
               default=_normalize_path('~/', globbing=False))
@@ -117,8 +117,6 @@ def link(ctx, source=None, target=None, use_config=True,
         if confirm and not yes:
             if not click.confirm('Create symlink {} ?'.format(msg)):
                 continue
-        click.secho('Creating symlink: {} --> {}'.format(_target, _source),
-                    fg='green', bold=True)
         try:
             os.symlink(_source, _target)
         except OSError as err:
@@ -135,8 +133,9 @@ def link(ctx, source=None, target=None, use_config=True,
             if _source == _normalize_path(
                 _target, globbing=False, resolve=True):
                 if DEBUG:
-                    click.secho('Symlink [ {} ] exists and points to matching source '
-                                '[ {} ]. Skipping.'.format(_target, _source))
+                    click.secho('Skipping [ {} ]. Symlink exists and points '
+                                'to matching source [ {} ]. Skipping.'.format(
+                                _target, _source))
                     continue
             else:
                 # In this case, we could ask for confirmation,
@@ -146,8 +145,11 @@ def link(ctx, source=None, target=None, use_config=True,
                 # since we could do it without affecting the 
                 # other (previous) source file/dir.
                 _errcho('Symlink {} already exists but does not point '
-                        'to source {}.'.format(_target, _source))
+                        'to source {}. Not creating'.format(_target, _source))
                 continue
+        else:
+            click.secho('Created symlink: {} --> {}'.format(_target, _source),
+                        fg='green', bold=True)
 
 
 @cli.command(short_help='Remove symlinks')
