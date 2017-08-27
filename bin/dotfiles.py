@@ -4,9 +4,7 @@ import collections
 import errno
 import functools
 import glob
-import io
 import json
-import operator
 import os
 
 import click
@@ -21,12 +19,6 @@ CONTEXT_SETTINGS = dict(
 _DF = 'dotfiles.yaml'
 CHAIN = u'\U0001f517'
 DEBUG = False
-
-_pgb = functools.partial(
-    click.progressbar,
-    fill_char=CHAIN,
-    show_eta=False
-)
 
 
 def _errcho(text, abort=True, **kw):
@@ -46,6 +38,18 @@ def _normalize_path(path, globbing=False, resolve=True):
         funcs.append(glob.glob)
     return functools.reduce(
         lambda x, y: y(x), funcs, path
+    )
+
+
+def _filetype(path):
+    path = _normalize_path(path, resolve=False)
+    return filter(None,
+        [
+            os.path.islink(path) and 'link',
+            os.path.isdir(path) and 'dir',
+            os.path.isfile(path) and 'file',
+            os.path.ismount(path) and 'mount',
+        ]
     )
 
 
@@ -96,32 +100,55 @@ def link(ctx, source=None, target=None, use_config=True,
     if DEBUG:
         click.echo('Symlinks to create:')
         click.echo(json.dumps(links, indent=2, sort_keys=True))
-    def _isf(_l):
-        if not _l:
-            return
-        __t, __s = _l
-        return click.style(
-            'Creating symlink: {} --> {}'.format(__t, __s),
-            fg='green', bold=True)
-    with _pgb(links.items(), label='Creating symlinks',
-              item_show_func=_isf) as _links:
-        for _target, _source in _links:
-            assert os.path.exists(_source)
-            target_parent_dir = os.path.dirname(_target)
-            # os.symlink will not create intermediate dirs
-            if not os.path.isdir(target_parent_dir):
-                if confirm and not yes:
-                    if not click.confirm(
-                        '\n\nCreate symlink target parent dir [ {} ] for target [ {} ] ?'.format(
-                        target_parent_dir, _target)):
-                        continue
-                _mkdir_p(target_parent_dir)
-            # create symlinks
-            msg = '{} --> {}'.format(_target, _source)
+
+    for _target, _source in links.items():
+        assert os.path.exists(_source)
+        target_parent_dir = os.path.dirname(_target)
+        # os.symlink will not create intermediate dirs
+        if not os.path.isdir(target_parent_dir):
             if confirm and not yes:
-                if not click.confirm('Create symlink {} ?'.format(msg)):
+                if not click.confirm(
+                    '\n\nCreate target parent dir(s) [ {} ] for symlink [ {} ] ?'.format(
+                    target_parent_dir, _target)):
                     continue
+            _mkdir_p(target_parent_dir)
+        # create symlinks
+        msg = '{} --> {}'.format(_target, _source)
+        if confirm and not yes:
+            if not click.confirm('Create symlink {} ?'.format(msg)):
+                continue
+        click.secho('Creating symlink: {} --> {}'.format(_target, _source),
+                    fg='green', bold=True)
+        try:
             os.symlink(_source, _target)
+        except OSError as err:
+            # target already exists (probably a symlink)
+            if err.errno != errno.EEXIST:
+                raise
+            target_types = _filetype(_target)
+            if 'link' not in target_types:
+                # Raise the OSError if target is not a symlink
+                # In this case, I'm not sure what the user expects
+                # Maybe --force could overwrite?
+                _errcho('Target [ {} ] already exists and '
+                        'is not a symlink.'.format(_target))
+            if _source == _normalize_path(
+                _target, globbing=False, resolve=True):
+                if DEBUG:
+                    click.secho('Symlink [ {} ] exists and points to matching source '
+                                '[ {} ]. Skipping.'.format(_target, _source))
+                    continue
+            else:
+                # In this case, we could ask for confirmation,
+                # or respect a --force and overwrite.
+                # This is not a very "destructive" overwrite,
+                # thus it should be a relatively safe thing to do,
+                # since we could do it without affecting the 
+                # other (previous) source file/dir.
+                _errcho('Symlink {} already exists but does not point '
+                        'to source {}.'.format(_target, _source))
+                continue
+
 
 @cli.command(short_help='Remove symlinks')
 @click.option('--target', '-t', type=click.Path(exists=True),
@@ -144,26 +171,20 @@ def unlink(ctx, target=None, use_config=True, confirm=True, yes=False):
     if DEBUG:
         click.echo('Links found to remove:')
         click.echo(json.dumps(links, indent=2, sort_keys=True))
-    def _isf(_l):
-        if not _l:
-            return
-        return click.style(
-            'Removing symlink: {}'.format(_l),
-            fg='green', bold=True)
-    with _pgb(links, label='Removing symlinks',
-              item_show_func=_isf) as _links:
-        for _target in _links:
-            # remove symlinks
-            if not os.path.islink(_target):
-                click.secho('[ {} ] is not a symlink, skipping'.format(_target),
-                            fg='yellow', err=True)
+    for _target in links:
+        # remove symlinks
+        if not os.path.islink(_target):
+            click.secho('[ {} ] is not a symlink, skipping'.format(_target),
+                        fg='yellow', err=True)
+            continue
+        msg = '{} (points to {} )'.format(
+            _target, _normalize_path(_target))
+        if confirm and not yes:
+            if not click.confirm('Remove {} ?'.format(msg)):
                 continue
-            msg = '{} (points to {} )'.format(
-                _target, _normalize_path(_target))
-            if confirm and not yes:
-                if not click.confirm('Remove {} ?'.format(msg)):
-                    continue
-            os.unlink(_target)
+        click.secho('Removing symlink: {}'.format(_target),
+                    fg='green', bold=True)
+        os.unlink(_target)
 
 
 def _resolve_all_links(links):
@@ -184,14 +205,17 @@ def _resolve_all_links(links):
             # we want to write _into_ the home dir, not overwrite it
             source = source if isinstance(source, list) else [source]
         # now we have a single target which might be a dir
-        # and one or more sources, which might be a combination of both
+        # and one or more sources, which might be a combination of
+        # both files and directories
         # all are normalized and absolute
         if isinstance(source, list):
             # write sources into target dir
-            if os.path.isfile(target):
-                _errcho('target ( {} ) is an existing file! Cannot write '
-                        'symlinks from the following sources '
-                        'into this target: {}'.format(target, source))
+            # isdir() will resolve a symlink dir
+            if not os.path.isdir(target):
+                # consider moving this check to the link() or unlink() funcs
+                _errcho('target ( {} ) already exists and is not a directory. '
+                        'Cannot write multiple symlinks from the following '
+                        'sources into this target: {}'.format(target, source))
             for _s in source:
                 _, tail = os.path.split(_s)
                 # is this right?
@@ -208,7 +232,7 @@ def _resolve_all_links(links):
 def _resolve_source(source):
     abs_sources = _normalize_path(source, globbing=True)
     # at this point we have 1 or more sources
-    # source may be a single dir, a single file, or a bunch of files
+    # source may be a single dir, a single file, or a bunch of files like ones/in/here/*
     if not abs_sources:
         _errcho('Bad symlink source (nothing matched/found): {}'.format(source))
     if len(abs_sources) == 1:
