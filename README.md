@@ -5,7 +5,7 @@ dotfiles
 
 [homebrew](https://brew.sh/)  
 [vim-plug](https://github.com/junegunn/vim-plug)  
-python & pip
+python & pip  
 [pyenv](https://github.com/pyenv/pyenv)
 
 ```bash
