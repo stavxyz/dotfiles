@@ -3,10 +3,11 @@ dotfiles
 
 ### requirements:
 
-[homebrew](https://brew.sh/)  
+[homebrew](https://brew.sh/) (if mac) 
 [vim-plug](https://github.com/junegunn/vim-plug)  
 python & pip  
 [pyenv](https://github.com/pyenv/pyenv)
+
 
 ```bash
 # vim-plug for regular vim
