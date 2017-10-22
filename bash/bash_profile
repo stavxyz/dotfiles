@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/local/binexport:~/.pyenv/bin:$PATH
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/local/bin:~/.pyenv/bin:$PATH
 
 # https://github.com/samstav/dotfiles
 export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
