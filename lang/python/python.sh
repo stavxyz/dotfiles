@@ -12,3 +12,5 @@ alias pipi="pip install --upgrade --force-reinstall --no-cache-dir $1"
 
 # pyenv
 eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+

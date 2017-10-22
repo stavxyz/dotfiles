@@ -5,8 +5,13 @@ errcho() {
 }
 
 # tell ls to be colorful
-alias ls='ls -aGFh'
-alias la="ls -alsG"
+if [[ $OSTYPE == *"linux"* ]]; then
+  alias ls='ls --color=auto'
+elif [[ $OSTYPE == *"darwin"* ]]; then
+  alias ls='ls -aGFh'
+  alias la='ls -alsG'
+fi
+
 
 ## git aliases
 alias gitst='git status'
@@ -26,9 +31,6 @@ findfile () {
 #### LOCAL aliases ###
 ######################
 
-if [ -d ~/.aliases ];
-  then
-    for f in ~/.aliases/*; do source $f; done
-  else
-    errcho "Found no ~/.aliases directory"
+if [ -d ~/.aliases ]; then
+  for f in ~/.aliases/*; do source $f; done
 fi
