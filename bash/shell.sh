@@ -15,7 +15,6 @@ export GREP_OPTIONS='--color=auto'
 #export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}\007"'
 export PROMPT_COMMAND='echo -ne "\033]0;${PWD##*/}-(${VIRTUAL_ENV##*/})\007"'
 
-
 ########################
 ## COLOR/CUSTOMIZE PROMPT
 ########################
@@ -27,6 +26,11 @@ export PURPLE="\[\e[35m\]"
 export LTBLUE="\[\e[36m\]"
 export WHITE="\[\e[37m\]"
 export RESET="\[\e[0m\]"
+
+if [ -f "/etc/debian_version" ]; then
+    export IS_DEBIAN=1
+    export ICON="🌀";
+fi
 
 cd () { builtin cd "$@" && chpwd; }
 pushd () { builtin pushd "$@" && chpwd; }
@@ -46,6 +50,6 @@ function hpwd {
     echo $HPWD
 }
 
-export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h ${PURPLE}\n\$ ${RESET}"
+export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h${PURPLE}${ICON}\n\$ ${RESET}"
 cd  # this is to trigger evaluation of chpwd when shell comes up
 #################
