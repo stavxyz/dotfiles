@@ -22,7 +22,9 @@ else
   source "${DOTFILES_DIR}/lang/go/go.sh"
   source "${DOTFILES_DIR}/bash/shell.sh"
   source "${DOTFILES_DIR}/bash/aliases.sh"
-  source "${DOTFILES_DIR}/bash/history.sh"
+  if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
+    source "${DOTFILES_DIR}/bash/history.sh"
+  fi
   if [[ $OSTYPE == *"darwin"* ]]; then
     source "${DOTFILES_DIR}/osx/osx.sh"
   fi
