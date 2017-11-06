@@ -19,6 +19,8 @@ alias gits='git status'
 alias gs='git status'
 alias g='git'
 
+# vim
+alias vimp='vim -c ":PlugInstall|q|q"'
 
 # misc. aliases
 alias rgrep='grep --exclude .babel.json --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
