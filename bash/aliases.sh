@@ -22,6 +22,22 @@ findfile () {
   find . -not -path '*/\.*' -type f -iname $1
 }
 
+# jason is a person
+
+jsonvalue ()
+{
+    if [ -z "$1" ]; then
+        errcho 'Usage: jsonvalue <jsondata> <key>';
+        return 1;
+    fi
+    if [ -z "$2" ]; then
+        errcho 'Usage: jsonvalue <jsondata> <key>';
+        return 1;
+    fi
+    echo $1 | jq -r --arg KEY $2 '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
+}
+
+
 ######################
 #### LOCAL aliases ###
 ######################
