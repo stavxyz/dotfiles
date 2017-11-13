@@ -10,7 +10,10 @@
         diffc = diff --cached
         dc = diff --cached
         fa = fetch --all
+        edit = reset --soft HEAD^
+        rb = rebase --interactive --autostash
         rebase-ours = rebase --interactive --autostash --merge --strategy recursive --strategy-option ours
+        rebase-theirs = rebase --interactive --autostash --merge --strategy recursive --strategy-option theirs
         reup = rebase --interactive --autostash origin/master
         master = "!f() { git checkout master && git fetch origin master && git reset --hard origin/master; }; f"
 [format]
