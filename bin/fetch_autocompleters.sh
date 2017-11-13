@@ -4,7 +4,7 @@ errcho() {
   >&2 echo $@
 }
 
-DOTFILES_GIT_DIR=$(git rev-parse --show-toplevel | true)
+DOTFILES_GIT_DIR=$(git rev-parse --show-toplevel || true)
 DOTFILES_DIR=${DOTFILES_GIT_DIR:-${DOTFILES_DIR}}
 
 if [ ! -d "${DOTFILES_DIR}" ]; then
@@ -25,8 +25,10 @@ else
   curl -L https://bitbucket.org/virtualenvwrapper/virtualenvwrapper/raw/master/virtualenvwrapper.sh \
     -o $DOTFILES_DIR/autocomplete/virtualenvwrapper-completion.bash
 
-  echo -e "\n *** Fetching homebrew autocomplete script. ***"
-  curl -L https://raw.githubusercontent.com/Homebrew/brew/master/completions/bash/brew \
-    -o $DOTFILES_DIR/autocomplete/homebrew-completion.bash
+  if [[ $OSTYPE == *"darwin"* ]]; then
+    echo -e "\n *** Fetching homebrew autocomplete script. ***"
+    curl -L https://raw.githubusercontent.com/Homebrew/brew/master/completions/bash/brew \
+      -o $DOTFILES_DIR/autocomplete/homebrew-completion.bash
+  fi
 
 fi
