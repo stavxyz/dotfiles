@@ -14,7 +14,7 @@ else
     -o $DOTFILES_DIR/autocomplete/git-completion.bash
 
   echo -e "\n *** Fetching docker autocomplete script. ***"
-  curl -L https://raw.githubusercontent.com/docker/docker/master/contrib/completion/bash/docker \
+  curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker \
     -o $DOTFILES_DIR/autocomplete/docker-completion.bash
 
   echo -e "\n *** Fetching docker-compose autocomplete script. ***"
