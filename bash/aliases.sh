@@ -45,6 +45,15 @@ jsonvalue ()
 }
 
 
+# dates
+
+ago ()
+{
+  __ago=$1;
+  __ago=${__ago:-24};
+  date -j -f "%a %b %d %T %Z %Y" "$(date -v -${__ago}H)" "+%s"
+}
+
 ######################
 #### LOCAL aliases ###
 ######################
