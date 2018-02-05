@@ -8,6 +8,7 @@ Plug 'chriskempson/base16-vim'
 " javascript
 Plug 'https://github.com/pangloss/vim-javascript.git'
 Plug 'https://github.com/isRuslan/vim-es6.git'
+Plug 'https://github.com/fatih/vim-go.git'
 
 " personal (local)
 Plug '~/.vim/samstav-vimrc'
