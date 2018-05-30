@@ -5,12 +5,27 @@ call plug#begin('~/.vim/plugged')
 
 " colors
 Plug 'chriskempson/base16-vim'
+Plug 'w0ng/vim-hybrid'
+
 " javascript
 Plug 'https://github.com/pangloss/vim-javascript.git'
 Plug 'https://github.com/isRuslan/vim-es6.git'
 Plug 'https://github.com/fatih/vim-go.git'
 
+" status line
+let g:airline_powerline_fonts = 1
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+" writing
+Plug 'reedes/vim-pencil'
+
 " personal (local)
 Plug '~/.vim/samstav-vimrc'
 
 call plug#end()
+
+set background=dark
+colorscheme base16-default-dark
+"colorscheme base16-default-light
+"colorscheme hybrid

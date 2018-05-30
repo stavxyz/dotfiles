@@ -2,6 +2,9 @@
 
 let g:jsx_ext_required = 0
 
+set nocompatible
+filetype plugin on
+
 set synmaxcol=10000
 
 " map F9 to toggle line numbers
@@ -28,10 +31,6 @@ syntax sync minlines=1000
 "
 " change indent depending on filetype
 " -----------------------------------
-
-" Default to 4 char tabs. Probably gets overridden.
-set shiftwidth=4
-set softtabstop=4
 
 autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
 autocmd FileType coffeescript setlocal shiftwidth=2 tabstop=2
@@ -62,7 +61,7 @@ set showcmd
 " trying to get yy, D and P to work with system clipboard
 set clipboard=unnamed
 
-" Who doesn't like autoindent?
+" Who doesn't like autoindent? me?
 "set autoindent
 
 " Spaces are better than a tab character
@@ -91,7 +90,7 @@ set backspace=2
 set cmdheight=2
 
 "always show status line (filename)
-set ls=2
+"set ls=2
 
 " Add the cool little dots for spaces while in Insert mode
 set list
@@ -99,6 +98,10 @@ set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 
 " show line/column
 set ruler
+
+" golang (fatih/vim-go)
+let g:go_fmt_command = "goimports"
+let g:go_metalinter_autosave = 1
 
 " ************ Status Line *************
 
@@ -109,6 +112,26 @@ set ruler
 "set statusline+=\ %P    "percent through file
 
 " ************************************
+
+" statusline / airline conf
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+let g:airline_symbols.space = "\ua0"
+
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline_section_x = '%{PencilMode()}'
+
+let g:airline_theme='base16'
+
+augroup pencil
+  autocmd!
+  autocmd FileType markdown,mkd call pencil#init()
+  autocmd FileType text         call pencil#init({'wrap': 'soft'})
+augroup END
+
+"""""""""""""""""""""""""""""""""""""""""""
+
 
 if $TMUX == ''
     set clipboard+=unnamed
