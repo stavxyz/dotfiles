@@ -23,7 +23,7 @@ alias g='git'
 alias vimp='vim -c ":PlugInstall|q|q"'
 
 # misc. aliases
-alias rgrep='grep --exclude .babel.json --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
+alias rgrep='grep --exclude .babel.json --exclude-dir vendor --exclude-dir build --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
 findfile () {
   echo -e "Looking for regular file $1, ignoring hidden directories.\n"
   find . -not -path '*/\.*' -type f -iname $1
