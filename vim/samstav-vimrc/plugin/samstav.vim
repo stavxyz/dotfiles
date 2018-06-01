@@ -133,6 +133,22 @@ augroup END
 """""""""""""""""""""""""""""""""""""""""""
 
 
+"""""""""" match iterm / colors
+
+let iterm_profile = $ITERM_PROFILE
+if iterm_profile == "dark"
+    set background=dark
+else
+    set background=light
+endif
+
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
+
+"""""""""""" end iterm /colors
+
 if $TMUX == ''
     set clipboard+=unnamed
 else
