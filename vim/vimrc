@@ -24,8 +24,3 @@ Plug 'reedes/vim-pencil'
 Plug '~/.vim/samstav-vimrc'
 
 call plug#end()
-
-"set background=light
-"colorscheme base16-default-dark
-"colorscheme base16-default-light
-"colorscheme hybrid
