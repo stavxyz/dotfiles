@@ -4,15 +4,6 @@ errcho() {
   >&2 echo $@
 }
 
-# tell ls to be colorful
-if [[ $OSTYPE == *"linux"* ]]; then
-  alias ls='ls --color=auto'
-elif [[ $OSTYPE == *"darwin"* ]]; then
-  alias ls='ls -aGFh'
-  alias la='ls -alsG'
-fi
-
-
 ## git aliases
 alias gitst='git status'
 alias gits='git status'
