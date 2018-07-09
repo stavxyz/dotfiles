@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/local/bin:~/.pyenv/bin:$PATH
+export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/local/bin:~/.pyenv/bin:~/.local/bin:$PATH
 
 # https://github.com/samstav/dotfiles
 export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
@@ -17,10 +17,10 @@ errcho() {
 if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
 else
+  source "${DOTFILES_DIR}/bash/shell.sh"
   source "${DOTFILES_DIR}/lang/python/python.sh"
   source "${DOTFILES_DIR}/lang/node/node.sh"
   source "${DOTFILES_DIR}/lang/go/go.sh"
-  source "${DOTFILES_DIR}/bash/shell.sh"
   source "${DOTFILES_DIR}/bash/aliases.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
     source "${DOTFILES_DIR}/bash/history.sh"
