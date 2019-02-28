@@ -21,6 +21,11 @@ curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
 # pyenv
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 pyenv update
+
+# pyenv-virtualenv
+git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper \
+  && cd $(pyenv root)/plugins/pyenv-virtualenvwrapper && git tag --list && git checkout v20140609 && cd 
+
 ```
 
 ### setup:
