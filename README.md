@@ -28,6 +28,22 @@ git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plu
 
 ```
 
+### powerline fonts
+
+From https://github.com/powerline/fonts
+
+
+```
+# clone
+git clone https://github.com/powerline/fonts.git --depth=1 powerline-fonts
+# install
+cd powerline-fonts
+./install.sh
+# clean-up a bit
+cd ..
+rm -rf powerline-fonts
+```
+
 ### setup:
 
 ```
