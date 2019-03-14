@@ -29,6 +29,7 @@ else
   if [[ $OSTYPE == *"darwin"* ]]; then
     source "${DOTFILES_DIR}/osx/osx.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
+    source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
