@@ -1,3 +1,5 @@
 click>=6.0
 colorama>=0.3
 PyYAML>=3.0
+virtualenvwrapper>=4.8.4
+keyring>=18.0.0
