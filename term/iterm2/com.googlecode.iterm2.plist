@@ -1540,7 +1540,7 @@
 	<key>MaxVertically</key>
 	<false/>
 	<key>NSNavLastRootDirectory</key>
-	<string>~/dotfiles/shell/base16-iterm2/itermcolors</string>
+	<string>~/dotfiles/term/iterm2</string>
 	<key>NSNavPanelExpandedSizeForOpenMode</key>
 	<string>{712, 448}</string>
 	<key>NSQuotedKeystrokeBinding</key>
@@ -1574,21 +1574,10 @@
 	</data>
 	<key>NSTableView Supports v2 KeyBingingTable</key>
 	<true/>
-	<key>NSToolbar Configuration com.apple.NSColorPanel</key>
-	<dict>
-		<key>TB Is Shown</key>
-		<integer>1</integer>
-	</dict>
-	<key>NSWindow Frame NSFontPanel</key>
-	<string>349 118 984 485 0 0 1440 900 </string>
-	<key>NSWindow Frame SUUpdateAlert</key>
-	<string>-1268 432 620 392 -1920 -84 1920 1080 </string>
-	<key>NSWindow Frame SessionsPreferences</key>
-	<string>269 126 606 469 0 0 1440 900 </string>
 	<key>NSWindow Frame SharedPreferences</key>
-	<string>403 271 796 473 0 0 1440 900 </string>
+	<string>850 419 916 514 0 0 3008 1669 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>0 0 1440 900 0 0 1440 900 </string>
+	<string>0 0 2560 1440 0 0 2560 1417 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -2235,13 +2224,13 @@
 			<key>Name</key>
 			<string>dark</string>
 			<key>Non Ascii Font</key>
-			<string>DroidSansMonoForPowerline 20</string>
+			<string>Menlo-Regular 24</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>DroidSansMonoForPowerline 20</string>
+			<string>Menlo-Regular 24</string>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
@@ -3067,13 +3056,13 @@
 			<key>Name</key>
 			<string>light</string>
 			<key>Non Ascii Font</key>
-			<string>DroidSansMonoForPowerline 20</string>
+			<string>Menlo-Regular 24</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>DroidSansMonoForPowerline 20</string>
+			<string>Menlo-Regular 24</string>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
@@ -3814,13 +3803,13 @@
 			<key>Name</key>
 			<string>Default</string>
 			<key>Non Ascii Font</key>
-			<string>Hack-Regular 18</string>
+			<string>Menlo-Regular 14</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>Hack-Regular 18</string>
+			<string>Menlo-Regular 14</string>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
@@ -3995,20 +3984,31 @@
 			<string>/Users/samstav</string>
 		</dict>
 	</array>
-	<key>NoSyncHaveUsedCopyMode</key>
+	<key>NoSyncHaveRequestedFullDiskAccess</key>
 	<true/>
 	<key>NoSyncHaveWarnedAboutPasteConfirmationChange</key>
 	<true/>
 	<key>NoSyncInstallationId</key>
-	<string>E911E68F-7078-46FF-ABAA-E515EF294E89</string>
-	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
-	<true/>
-	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
-	<integer>0</integer>
+	<string>4BBE24CA-E6DC-4DF2-B3D0-A02392B20CB9</string>
+	<key>NoSyncLastTipTime</key>
+	<real>574193148.04570794</real>
 	<key>NoSyncPermissionToShowTip</key>
-	<false/>
+	<true/>
+	<key>NoSyncSuppressRestartSessionConfirmationAlert</key>
+	<true/>
+	<key>NoSyncSuppressRestartSessionConfirmationAlert_selection</key>
+	<integer>0</integer>
 	<key>NoSyncTimeOfFirstLaunchOfVersionWithTip</key>
-	<real>512086018.66310197</real>
+	<real>572997638.77199805</real>
+	<key>NoSyncTipsToNotShow</key>
+	<array>
+		<string>000</string>
+		<string>0000</string>
+		<string>0001</string>
+		<string>0002</string>
+		<string>0003</string>
+		<string>0004</string>
+	</array>
 	<key>OnlyWhenMoreTabs</key>
 	<true/>
 	<key>OpenArrangementAtStartup</key>
@@ -4057,7 +4057,7 @@
 		</dict>
 	</dict>
 	<key>PrefsCustomFolder</key>
-	<string>/Users/stav/Dropbox/machine/iterm2</string>
+	<string>/Users/sstavinoha/dotfiles/term/iterm2</string>
 	<key>PromptOnQuit</key>
 	<true/>
 	<key>QuitWhenAllWindowsClosed</key>
@@ -4066,18 +4066,16 @@
 	<integer>8</integer>
 	<key>RightOption</key>
 	<integer>3</integer>
-	<key>SUAutomaticallyUpdate</key>
-	<true/>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUFeedAlternateAppNameKey</key>
 	<string>iTerm</string>
 	<key>SUFeedURL</key>
-	<string>https://iterm2.com/appcasts/final.xml?shard=57</string>
+	<string>https://iterm2.com/appcasts/final.xml?shard=34</string>
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2018-06-01T16:37:37Z</date>
+	<date>2019-03-11T16:55:14Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SavePasteHistory</key>
@@ -4137,7 +4135,7 @@
 	<key>findRegex_iTerm</key>
 	<false/>
 	<key>iTerm Version</key>
-	<string>3.1.6</string>
+	<string>3.2.7</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
