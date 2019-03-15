@@ -29,15 +29,21 @@ else
   if [[ $OSTYPE == *"darwin"* ]]; then
     source "${DOTFILES_DIR}/osx/osx.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
-    source "${DOTFILES_DIR}/term/iterm2.sh"
+    # Can't get iterm2_shell_integration to play
+    # nicely with direnv, disabling for now :(
+    #source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
     # run ./bash/fetch_autocompleters.sh to fetch these
     source $f;
   done
+  # direnv last
+  source "${DOTFILES_DIR}/bash/direnv.sh"
 fi
 
 # vim please
 export VISUAL=vim
+export EDITOR=vim
 export GIT_EDITOR=vim
+
