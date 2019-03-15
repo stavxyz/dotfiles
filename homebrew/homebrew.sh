@@ -15,3 +15,16 @@ fi
 ################################
 
 export PATH=/usr/local/opt/python/libexec/bin:$PATH
+
+#### From `brew info make` ####
+#
+# GNU "make" has been installed as "gmake".
+# If you need to use it as "make", you can add a "gnubin" directory
+# to your PATH from your bashrc like:
+#
+#    PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+#
+################################
+
+# prefer brew installed gmake
+export PATH=/usr/local/opt/make/libexec/gnubin:$PATH
