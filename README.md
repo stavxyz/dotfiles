@@ -28,6 +28,14 @@ git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plu
 
 ```
 
+### nodejs
+
+https://github.com/mklement0/n-install
+
+```
+curl -L https://git.io/n-install | bash
+```
+
 ### powerline fonts
 
 From https://github.com/powerline/fonts
@@ -42,7 +50,11 @@ cd powerline-fonts
 # clean-up a bit
 cd ..
 rm -rf powerline-fonts
-```
+``` 
+
+#### tmuxline
+
+https://github.com/edkolev/tmuxline.vim
 
 ### setup:
 
