@@ -7,4 +7,7 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 
 # Toggle module support
-GO111MODULE='on'
+export GO111MODULE='on'
+
+# gore
+alias gore='gore -autoimport'
