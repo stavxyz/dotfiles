@@ -12,10 +12,19 @@ Plug 'https://github.com/pangloss/vim-javascript.git'
 Plug 'https://github.com/isRuslan/vim-es6.git'
 Plug 'https://github.com/fatih/vim-go.git'
 
+" jq
+Plug 'https://github.com/vito-c/jq.vim'
+
+" style
+Plug 'https://github.com/prettier/vim-prettier'
+
 " status line
 let g:airline_powerline_fonts = 1
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
+" tmux/vim style, profile, and line compat
+Plug 'edkolev/tmuxline.vim'
 
 " writing
 Plug 'reedes/vim-pencil'
