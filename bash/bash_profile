@@ -20,16 +20,18 @@ else
   source "${DOTFILES_DIR}/bash/shell.sh"
   source "${DOTFILES_DIR}/bash/ssh.sh"
   source "${DOTFILES_DIR}/homebrew/homebrew.sh"
-  source "${DOTFILES_DIR}/lang/python/python.sh"
+  alias confpython="source ${DOTFILES_DIR}/lang/python/python.sh"
   source "${DOTFILES_DIR}/lang/node/node.sh"
   source "${DOTFILES_DIR}/lang/go/go.sh"
-  source "${DOTFILES_DIR}/bash/aliases.sh"
+  alias confruby="source ${DOTFILES_DIR}/lang/ruby/ruby.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
     source "${DOTFILES_DIR}/bash/history.sh"
   fi
-  if [[ $OSTYPE == *"darwin"* ]]; then
+  source "${DOTFILES_DIR}/bash/fzf.sh"
+  if [[ $OSTYPE =~ "darwin" ]]; then
     source "${DOTFILES_DIR}/osx/osx.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
+    source "${DOTFILES_DIR}/bash/asdf.sh"
     # Can't get iterm2_shell_integration to play
     # nicely with direnv, disabling for now :(
     #source "${DOTFILES_DIR}/term/iterm2.sh"
@@ -41,10 +43,10 @@ else
   done
   # direnv last
   source "${DOTFILES_DIR}/bash/direnv.sh"
+  source "${DOTFILES_DIR}/bash/aliases.sh"
 fi
 
 # vim please
 export VISUAL=vim
 export EDITOR=vim
 export GIT_EDITOR=vim
-
