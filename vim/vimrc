@@ -3,6 +3,13 @@
 "
 call plug#begin('~/.vim/plugged')
 
+" fzf
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
+
+" did you mean?
+Plug 'https://github.com/EinfachToll/DidYouMean.git'
+
 " colors
 Plug 'chriskempson/base16-vim'
 Plug 'w0ng/vim-hybrid'
@@ -24,6 +31,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " tmux/vim style, profile, and line compat
+Plug 'sjl/vitality.vim'
 Plug 'edkolev/tmuxline.vim'
 
 " writing
