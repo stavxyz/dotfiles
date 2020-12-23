@@ -14,6 +14,7 @@ force_color_prompt=yes
 BASE16_SHELL=$HOME/.config/base16-shell/
 [ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
+# https://stackoverflow.com/a/38883860
 # setup iterm / vim / tmux / mac menu bar
 # requires 'brew install dark-mode'
 function theme-switch {
@@ -22,14 +23,18 @@ function theme-switch {
  if [ $1 = "dark" ]; then
     dark-mode on 2> /dev/null # Prevent error message if dark-mode is not installed
     base16_solarized-dark 2> /dev/null # prevent error message if base16-shell is not installed
+    vim -c ":set background=dark" +Tmuxline +qall
     if tmux info &> /dev/null; then
+        echo "Setting tmux environment to * $ITERM_PROFILE *"
         tmux set-environment ITERM_PROFILE dark
         tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-dark.conf
     fi
  else
     dark-mode off 2> /dev/null
     base16_solarized-light 2> /dev/null # prevent error message if base16-shell is not installed
+    vim -c ":set background=light" +Tmuxline +qall
     if tmux info &> /dev/null; then
+        echo "Setting tmux environment to * $ITERM_PROFILE *"
         tmux set-environment ITERM_PROFILE light
         tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-light.conf
     fi
@@ -104,3 +109,6 @@ function hpwd {
 export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h${PURPLE}${ICON}\n\$ ${RESET}"
 cd  # this is to trigger evaluation of chpwd when shell comes up
 #################
+
+# enable system bash completion
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
