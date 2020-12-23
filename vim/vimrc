@@ -14,6 +14,9 @@ Plug 'https://github.com/EinfachToll/DidYouMean.git'
 Plug 'chriskempson/base16-vim'
 Plug 'w0ng/vim-hybrid'
 
+" ruby
+Plug 'vim-ruby/vim-ruby'
+
 " javascript
 Plug 'https://github.com/pangloss/vim-javascript.git'
 Plug 'https://github.com/isRuslan/vim-es6.git'
@@ -24,7 +27,7 @@ Plug 'prettier/vim-prettier', { 'branch': 'release/1.x', 'do': 'yarn install' }
 Plug 'https://github.com/vito-c/jq.vim'
 
 " style
-Plug 'https://github.com/prettier/vim-prettier'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 
 " status line
 let g:airline_powerline_fonts = 1
@@ -36,7 +39,7 @@ Plug 'sjl/vitality.vim'
 Plug 'edkolev/tmuxline.vim'
 
 " writing
-Plug 'reedes/vim-pencil'
+"Plug 'reedes/vim-pencil'
 
 " personal (local)
 Plug '~/.vim/samstav-vimrc'
