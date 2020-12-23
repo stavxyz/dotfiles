@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/local/bin:~/.pyenv/bin:~/.local/bin:$PATH
+export PATH=~/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/.pyenv/bin:~/.local/bin:$PATH
 
 # https://github.com/samstav/dotfiles
 export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
@@ -11,8 +11,35 @@ if ! git -C ${DOTFILES_DIR} diff-index --quiet HEAD --; then
 fi
 
 errcho() {
-  >&2 echo $@
+  printf "%s\n" "$@" 1>&2
 }
+
+errxit ()
+{
+  errcho "$@"
+  exit 1
+}
+
+
+# shellcheck disable=SC2120
+_err() {
+  if [ -n "${1:-}" ]; then
+    _errmsg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
+    if [ -n "${2:-}" ]; then
+      _errmsg="${_errmsg} in function '${2}'"
+    fi
+    errcho "${_errmsg}"
+  fi
+  errcho "⛔️ Script failed."
+}
+
+_sigint() {
+  errcho "🍿 Script discontinued."
+  exit 1
+}
+
+trap '_err ${LINENO} ${FUNCNAME:-}' ERR
+trap '_sigint' SIGHUP SIGINT SIGTERM
 
 if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
