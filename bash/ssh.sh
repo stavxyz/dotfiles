@@ -5,5 +5,5 @@ for _key in $(ls -A ~/.ssh/*.pub); do
     # %???? removes '.pub' to target
     # corresponding private key
     _priv="${_key%????}"
-    ssh-add "${_priv}"
+    ssh-add -q "${_priv}"
 done

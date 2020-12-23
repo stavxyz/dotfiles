@@ -183,7 +183,7 @@ let g:airline_symbols.linenr = ''
 let g:airline_symbols.space = "\ua0"
 
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-let g:airline_section_x = '%{PencilMode()}'
+"let g:airline_section_x = '%{PencilMode()}'
 
 let g:airline_theme='base16'
 
@@ -194,11 +194,11 @@ let g:airline#extensions#tabline#enabled = 1
 "let g:airline#extensions#tabline#fnamemod = ':t'
 
 
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd call pencil#init()
-  autocmd FileType text         call pencil#init({'wrap': 'soft'})
-augroup END
+"augroup pencil
+"  autocmd!
+"  autocmd FileType markdown,mkd call pencil#init()
+"  autocmd FileType text         call pencil#init({'wrap': 'soft'})
+"augroup END
 
 """""""""""""""""""""""""""""""""""""""""""
 
