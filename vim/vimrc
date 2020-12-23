@@ -3,6 +3,13 @@
 "
 call plug#begin('~/.vim/plugged')
 
+" fzf
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
+
+" did you mean?
+Plug 'https://github.com/EinfachToll/DidYouMean.git'
+
 " colors
 Plug 'chriskempson/base16-vim'
 Plug 'w0ng/vim-hybrid'
@@ -13,10 +20,20 @@ Plug 'https://github.com/isRuslan/vim-es6.git'
 Plug 'https://github.com/fatih/vim-go.git'
 Plug 'prettier/vim-prettier', { 'branch': 'release/1.x', 'do': 'yarn install' }
 
+" jq
+Plug 'https://github.com/vito-c/jq.vim'
+
+" style
+Plug 'https://github.com/prettier/vim-prettier'
+
 " status line
 let g:airline_powerline_fonts = 1
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+
+" tmux/vim style, profile, and line compat
+Plug 'sjl/vitality.vim'
+Plug 'edkolev/tmuxline.vim'
 
 " writing
 Plug 'reedes/vim-pencil'

@@ -28,6 +28,40 @@ let c_minlines=1000
 syntax sync minlines=1000
 
 
+""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""" fzf
+""""""""""""""""""""""""""""""""""""""""""""
+if executable('fzf')
+  let g:dym_use_fzf = 1
+  " FZF {{{
+  " <C-p> or <C-t> to search files
+  nnoremap <silent> <C-t> :Files <cr>
+  nnoremap <silent> <C-p> :Files <cr>
+
+  " <M-p> for open buffers
+  " nnoremap <silent> <M-p> :Buffers<cr>
+
+  " <M-S-p> for MRU
+  " nnoremap <silent> <M-S-p> :History<cr>
+
+  " Use fuzzy completion relative filepaths across directory
+  "imap <expr> <c-x><c-f> fzf#vim#complete#path('git ls-files $(git rev-parse --show-toplevel)')
+
+  " Better command history with q:
+  "command! CmdHist call fzf#vim#command_history({'right': '40'})
+  "nnoremap q: :CmdHist<CR>
+
+  " Better search history
+  "command! QHist call fzf#vim#search_history({'right': '40'})
+  "nnoremap q/ :QHist<CR>
+
+  command! -bang -nargs=* Ack call fzf#vim#ag(<q-args>, {'down': '40%', 'options': --no-color'})
+  " }}}
+else
+  " Sorry
+end
+
+
 "
 " change indent depending on filetype
 " -----------------------------------
@@ -118,15 +152,47 @@ let g:prettier#config#single_quote = 'true'
 " ************************************
 
 " statusline / airline conf
+let g:airline_powerline_fonts = 1
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
+
+" unicode symbols
+let g:airline_left_sep = '»'
+let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+let g:airline_right_sep = '◀'
+let g:airline_symbols.linenr = '␊'
+let g:airline_symbols.linenr = '␤'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.paste = 'ρ'
+let g:airline_symbols.paste = 'Þ'
+let g:airline_symbols.paste = '∥'
+let g:airline_symbols.whitespace = 'Ξ'
+
+" airline symbols
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
+let g:airline_symbols.branch = ''
+let g:airline_symbols.readonly = ''
+let g:airline_symbols.linenr = ''
+
 let g:airline_symbols.space = "\ua0"
 
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline_section_x = '%{PencilMode()}'
 
 let g:airline_theme='base16'
+
+" Enable the list of buffers
+let g:airline#extensions#tabline#enabled = 1
+
+" Show just the filename
+"let g:airline#extensions#tabline#fnamemod = ':t'
+
 
 augroup pencil
   autocmd!
