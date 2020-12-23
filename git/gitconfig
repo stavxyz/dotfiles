@@ -15,7 +15,7 @@
         rebase-ours = rebase --interactive --autostash --merge --strategy recursive --strategy-option ours
         rebase-theirs = rebase --interactive --autostash --merge --strategy recursive --strategy-option theirs
         reup = rebase --interactive --autostash origin/master
-        pull = pull --autostash
+        pull = pull --autostash --rebase
         fpush = "!f() { git push --verbose --progress --atomic --force-with-lease origin $(git rev-parse --abbrev-ref HEAD); }; f"
         master = "!f() { git stash save 'heading-to-master' && git checkout master && git fetch origin master && git reset --hard origin/master && git stashes; }; f"
 [format]

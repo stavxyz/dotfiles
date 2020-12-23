@@ -103,6 +103,10 @@ set ruler
 let g:go_fmt_command = "goimports"
 let g:go_metalinter_autosave = 1
 
+" single quotes over double quotes
+" Prettier default: false
+let g:prettier#config#single_quote = 'true'
+
 " ************ Status Line *************
 
 "set statusline=%t       "tail of the filename
