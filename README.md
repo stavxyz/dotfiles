@@ -8,16 +8,17 @@ dotfiles
 python & pip  
 [pyenv](https://github.com/pyenv/pyenv)
 
+### pyenv 
 
-```bash
-# vim-plug for regular vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+https://github.com/pyenv/pyenv/wiki/common-build-problems#prerequisites
 
-# vim-plug for neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    
+```
+sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+```
+
+```
 # pyenv
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
@@ -30,7 +31,18 @@ pyenv update
 # pyenv-virtualenv
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper \
   && cd $(pyenv root)/plugins/pyenv-virtualenvwrapper && git tag --list && git checkout v20140609 && cd 
+```
 
+### vim things
+
+```bash
+# vim-plug for regular vim
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+# vim-plug for neovim
+curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
 
 ### nodejs
