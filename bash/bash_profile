@@ -22,6 +22,7 @@ errxit ()
 
 # shellcheck disable=SC2120
 _err() {
+  errcho $@
   if [ -n "${1:-}" ]; then
     _errmsg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
     if [ -n "${2:-}" ]; then
@@ -44,7 +45,7 @@ if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
 else
   source "${DOTFILES_DIR}/bash/dotfiles.sh"
-  source "${DOTFILES_DIR}/bash/shell.sh"
+  source "${DOTFILES_DIR}/bash/prompt.sh"
   source "${DOTFILES_DIR}/bash/ssh.sh"
   source "${DOTFILES_DIR}/homebrew/homebrew.sh"
   alias confpython="source ${DOTFILES_DIR}/lang/python/python.sh"
@@ -70,6 +71,7 @@ else
   done
   # direnv last
   source "${DOTFILES_DIR}/bash/direnv.sh"
+  source "${DOTFILES_DIR}/bash/colors.sh"
   source "${DOTFILES_DIR}/bash/aliases.sh"
 fi
 

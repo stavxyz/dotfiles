@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if ! [[ $OSTYPE == *"darwin"* ]]; then
+  return
+fi
+
 # requires python-keyring
 export HOMEBREW_GITHUB_API_TOKEN=`keyring get homebrew github_api_token`
 if [ -f $(brew --prefix)/etc/bash_completion ]; then
