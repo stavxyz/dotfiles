@@ -52,7 +52,6 @@ chpwd () {
     *) HPWD="$PWD";;
   esac
 }
-#PS1='$HPWD \$'
 
 function hpwd {
     echo $HPWD
@@ -62,8 +61,9 @@ export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h${P
 cd  # this is to trigger evaluation of chpwd when shell comes up
 #################
 
+
 # enable system bash completion
-if [[ -f "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
+if [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && [[ -f "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
   source "/usr/local/etc/profile.d/bash_completion.sh"
 else
   errcho "Could not find bash completion script."
