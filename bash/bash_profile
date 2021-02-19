@@ -62,7 +62,7 @@ else
     source "${DOTFILES_DIR}/bash/asdf.sh"
     # Can't get iterm2_shell_integration to play
     # nicely with direnv, disabling for now :(
-    #source "${DOTFILES_DIR}/term/iterm2.sh"
+    source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
@@ -79,3 +79,5 @@ fi
 export VISUAL=vim
 export EDITOR=vim
 export GIT_EDITOR=vim
+
+trap - ERR
