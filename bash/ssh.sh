@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-eval "$(ssh-agent -s)"
+eval "$(ssh-agent -s)" > /dev/null
 
-if [ ! -d "~/.ssh" ]; then
-  echo "~/.ssh dir DNE, skipping."
+if ! [[ -d "${HOME}/.ssh" ]]; then
+  errcho "~/.ssh dir DNE, skipping."
 else
   for _key in $(ls -A ~/.ssh/*.pub); do
       # %???? removes '.pub' to target
