@@ -21,6 +21,14 @@ errxit ()
   exit 1
 }
 
+debug ()
+{
+  if [ -n ${DOTFILES_DEBUG:-''} ]; then
+    errcho "$@"
+  fi
+}
+
+
 
 # shellcheck disable=SC2120
 _err() {
@@ -46,12 +54,19 @@ trap '_sigint' SIGHUP SIGINT SIGTERM
 if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
 else
+  debug "sourcing dotfiles.sh"
   source "${DOTFILES_DIR}/bash/dotfiles.sh"
+  debug "sourcing prompt.sh"
   source "${DOTFILES_DIR}/bash/prompt.sh"
+  debug "sourcing ssh.sh"
   source "${DOTFILES_DIR}/bash/ssh.sh"
+  debug "sourcing homebrew.sh"
   source "${DOTFILES_DIR}/homebrew/homebrew.sh"
-  alias confpython="source ${DOTFILES_DIR}/lang/python/python.sh"
+  debug "sourcing python.sh"
+  source ${DOTFILES_DIR}/lang/python/python.sh
+  debug "sourcing node.sh"
   source "${DOTFILES_DIR}/lang/node/node.sh"
+  debug "sourcing go.sh"
   source "${DOTFILES_DIR}/lang/go/go.sh"
   alias confruby="source ${DOTFILES_DIR}/lang/ruby/ruby.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
@@ -59,21 +74,29 @@ else
   fi
   source "${DOTFILES_DIR}/bash/fzf.sh"
   if [[ $OSTYPE =~ "darwin" ]]; then
+    debug "sourcing osx.sh"
     source "${DOTFILES_DIR}/osx/osx.sh"
+    debug "sourcing karabiner.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
+    debug "sourcing asdf.sh"
     source "${DOTFILES_DIR}/bash/asdf.sh"
     # Can't get iterm2_shell_integration to play
     # nicely with direnv, disabling for now :(
-    source "${DOTFILES_DIR}/term/iterm2.sh"
+    debug "sourcing iterm2.sh"
+    #source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
     # run ./bash/fetch_autocompleters.sh to fetch these
+    debug "sourcing $f"
     source $f;
   done
   # direnv last
+  debug "sourcing direnv.sh"
   source "${DOTFILES_DIR}/bash/direnv.sh"
+  debug "sourcing colors.sh"
   source "${DOTFILES_DIR}/bash/colors.sh"
+  debug "sourcing aliases.sh"
   source "${DOTFILES_DIR}/bash/aliases.sh"
 fi
 
