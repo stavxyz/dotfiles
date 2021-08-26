@@ -73,6 +73,7 @@ else
     source "${DOTFILES_DIR}/bash/history.sh"
   fi
   source "${DOTFILES_DIR}/bash/fzf.sh"
+  source "${DOTFILES_DIR}/bash/chef.sh"
   if [[ $OSTYPE =~ "darwin" ]]; then
     debug "sourcing osx.sh"
     source "${DOTFILES_DIR}/osx/osx.sh"
