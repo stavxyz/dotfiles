@@ -70,9 +70,12 @@ else
   source "${DOTFILES_DIR}/lang/go/go.sh"
   alias confruby="source ${DOTFILES_DIR}/lang/ruby/ruby.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
+    debug "sourcing bash/history.sh"
     source "${DOTFILES_DIR}/bash/history.sh"
   fi
+  debug "sourcing bash/fzf.sh"
   source "${DOTFILES_DIR}/bash/fzf.sh"
+  debug "sourcing bash/chef.sh"
   source "${DOTFILES_DIR}/bash/chef.sh"
   if [[ $OSTYPE =~ "darwin" ]]; then
     debug "sourcing osx.sh"
