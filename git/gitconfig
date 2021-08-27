@@ -16,7 +16,7 @@
         rebase-theirs = rebase --interactive --autostash --merge --strategy recursive --strategy-option theirs
         reup = rebase --interactive --autostash origin/master
         pull = pull --autostash --rebase
-        fpush = "!f() { git push --verbose --progress --atomic --force-with-lease origin $(git rev-parse --abbrev-ref HEAD); }; f"
+        fpush = "!f() { git push --verbose --progress --atomic --force-with-lease "${1:-origin}" $(git rev-parse --abbrev-ref HEAD); }; f"
         master = "!f() { git stash save 'heading-to-master' && git checkout master && git fetch origin master && git reset --hard origin/master && git stashes; }; f"
 [format]
         pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
