@@ -9,6 +9,7 @@ _cmd_exists () {
 }
 
 if _cmd_exists chef; then
+  export CHEF_LICENSE='accept'
   _chefgembin="$(chef exec 'echo $GEM_HOME')/bin"
   export PATH=$PATH:"${_chefgembin}"
   alias chefirb='/opt/chef-workstation/embedded/bin/irb'
