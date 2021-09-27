@@ -9,6 +9,10 @@ else
       # %???? removes '.pub' to target
       # corresponding private key
       _priv="${_key%????}"
-      [[ -f "${_priv}" ]] && ssh-add -q "${_priv}"
+      if [ -f "${_priv}" ]; then
+        ssh-add -q "${_priv}"
+      else
+        errcho "corresponding private key ${_priv} does not exist"
+      fi
   done
 fi
