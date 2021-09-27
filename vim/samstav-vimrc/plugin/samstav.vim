@@ -136,6 +136,8 @@ set ruler
 " golang (fatih/vim-go)
 let g:go_fmt_command = "goimports"
 let g:go_metalinter_autosave = 1
+let g:go_imports_autosave = 1
+let g:go_fmt_autosave = 1
 
 " single quotes over double quotes
 " Prettier default: false
@@ -201,6 +203,12 @@ let g:airline#extensions#tabline#enabled = 1
 "augroup END
 
 """""""""""""""""""""""""""""""""""""""""""
+
+" wrap long lines in quickfix
+augroup quickfix
+    autocmd!
+    autocmd FileType qf setlocal wrap
+augroup END
 
 
 """""""""" match iterm / colors
