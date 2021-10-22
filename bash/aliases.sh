@@ -35,6 +35,15 @@ jsonvalue ()
     echo $1 | jq -r --arg KEY $2 '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
 }
 
+# openssl
+
+# display certs from an https url
+getcert() {
+  local url="$1"
+  local parsed_url=$(printf "%s" "${url}" | sed 's|https://||g')
+  printf '\n' | openssl s_client -connect "$parsed_url":443 -showcerts | openssl x509 -noout -text
+}
+
 
 # dates
 
@@ -52,3 +61,5 @@ ago ()
 if [ -d ~/.aliases ]; then
   for f in ~/.aliases/*; do source $f; done
 fi
+
+
