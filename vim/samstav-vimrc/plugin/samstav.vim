@@ -138,10 +138,17 @@ let g:go_fmt_command = "goimports"
 let g:go_metalinter_autosave = 1
 let g:go_imports_autosave = 1
 let g:go_fmt_autosave = 1
+"let g:go_metalinter_enabled = ['vet', 'revive', 'errcheck']
+"let g:go_metalinter_command = "golangci-lint"
+
 
 " single quotes over double quotes
 " Prettier default: false
 let g:prettier#config#single_quote = 'true'
+
+" github.com/kristijanhusak/vim-js-file-import
+let g:js_file_import_sort_after_insert = 1
+let g:js_file_import_use_fzf = 1
 
 " ************ Status Line *************
 

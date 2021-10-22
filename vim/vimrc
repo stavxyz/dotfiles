@@ -22,6 +22,7 @@ Plug 'https://github.com/pangloss/vim-javascript.git'
 Plug 'https://github.com/isRuslan/vim-es6.git'
 Plug 'https://github.com/fatih/vim-go.git'
 "Plug 'prettier/vim-prettier', { 'branch': 'release/1.x', 'do': 'yarn install' }
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 
 " jq
 Plug 'https://github.com/vito-c/jq.vim'
