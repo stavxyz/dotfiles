@@ -14,10 +14,10 @@
         rb = rebase --interactive --autostash
         rebase-ours = rebase --interactive --autostash --merge --strategy recursive --strategy-option ours
         rebase-theirs = rebase --interactive --autostash --merge --strategy recursive --strategy-option theirs
-        reup = rebase --interactive --autostash origin/master
+        reup = "!f() { git rebase --interactive --autostash ${1:-origin}/${2:-master}; }; f"
         pull = pull --autostash --rebase
         fpush = "!f() { git push --verbose --progress --atomic --force-with-lease "${1:-origin}" $(git rev-parse --abbrev-ref HEAD); }; f"
-        master = "!f() { git stash save 'heading-to-master' && git checkout master && git fetch origin master && git reset --hard origin/master && git stashes; }; f"
+        main = "!f() { git stash save 'heading-to-${1:-master}' && git checkout ${1:-master} && git fetch origin ${1:-master} && git reset --hard origin/${1:-master} && git stashes; }; f"
 [format]
         pretty = %Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset
 [color]
@@ -35,3 +35,8 @@
 	rebase = true
 [init]
 	defaultBranch = trunk
+[hub]
+	host = github.internal.digitalocean.com
+	host = github.internal.digitalocean.com
+[includeIf "gitdir:~/do/"]
+    path = ~/.gitconfig-digitalocean
