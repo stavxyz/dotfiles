@@ -59,32 +59,25 @@ else
   source "${DOTFILES_DIR}/bash/dotfiles.sh"
   debug "sourcing prompt.sh"
   source "${DOTFILES_DIR}/bash/prompt.sh"
-  debug "sourcing ssh.sh"
-  source "${DOTFILES_DIR}/bash/ssh.sh"
   debug "sourcing homebrew.sh"
   source "${DOTFILES_DIR}/homebrew/homebrew.sh"
   debug "sourcing python.sh"
   source ${DOTFILES_DIR}/lang/python/python.sh
-  debug "sourcing node.sh"
-  source "${DOTFILES_DIR}/lang/node/node.sh"
-  debug "sourcing go.sh"
-  source "${DOTFILES_DIR}/lang/go/go.sh"
-  alias confruby="source ${DOTFILES_DIR}/lang/ruby/ruby.sh"
+  #debug "sourcing go.sh"
+  #source "${DOTFILES_DIR}/lang/go/go.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
     debug "sourcing bash/history.sh"
     source "${DOTFILES_DIR}/bash/history.sh"
   fi
   debug "sourcing bash/fzf.sh"
   source "${DOTFILES_DIR}/bash/fzf.sh"
-  debug "sourcing bash/chef.sh"
-  source "${DOTFILES_DIR}/bash/chef.sh"
   if [[ $OSTYPE =~ "darwin" ]]; then
     debug "sourcing osx.sh"
     source "${DOTFILES_DIR}/osx/osx.sh"
     debug "sourcing karabiner.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
-    debug "sourcing asdf.sh"
-    source "${DOTFILES_DIR}/bash/asdf.sh"
+    # debug "sourcing asdf.sh"
+    # source "${DOTFILES_DIR}/bash/asdf.sh"
     # Can't get iterm2_shell_integration to play
     # nicely with direnv, disabling for now :(
     debug "sourcing iterm2.sh"
@@ -106,8 +99,12 @@ else
 fi
 
 # vim please
-export VISUAL=vim
-export EDITOR=vim
-export GIT_EDITOR=vim
+export VISUAL=nvim
+export EDITOR=nvim
+export GIT_EDITOR=nvim
+
+alias vim="nvim"
+alias vi="nvim"
+alias oldvim="\vim"
 
 trap - ERR

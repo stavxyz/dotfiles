@@ -1,7 +1,7 @@
 "
 " PLUGINS
 "
-call plug#begin('~/.vim/plugged')
+call plug#begin()
 
 " fzf
 Plug '/usr/local/opt/fzf'

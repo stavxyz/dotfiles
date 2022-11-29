@@ -36,11 +36,9 @@ links:
     ~/.bash_aliases:                        bash/bash_aliases
     ~/.bashrc:                              bash/bashrc
     ~/.vimrc:                               vim/vimrc
-    ~/.config/nvim/init.vim:                vim/vimrc
     ~/.vim/samstav-vimrc:                   vim/samstav-vimrc
+    ~/.config/nvim/init.vim:                vim/vimrc
     ~/.tmux.conf:                           tmux/tmux.conf
-    ~/.pdbrc.py:                            lang/python/pdbrc.py
-    ~/.pystartup/.pythonrc:                 lang/python/pystartup/pythonrc
     ~/.gitignore_global:                    git/gitignore_global
     ~/.gitconfig:                           git/gitconfig
     ~/.config/karabiner/karabiner.json:     karabiner/karabiner.json
@@ -48,8 +46,6 @@ links:
     ~/.config/base16-shell:                 shell/base16-shell
 
 brew:
-    tap:
-        jpbochi/tap
     install:
         - pyenv
         - jq
@@ -58,7 +54,5 @@ brew:
         - vim --with-override-system-vi
         - neovim
         - macvim
-        - node
-        - yarn
         - reattach-to-user-namespace
         - drun
