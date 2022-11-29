@@ -10,6 +10,11 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   source $(brew --prefix)/etc/bash_completion
 fi
 
+if brew_mysql_prefix=$(brew --prefix mysql-client); then
+	export PATH=$PATH:$brew_mysql_prefix/bin
+fi
+
+
 #### From `brew info python` ###
 #
 # Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
