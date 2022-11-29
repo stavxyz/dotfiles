@@ -78,6 +78,7 @@ autocmd FileType ipy setlocal shiftwidth=4 tabstop=4
 autocmd FileType python setlocal shiftwidth=4 tabstop=4
 autocmd FileType c setlocal cindent
 autocmd FileType h setlocal cindent
+autocmd FileType sh set noexpandtab
 
 "dont ask me about changes when I switch buffers
 "automatically set the file with changes as 'hidden'
@@ -134,12 +135,22 @@ set listchars=tab:>.,trail:⋮,extends:#,nbsp:.
 set ruler
 
 " golang (fatih/vim-go)
-let g:go_fmt_command = "goimports"
+"let g:go_fmt_command = "goimports"
+let g:go_fmt_command="gopls"
+let g:go_gopls_gofumpt=1
 let g:go_metalinter_autosave = 1
 let g:go_imports_autosave = 1
-let g:go_fmt_autosave = 1
+let g:go_fmt_autosave = 0
 "let g:go_metalinter_enabled = ['vet', 'revive', 'errcheck']
-"let g:go_metalinter_command = "golangci-lint"
+let g:go_metalinter_command = "golangci-lint"
+
+" golang highlighting
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_operators = 1
 
 
 " single quotes over double quotes
