@@ -4,36 +4,4 @@ if ! [[ $OSTYPE == *"darwin"* ]]; then
   return
 fi
 
-# requires python-keyring
-#export HOMEBREW_GITHUB_API_TOKEN=`keyring get homebrew github_api_token`
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-  source $(brew --prefix)/etc/bash_completion
-fi
-
-if brew_mysql_prefix=$(brew --prefix mysql-client); then
-	export PATH=$PATH:$brew_mysql_prefix/bin
-fi
-
-
-#### From `brew info python` ###
-#
-# Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
-# `python3`, `python3-config`, `pip3` etc., respectively, have been installed into
-#  /usr/local/opt/python/libexec/bin
-#
-################################
-
-export PATH=/usr/local/opt/python/libexec/bin:$PATH
-
-#### From `brew info make` ####
-#
-# GNU "make" has been installed as "gmake".
-# If you need to use it as "make", you can add a "gnubin" directory
-# to your PATH from your bashrc like:
-#
-#    PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
-#
-################################
-
-# prefer brew installed gmake
-export PATH=/usr/local/opt/make/libexec/gnubin:$PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"

@@ -65,7 +65,7 @@ def _filetype(path):
 def cli(ctx, config=None, **options):
     """dotfiles CLI"""
     if config:
-        config = yaml.load(config)
+        config = yaml.safe_load(config)
     ctx.obj['config'] = config or {}
     if not ctx.obj['config'].get('home'):
         ctx.obj['config']['home'] = options['home']
