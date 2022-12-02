@@ -17,11 +17,13 @@ BASE16_SHELL=$HOME/.config/base16-shell/
 # requires 'brew install dark-mode'
 function theme-switch {
  echo -e "\033]50;SetProfile=$1\a"
- export ITERM_PROFILE=$1
  if [ $1 = "dark" ]; then
     dark-mode on 2> /dev/null # Prevent error message if dark-mode is not installed
     base16_solarized-dark 2> /dev/null # prevent error message if base16-shell is not installed
-    vim -c ":set background=dark" +Tmuxline +qall
+    if ! base16_solarized-dark; then
+        it2setcolor preset 'Solarized Dark'
+    fi
+    nvim -c ":set background=dark" +Tmuxline +qall
     if tmux info &> /dev/null; then
         echo "Setting tmux environment to * $ITERM_PROFILE *"
         tmux set-environment ITERM_PROFILE dark
@@ -29,8 +31,10 @@ function theme-switch {
     fi
  else
     dark-mode off 2> /dev/null
-    base16_solarized-light 2> /dev/null # prevent error message if base16-shell is not installed
-    vim -c ":set background=light" +Tmuxline +qall
+    if ! base16_solarized-light; then
+        it2setcolor preset 'Solarized Light'
+    fi
+    nvim -c ":set background=light" +Tmuxline +qall
     if tmux info &> /dev/null; then
         echo "Setting tmux environment to * $ITERM_PROFILE *"
         tmux set-environment ITERM_PROFILE light

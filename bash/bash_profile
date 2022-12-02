@@ -81,7 +81,7 @@ else
     # Can't get iterm2_shell_integration to play
     # nicely with direnv, disabling for now :(
     debug "sourcing iterm2.sh"
-    #source "${DOTFILES_DIR}/term/iterm2.sh"
+    source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
   # autocomplete scm, tmux
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
