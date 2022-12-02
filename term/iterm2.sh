@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+if test -f "${HOME}/.iterm2_shell_integration.bash"; then
+    source "${HOME}/.iterm2_shell_integration.bash"
+fi
