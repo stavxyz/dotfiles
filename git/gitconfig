@@ -39,5 +39,8 @@
 [hub]
 	host = github.internal.digitalocean.com
 	host = github.internal.digitalocean.com
+
 [includeIf "gitdir:~/do/"]
     path = ~/.gitconfig-digitalocean
+[http]
+	sslverify = false
