@@ -109,3 +109,5 @@ alias vi="nvim"
 alias oldvim="\vim"
 
 trap - ERR
+
+complete -C /opt/homebrew/bin/vault vault
