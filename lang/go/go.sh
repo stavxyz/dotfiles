@@ -2,3 +2,5 @@
 
 # gore
 alias gore='gore -autoimport'
+
+export PATH=$PATH:~/go/bin
