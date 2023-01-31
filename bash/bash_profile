@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 export PATH=~/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/.pyenv/bin:~/.local/bin:$PATH
