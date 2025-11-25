@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 errcho() {
-  >&2 echo $@
+  >&2 echo "$@"
 }
 
 ## git aliases
@@ -17,7 +17,7 @@ alias vimp='vim -c ":PlugInstall|q|q"'
 alias rgrep='grep --exclude .babel.json --exclude-dir vendor --exclude-dir build --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
 findfile () {
   >&2 echo -e "Looking for regular file $1, ignoring hidden directories.\n"
-  find . -not -path '*/\.*' -type f -iname $1
+  find . -not -path '*/\.*' -type f -iname "$1"
 }
 
 # jason is a person
@@ -32,7 +32,7 @@ jsonvalue ()
         errcho 'Usage: jsonvalue <jsondata> <key>';
         return 1;
     fi
-    echo $1 | jq -r --arg KEY $2 '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
+    echo "$1" | jq -r --arg KEY "$2" '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
 }
 
 # openssl
@@ -59,7 +59,7 @@ ago ()
 ######################
 
 if [ -d ~/.aliases ]; then
-  for f in ~/.aliases/*; do source $f; done
+  for f in ~/.aliases/*; do source "$f"; done
 fi
 
 
