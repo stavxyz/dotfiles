@@ -73,6 +73,8 @@ else
   fi
   debug "sourcing bash/fzf.sh"
   source "${DOTFILES_DIR}/bash/fzf.sh"
+  debug "sourcing bash/volta.sh"
+  source "${DOTFILES_DIR}/bash/volta.sh"
   if [[ $OSTYPE =~ "darwin" ]]; then
     debug "sourcing osx.sh"
     source "${DOTFILES_DIR}/osx/osx.sh"
@@ -115,5 +117,3 @@ alias vi="nvim"
 alias oldvim="\vim"
 
 trap - ERR
-
-complete -C /opt/homebrew/bin/vault vault
