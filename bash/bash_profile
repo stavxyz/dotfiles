@@ -3,7 +3,7 @@
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-export PATH=~/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/.pyenv/bin:~/.local/bin:$PATH
+export PATH=~/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/.pyenv/bin:~/.local/bin:/opt/homebrew/opt/openjdk/bin:$PATH
 
 # The primary requirement for using the dotfiles project
 # is setting DOTFILES_DIR...
@@ -66,6 +66,7 @@ else
   source ${DOTFILES_DIR}/lang/python/python.sh
   #debug "sourcing go.sh"
   #source "${DOTFILES_DIR}/lang/go/go.sh"
+  debug "looking for bash/history.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
     debug "sourcing bash/history.sh"
     source "${DOTFILES_DIR}/bash/history.sh"
@@ -88,7 +89,12 @@ else
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
     # run ./bash/fetch_autocompleters.sh to fetch these
     debug "sourcing $f"
-    source $f;
+    if ! output="$(source $f 2>&1)"; then
+        debug "failed to source $f"
+        debug ${output}
+        break
+    fi
+    debug "finished sourcing $f"
   done
   # direnv last
   debug "sourcing direnv.sh"
