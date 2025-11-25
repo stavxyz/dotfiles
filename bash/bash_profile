@@ -25,7 +25,7 @@ errxit ()
 #DOTFILES_DEBUG=1
 debug ()
 {
-  if [ -n ${DOTFILES_DEBUG:-''} ]; then
+  if [ -n "${DOTFILES_DEBUG:-''}" ]; then
     errcho "$@"
   fi
 }
@@ -34,7 +34,7 @@ debug ()
 
 # shellcheck disable=SC2120
 _err() {
-  errcho $@
+  errcho "$@"
   if [ -n "${1:-}" ]; then
     _errmsg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
     if [ -n "${2:-}" ]; then
@@ -56,14 +56,22 @@ trap '_sigint' SIGHUP SIGINT SIGTERM
 if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
 else
+  # Load utility functions first
+  debug "sourcing utils.sh"
+  source "${DOTFILES_DIR}/bash/utils.sh"
+
   debug "sourcing dotfiles.sh"
   source "${DOTFILES_DIR}/bash/dotfiles.sh"
   debug "sourcing prompt.sh"
   source "${DOTFILES_DIR}/bash/prompt.sh"
+
+  # Only source homebrew if brew command exists
   debug "sourcing homebrew.sh"
-  source "${DOTFILES_DIR}/homebrew/homebrew.sh"
+  source_if_command_exists "brew" "${DOTFILES_DIR}/homebrew/homebrew.sh"
+
+  # Only source python if pyenv exists
   debug "sourcing python.sh"
-  source ${DOTFILES_DIR}/lang/python/python.sh
+  source_if_command_exists "pyenv" "${DOTFILES_DIR}/lang/python/python.sh"
   #debug "sourcing go.sh"
   #source "${DOTFILES_DIR}/lang/go/go.sh"
   debug "looking for bash/history.sh"
@@ -91,16 +99,16 @@ else
   for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
     # run ./bash/fetch_autocompleters.sh to fetch these
     debug "sourcing $f"
-    if ! output="$(source $f 2>&1)"; then
+    if ! output="$(source "$f" 2>&1)"; then
         debug "failed to source $f"
-        debug ${output}
+        debug "${output}"
         break
     fi
     debug "finished sourcing $f"
   done
-  # direnv last
+  # direnv last (only if direnv command exists)
   debug "sourcing direnv.sh"
-  source "${DOTFILES_DIR}/bash/direnv.sh"
+  source_if_command_exists "direnv" "${DOTFILES_DIR}/bash/direnv.sh"
   debug "sourcing colors.sh"
   source "${DOTFILES_DIR}/bash/colors.sh"
   debug "sourcing aliases.sh"
@@ -116,4 +124,5 @@ alias vim="nvim"
 alias vi="nvim"
 alias oldvim="\vim"
 
-trap - ERR
+# Allow interactive commands to fail without triggering ERR trap
+set +e
