@@ -5,3 +5,5 @@ doc/tags
 .vim/bundle
 .bash_history
 *history*
+
+.claude
