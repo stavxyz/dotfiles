@@ -63,8 +63,32 @@ cd  # this is to trigger evaluation of chpwd when shell comes up
 
 
 # enable system bash completion
-if [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && [[ -f "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
+# Try various locations based on OS and package manager
+_bash_completion_loaded=false
+
+if [[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]]; then
+  # macOS with Homebrew (Apple Silicon)
+  source "/opt/homebrew/etc/profile.d/bash_completion.sh"
+  _bash_completion_loaded=true
+elif [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]]; then
+  # macOS with Homebrew (Intel)
   source "/usr/local/etc/profile.d/bash_completion.sh"
-else
-  errcho "Could not find bash completion script."
+  _bash_completion_loaded=true
+elif [[ -r "/usr/share/bash-completion/bash_completion" ]]; then
+  # Linux (Debian/Ubuntu with bash-completion package)
+  source "/usr/share/bash-completion/bash_completion"
+  _bash_completion_loaded=true
+elif [[ -r "/etc/bash_completion" ]]; then
+  # Linux (older systems / alternative location)
+  source "/etc/bash_completion"
+  _bash_completion_loaded=true
 fi
+
+# If no system-wide bash completion, try to load git completion directly
+if [[ "$_bash_completion_loaded" == "false" ]]; then
+  if [[ -r "/usr/share/bash-completion/completions/git" ]]; then
+    source "/usr/share/bash-completion/completions/git"
+  fi
+fi
+
+unset _bash_completion_loaded
