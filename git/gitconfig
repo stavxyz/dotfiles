@@ -1,6 +1,6 @@
 [user]
         name = Sam Stavinoha
-        email = smlstvnh@gmail.com
+        email = hi@stav.xyz
 [alias]
         stashes = stash list
         branches = branch -a -v --color
