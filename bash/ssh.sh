@@ -5,7 +5,10 @@ eval "$(ssh-agent -s)" > /dev/null
 if ! [[ -d "${HOME}/.ssh" ]]; then
   errcho "${HOME}/.ssh dir DNE, skipping."
 else
-  for _key in $(ls -1A ~/.ssh/*.pub); do
+  for _key in ~/.ssh/*.pub; do
+      # Skip if glob didn't match any files
+      [[ -f "$_key" ]] || continue
+
       # %???? removes '.pub' to target
       # corresponding private key
       _priv="${_key%????}"

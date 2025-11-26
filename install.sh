@@ -17,6 +17,14 @@ set -euo pipefail
 echo "Installing dotfiles prerequisites..."
 
 # ============================================================================
+# Dotfiles Framework Directories
+# ============================================================================
+
+echo "Creating dotfiles framework directories..."
+mkdir -p "${HOME}/.dot/state"
+echo "✓ Created ~/.dot/state/"
+
+# ============================================================================
 # Vim Plugin Manager
 # ============================================================================
 

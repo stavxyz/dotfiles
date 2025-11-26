@@ -22,6 +22,9 @@ alias vimp='vim -c ":PlugInstall|q|q"'
 # Search Utilities
 # ============================================================================
 
+# Enable colored grep output
+alias grep='grep --color=auto'
+
 # Recursive grep with common excludes
 alias rgrep='grep \
   --exclude .babel.json \
