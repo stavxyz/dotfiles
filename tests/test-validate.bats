@@ -19,15 +19,15 @@ setup() {
 }
 
 @test "utilities module exists and loads" {
-    if [ -f "$DOTFILES_DIR/bash/utils.sh" ]; then
-        run bash -c "source $DOTFILES_DIR/bash/utils.sh && type command_exists"
+    if [ -f "$DOTFILES_DIR/modules/static/10-utils.sh" ]; then
+        run bash -c "source $DOTFILES_DIR/modules/static/10-utils.sh && type command_exists"
         [ "$status" -eq 0 ]
     fi
 }
 
 @test "config module exists and loads" {
-    if [ -f "$DOTFILES_DIR/bash/config.sh" ]; then
-        run bash -c "source $DOTFILES_DIR/bash/config.sh && echo \$DOTFILES_LAZY_PYENV"
+    if [ -f "$DOTFILES_DIR/modules/static/20-config.sh" ]; then
+        run bash -c "source $DOTFILES_DIR/modules/static/20-config.sh && echo \$DOTFILES_LAZY_PYENV"
         [ "$status" -eq 0 ]
     fi
 }
