@@ -83,7 +83,11 @@ jobs:
               console.log('Could not read validation output');
             }
 
-            const body = `## 🧪 Test Results
+            const os = '${{ matrix.os }}';
+            const osEmoji = os.includes('macos') ? '🍎' : '🐧';
+            const osName = os.includes('macos') ? 'macOS' : 'Linux';
+
+            const body = `## ${osEmoji} Test Results (${osName})
 
             ### ✅ Validation Tests
             \`\`\`
@@ -96,9 +100,9 @@ jobs:
             \`\`\`
 
             ---
-            *Tests run on \`${{ matrix.os }}\`*`;
+            *Platform: \`${os}\`*`;
 
-            // Find existing comment
+            // Find existing comment for this OS
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -107,7 +111,7 @@ jobs:
 
             const botComment = comments.find(comment =>
               comment.user.type === 'Bot' &&
-              comment.body.includes('🧪 Test Results')
+              comment.body.includes(`Test Results (${osName})`)
             );
 
             if (botComment) {
