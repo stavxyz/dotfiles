@@ -2,7 +2,7 @@
 #
 # Dotfiles Installation Script
 #
-# This script installs prerequisites and symlinks configuration files.
+# This script installs prerequisites for the dotfiles system.
 # Run: ./install.sh
 #
 # Prerequisites installed:
@@ -16,22 +16,41 @@ set -euo pipefail
 
 echo "Installing dotfiles prerequisites..."
 
-# Install vim-plug for Vim
+# ============================================================================
+# Vim Plugin Manager
+# ============================================================================
+
 echo "Installing vim-plug..."
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
+# ============================================================================
+# Python Environment Manager (pyenv)
+# ============================================================================
 
-# pyenv
+echo "Installing pyenv..."
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+
+echo "Updating pyenv..."
 pyenv update
 
-export PATH="/root/.pyenv/bin:$PATH"
+# Setup pyenv for this session
+export PATH="${HOME}/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
+# ============================================================================
+# Python Virtual Environment Tools
+# ============================================================================
 
+echo "Installing pyenv-virtualenvwrapper..."
 git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git \
-  $(pyenv root)/plugins/pyenv-virtualenvwrapper && \
-  cd $(pyenv root)/plugins/pyenv-virtualenvwrapper && \
-  git tag --list && git checkout v20140609
+  "$(pyenv root)/plugins/pyenv-virtualenvwrapper"
+
+echo ""
+echo "✅ Installation complete!"
+echo ""
+echo "Next steps:"
+echo "  1. Restart your terminal (to load pyenv)"
+echo "  2. Run: ./bin/dotfiles.py link"
+echo ""
