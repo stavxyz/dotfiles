@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
+# Module: osx
+# Description: macOS system preferences (keyboard repeat settings)
+# Dependencies: none
 
-# disable press-and-hold for additional chars to force key repeat
-# seems to be a symptom of setting repeat too fast and I don't need this
+# Disable press-and-hold for accent characters (enables key repeat for all keys)
 defaults write -g ApplePressAndHoldEnabled -bool false
 
-# -globalDomain is equivalent to domain = NSGlobalDomain
-# make key repeat fast
+# Set fast key repeat rates
+# InitialKeyRepeat: delay before repeat starts (11 = 165ms)
+# KeyRepeat: speed of repeat (1 = 15ms)
 defaults write -globalDomain InitialKeyRepeat -int 11
 defaults write -globalDomain KeyRepeat -int 1
-
-# echo "globalDomain InitialKeyRepeat: $(defaults read -globalDomain InitialKeyRepeat)"
-# echo "globalDomain KeyRepeat: $(defaults read -globalDomain KeyRepeat)"
