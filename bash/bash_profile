@@ -78,34 +78,58 @@ set -E
 
 [[ ! -d "${DOTFILES_DIR}" ]] && errcho 'dotfiles directory not found' && exit 0
 
-# Convention: Auto-load all modules from bash/source/ in numeric order
-for module in "${DOTFILES_DIR}"/bash/source/[0-9][0-9]-*.sh; do
+# Detect platform (strip version numbers: darwin24.5.0 → darwin)
+platform="${OSTYPE%%[0-9]*}"
+
+# Static modules: Always sourced (fast operations)
+
+# Cross-platform static modules
+for module in "${DOTFILES_DIR}"/modules/static/[0-9][0-9]-*.sh; do
   if [[ -f "$module" ]]; then
     debug "sourcing ${module##*/}"
     source "$module"
   fi
 done
 
-# Conditional: Homebrew (if brew binary exists)
-if [[ -x "/opt/homebrew/bin/brew" ]] || [[ -x "/usr/local/bin/brew" ]]; then
-  source "${DOTFILES_DIR}/homebrew/homebrew.sh"
+# Platform-specific static modules
+if [[ -d "${DOTFILES_DIR}/modules/static/${platform}" ]]; then
+  for module in "${DOTFILES_DIR}"/modules/static/"${platform}"/[0-9][0-9]-*.sh; do
+    if [[ -f "$module" ]]; then
+      debug "sourcing platform-specific ${module##*/}"
+      source "$module"
+    fi
+  done
+fi
+
+# Dynamic modules: Only run if file content changed (system modifications)
+
+# Cross-platform dynamic modules
+for module in "${DOTFILES_DIR}"/modules/dynamic/*.sh; do
+  if [[ -f "$module" ]]; then
+    module_name="$(basename "$module" .sh)"
+    debug "checking dynamic module: $module_name"
+    run_if_changed "$module_name" "$module" "source \"$module\""
+  fi
+done
+
+# Platform-specific dynamic modules
+if [[ -d "${DOTFILES_DIR}/modules/dynamic/${platform}" ]]; then
+  for module in "${DOTFILES_DIR}"/modules/dynamic/"${platform}"/*.sh; do
+    if [[ -f "$module" ]]; then
+      module_name="$(basename "$module" .sh)"
+      debug "checking platform-specific dynamic module: $module_name"
+      run_if_changed "$module_name" "$module" "source \"$module\""
+    fi
+  done
 fi
 
 # Disable strict error checking for external scripts (completions, etc.)
-# External bash completion scripts often have non-zero returns as normal behavior
 set +E
 
 # Lazy loading setup (function calls, not file sourcing)
 setup_lazy_pyenv
 setup_lazy_direnv
 load_completions
-
-# Platform-specific modules (macOS only)
-if [[ $OSTYPE =~ darwin ]]; then
-  source "${DOTFILES_DIR}/osx/osx.sh"
-  source "${DOTFILES_DIR}/karabiner/karabiner.sh"
-  source "${DOTFILES_DIR}/term/iterm2.sh"
-fi
 
 # ============================================================================
 # Editor Preferences
