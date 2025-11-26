@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: prompt
+# Description: Bash prompt configuration with colors and git integration
+# Dependencies: none
 
 force_color_prompt=yes
 
