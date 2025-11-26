@@ -56,9 +56,21 @@ trap '_sigint' SIGHUP SIGINT SIGTERM
 if [ ! -d "${DOTFILES_DIR}" ]; then
   errcho 'dotfiles directory not found'
 else
-  # Load utility functions first
+  # Load core modules first
   debug "sourcing utils.sh"
   source "${DOTFILES_DIR}/bash/utils.sh"
+
+  debug "sourcing config.sh"
+  source "${DOTFILES_DIR}/bash/config.sh"
+
+  debug "sourcing cache.sh"
+  source "${DOTFILES_DIR}/bash/cache.sh"
+
+  debug "sourcing lazy.sh"
+  source "${DOTFILES_DIR}/bash/lazy.sh"
+
+  debug "sourcing autocomplete-lazy.sh"
+  source "${DOTFILES_DIR}/bash/autocomplete-lazy.sh"
 
   debug "sourcing dotfiles.sh"
   source "${DOTFILES_DIR}/bash/dotfiles.sh"
@@ -69,9 +81,9 @@ else
   debug "sourcing homebrew.sh"
   source_if_command_exists "brew" "${DOTFILES_DIR}/homebrew/homebrew.sh"
 
-  # Only source python if pyenv exists
-  debug "sourcing python.sh"
-  source_if_command_exists "pyenv" "${DOTFILES_DIR}/lang/python/python.sh"
+  # Setup lazy loading for pyenv (replaces direct python.sh sourcing)
+  debug "setting up lazy pyenv"
+  setup_lazy_pyenv
   #debug "sourcing go.sh"
   #source "${DOTFILES_DIR}/lang/go/go.sh"
   debug "looking for bash/history.sh"
@@ -95,20 +107,14 @@ else
     debug "sourcing iterm2.sh"
     source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
-  # autocomplete scm, tmux
-  for f in "${DOTFILES_DIR}"/autocomplete/*.bash; do
-    # run ./bash/fetch_autocompleters.sh to fetch these
-    debug "sourcing $f"
-    if ! output="$(source "$f" 2>&1)"; then
-        debug "failed to source $f"
-        debug "${output}"
-        break
-    fi
-    debug "finished sourcing $f"
-  done
-  # direnv last (only if direnv command exists)
-  debug "sourcing direnv.sh"
-  source_if_command_exists "direnv" "${DOTFILES_DIR}/bash/direnv.sh"
+
+  # Load completions (async if lazy loading enabled)
+  debug "loading completions"
+  load_completions
+
+  # Setup lazy loading for direnv (replaces direct direnv.sh sourcing)
+  debug "setting up lazy direnv"
+  setup_lazy_direnv
   debug "sourcing colors.sh"
   source "${DOTFILES_DIR}/bash/colors.sh"
   debug "sourcing aliases.sh"
