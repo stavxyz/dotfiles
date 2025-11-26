@@ -47,8 +47,18 @@ debug() {
 _err() {
   errcho "$@"
   if [[ -n "${1:-}" ]]; then
-    local msg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
-    [[ -n "${2:-}" ]] && msg="${msg} in function '${2}'"
+    # Show the actual file and line where the error occurred
+    local line="${1}"
+    local func="${2:-}"
+    local source_file="${BASH_SOURCE[1]:-${BASH_SOURCE[0]:-$0}}"
+
+    # Show relative path if it's in dotfiles
+    if [[ "$source_file" == "${DOTFILES_DIR}"* ]]; then
+      source_file="${source_file#${DOTFILES_DIR}/}"
+    fi
+
+    local msg="⏩ Error at ${source_file}:${line}"
+    [[ -n "$func" ]] && msg="${msg} in function '${func}'"
     errcho "$msg"
   fi
   errcho "⛔️ Script failed."
@@ -78,6 +88,10 @@ done
 
 # Conditional: Homebrew (if brew exists)
 command_exists brew && source "${DOTFILES_DIR}/homebrew/homebrew.sh"
+
+# Disable strict error checking for external scripts (completions, etc.)
+# External bash completion scripts often have non-zero returns as normal behavior
+set +E
 
 # Lazy loading setup (function calls, not file sourcing)
 setup_lazy_pyenv
