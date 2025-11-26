@@ -3,66 +3,83 @@
 # Description: Shell aliases and utility functions
 # Dependencies: jq (for jsonvalue)
 
-errcho() {
-  >&2 echo "$@"
-}
+# ============================================================================
+# Git Aliases
+# ============================================================================
 
-## git aliases
-alias gitst='git status -uno'
-alias gits='git status'
-alias gs='git status'
 alias g='git'
+alias gs='git status'
+alias gits='git status'
+alias gitst='git status -uno'
 
-# vim
+# ============================================================================
+# Editor Aliases
+# ============================================================================
+
 alias vimp='vim -c ":PlugInstall|q|q"'
 
-# misc. aliases
-alias rgrep='grep --exclude .babel.json --exclude-dir vendor --exclude-dir build --exclude-dir .terraform --exclude-dir node_modules --exclude-dir dist --exclude-dir .git --exclude-dir .tox -I -r -n -i -e'
-findfile () {
-  >&2 echo -e "Looking for regular file $1, ignoring hidden directories.\n"
+# ============================================================================
+# Search Utilities
+# ============================================================================
+
+# Recursive grep with common excludes
+alias rgrep='grep \
+  --exclude .babel.json \
+  --exclude-dir vendor \
+  --exclude-dir build \
+  --exclude-dir .terraform \
+  --exclude-dir node_modules \
+  --exclude-dir dist \
+  --exclude-dir .git \
+  --exclude-dir .tox \
+  -I -r -n -i -e'
+
+findfile() {
+  echo "Looking for regular file: $1 (ignoring hidden directories)" >&2
   find . -not -path '*/\.*' -type f -iname "$1"
 }
 
-# jason is a person
+# ============================================================================
+# JSON Utilities
+# ============================================================================
 
-jsonvalue ()
-{
-    if [ -z "$1" ]; then
-        errcho 'Usage: jsonvalue <jsondata> <key>';
-        return 1;
-    fi
-    if [ -z "$2" ]; then
-        errcho 'Usage: jsonvalue <jsondata> <key>';
-        return 1;
-    fi
-    echo "$1" | jq -r --arg KEY "$2" '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
+jsonvalue() {
+  if [[ -z "$1" || -z "$2" ]]; then
+    echo "Usage: jsonvalue <jsondata> <key>" >&2
+    return 1
+  fi
+  echo "$1" | jq -r --arg KEY "$2" '. as $DATA|($KEY|split(".")|reduce .[] as $subkey ($DATA; .[$subkey])) // empty'
 }
 
-# openssl
+# ============================================================================
+# SSL/TLS Utilities
+# ============================================================================
 
-# display certs from an https url
+# Display certificate from HTTPS URL
 getcert() {
-  local url="$1"
-  local parsed_url=$(printf "%s" "${url}" | sed 's|https://||g')
-  printf '\n' | openssl s_client -connect "$parsed_url":443 -showcerts | openssl x509 -noout -text
+  local url="${1#https://}"  # Strip https:// prefix if present
+  printf '\n' | openssl s_client -connect "$url":443 -showcerts | openssl x509 -noout -text
 }
 
+# ============================================================================
+# Date Utilities
+# ============================================================================
 
-# dates
-
-ago ()
-{
-  __ago=$1;
-  __ago=${__ago:-24};
-  date -j -f "%a %b %d %T %Z %Y" "$(date -v -${__ago}H)" "+%s"
+# Get Unix timestamp N hours ago (macOS only)
+ago() {
+  local hours="${1:-24}"
+  date -j -f "%a %b %d %T %Z %Y" "$(date -v -${hours}H)" "+%s"
 }
 
-######################
-#### LOCAL aliases ###
-######################
+# ============================================================================
+# Local Extensions
+# ============================================================================
 
-if [ -d ~/.aliases ]; then
-  for f in ~/.aliases/*; do source "$f"; done
+# Load user-specific aliases from ~/.aliases/
+if [[ -d ~/.aliases ]]; then
+  for f in ~/.aliases/*; do
+    [[ -f "$f" ]] && source "$f"
+  done
 fi
 
 
