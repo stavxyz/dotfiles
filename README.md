@@ -1,82 +1,94 @@
-dotfiles
-========
+# dotfiles
 
-### requirements:
+Fast, stable shell configuration for macOS and Linux.
 
-[homebrew](https://brew.sh/) (if mac) 
-[vim-plug](https://github.com/junegunn/vim-plug)  
-python & pip  
-[pyenv](https://github.com/pyenv/pyenv)
+**Performance**: 113ms average shell startup time ⚡️
 
-### pyenv 
-
-https://github.com/pyenv/pyenv/wiki/common-build-problems#prerequisites
-
-```
-sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-```
-
-```
-# pyenv
-curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
-
-export PATH="/root/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
-
-pyenv update
-
-# pyenv-virtualenv
-git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper \
-  && cd $(pyenv root)/plugins/pyenv-virtualenvwrapper && git tag --list && git checkout v20140609 && cd 
-```
-
-### vim things
+## Quick Start
 
 ```bash
-# vim-plug for regular vim
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# vim-plug for neovim
-curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-```
-
-### nodejs
-
-https://github.com/mklement0/n-install
-
-```
-curl -L https://git.io/n-install | bash
-```
-
-### powerline fonts
-
-From https://github.com/powerline/fonts
-
-
-```
-# clone
-git clone https://github.com/powerline/fonts.git --depth=1 powerline-fonts
-# install
-cd powerline-fonts
+git clone https://github.com/stavxyz/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 ./install.sh
-# clean-up a bit
-cd ..
-rm -rf powerline-fonts
-``` 
-
-#### tmuxline
-
-https://github.com/edkolev/tmuxline.vim
-
-### setup:
-
 ```
-pip install -U -r requirements.txt
-./bin/dotfiles.py --debug unlink
-./bin/dotfiles.py --debug link
+
+Restart your terminal.
+
+## What's Included
+
+- **Bash**: Fast startup, git-aware prompt, cross-platform completions
+- **Vim**: Modern config with vim-plug, Go/Ruby/JavaScript support
+- **Git**: Powerful aliases (fpush, reup, changelog, main sync)
+- **Tmux**: Vim keybindings, session persistence, Solarized colors
+- **Tools**: pyenv, direnv, fzf, volta integration
+
+## Requirements
+
+**macOS**:
+- Homebrew
+- Bash 5+ (install via `brew install bash`)
+
+**Linux**:
+- Bash 4.3+
+- Build tools for pyenv (optional)
+
+## Platform Support
+
+| Feature | macOS | Linux |
+|---------|-------|-------|
+| Bash config | ✓ | ✓ |
+| Vim/Git/Tmux | ✓ | ✓ |
+| Karabiner | ✓ | - |
+| iTerm2 integration | ✓ | - |
+
+## Configuration
+
+Customize in `~/.bashrc` (before dotfiles load):
+
+```bash
+# Performance toggles (defaults shown)
+export DOTFILES_LAZY_PYENV=true           # Lazy load pyenv
+export DOTFILES_LAZY_DIRENV=true          # Lazy load direnv
+export DOTFILES_LAZY_COMPLETIONS=true     # Async completion loading
+export DOTFILES_CACHE_EVALS=true          # Cache expensive evals
+
+# Disable lazy loading for immediate availability
+export DOTFILES_LAZY_PYENV=false          # Load pyenv eagerly
 ```
+
+## Troubleshooting
+
+**Slow startup?**
+- Lazy loading is enabled by default for 113ms startup
+- Check: `echo $DOTFILES_LAZY_COMPLETIONS` should be `true`
+
+**Missing completion?**
+- Completions load asynchronously (takes ~1 second after shell start)
+- Check tool is installed: `which pyenv direnv brew`
+
+**Command not found after setup?**
+- Restart terminal completely
+- Check PATH: `echo $PATH | grep homebrew`
+
+## Testing
+
+Run automated tests:
+
+```bash
+# Validate all functionality
+bats tests/test-validate.bats
+
+# Benchmark startup performance
+bats tests/test-benchmark.bats
+```
+
+## Git Aliases
+
+Powerful git shortcuts included:
+
+- `git fpush` - Force push with lease (safe force push)
+- `git reup` - Rebase onto origin/main
+- `git main` - Sync with main branch
+- `git changelog` - Generate changelog since last tag
+
+Full list: see `git/gitconfig`
