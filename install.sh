@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
+#
+# Dotfiles Installation Script
+#
+# This script installs prerequisites and symlinks configuration files.
+# Run: ./install.sh
+#
+# Prerequisites installed:
+# - vim-plug (Vim plugin manager)
+# - pyenv (Python version manager)
+# - pyenv-virtualenvwrapper (Python virtual environment tools)
+#
+# After running, execute: ./bin/dotfiles.py link
 
+set -euo pipefail
+
+echo "Installing dotfiles prerequisites..."
+
+# Install vim-plug for Vim
+echo "Installing vim-plug..."
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
