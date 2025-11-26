@@ -86,8 +86,10 @@ for module in "${DOTFILES_DIR}"/bash/source/[0-9][0-9]-*.sh; do
   fi
 done
 
-# Conditional: Homebrew (if brew exists)
-command_exists brew && source "${DOTFILES_DIR}/homebrew/homebrew.sh"
+# Conditional: Homebrew (if brew binary exists)
+if [[ -x "/opt/homebrew/bin/brew" ]] || [[ -x "/usr/local/bin/brew" ]]; then
+  source "${DOTFILES_DIR}/homebrew/homebrew.sh"
+fi
 
 # Disable strict error checking for external scripts (completions, etc.)
 # External bash completion scripts often have non-zero returns as normal behavior
