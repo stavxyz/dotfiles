@@ -8,20 +8,32 @@ on:
 
 jobs:
   test:
-    name: Run Tests
-    runs-on: macos-latest
+    name: Run Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+      fail-fast: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Homebrew
+      - name: Set up Homebrew (macOS)
+        if: runner.os == 'macOS'
         run: |
           echo "Homebrew already installed on macos-latest"
           brew --version
 
-      - name: Install bats
+      - name: Install bats (macOS)
+        if: runner.os == 'macOS'
         run: brew install bats-core coreutils
+
+      - name: Install bats (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bats
 
       - name: Run validation tests
         id: validate
@@ -84,7 +96,7 @@ jobs:
             \`\`\`
 
             ---
-            *Tests run on macOS with bash 5.3.3*`;
+            *Tests run on \`${{ matrix.os }}\`*`;
 
             // Find existing comment
             const { data: comments } = await github.rest.issues.listComments({
