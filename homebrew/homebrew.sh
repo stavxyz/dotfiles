@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
+# Module: homebrew
+# Description: Homebrew environment setup with caching support
+# Dependencies: cache.sh (optional)
 
-if ! [[ $OSTYPE == *"darwin"* ]]; then
-  return
-fi
+# macOS only
+[[ $OSTYPE != *darwin* ]] && return
 
-# Use cached eval if caching is enabled, otherwise run directly
+# Use cached eval if available (reduces startup time by ~200ms)
 if [[ "$DOTFILES_CACHE_EVALS" == "true" ]] && command -v cache_eval &>/dev/null; then
   cache_eval "brew_shellenv" 3600 "/opt/homebrew/bin/brew shellenv"
 else
