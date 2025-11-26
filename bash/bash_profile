@@ -37,7 +37,11 @@ echo '💙'
 
 errcho() { printf "%s\n" "$@" 1>&2; }
 errxit() { errcho "$@"; exit 1; }
-debug() { [[ -n "${DOTFILES_DEBUG:-}" ]] && errcho "$@"; }
+debug() {
+  if [[ -n "${DOTFILES_DEBUG:-}" ]]; then
+    errcho "$@"
+  fi
+}
 
 # shellcheck disable=SC2120
 _err() {
