@@ -1,52 +1,64 @@
 #!/usr/bin/env bash
+# Module: colors
+# Description: Color themes and switching for shell, vim, tmux, and iTerm2
+# Dependencies: base16-shell, dark-mode, nvim, tmux (optional)
 
-################ BASE16_SHELL #######################
-# A shell script to change your shell's default ANSI
-# colors but most importantly, colors 17 to 21 of
-# your shell's 256 colorspace (if supported by your terminal).
-# This script makes it possible to honor the original
-# bright colors of your shell (e.g. bright green is still
-# green and so on) while providing additional base16 colors
-# to applications such as Vim.
-# The following sets up autocompletion for base16-shell
-BASE16_SHELL=$HOME/.config/base16-shell/
-[ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
+# ============================================================================
+# Base16 Shell Setup
+# ============================================================================
 
-# https://stackoverflow.com/a/38883860
-# setup iterm / vim / tmux / mac menu bar
-# requires 'brew install dark-mode'
-function theme-switch {
- echo -e "\033]50;SetProfile=$1\a"
- if [ $1 = "dark" ]; then
-    dark-mode on 2> /dev/null # Prevent error message if dark-mode is not installed
-    base16_solarized-dark 2> /dev/null # prevent error message if base16-shell is not installed
-    if ! base16_solarized-dark; then
-        it2setcolor preset 'Solarized Dark'
+# Base16 provides consistent color schemes across terminal, vim, and tmux
+# Adds colors 17-21 to the 256 colorspace while preserving bright colors
+BASE16_SHELL="$HOME/.config/base16-shell/"
+[[ -n "$PS1" && -s "$BASE16_SHELL/profile_helper.sh" ]] && eval "$($BASE16_SHELL/profile_helper.sh)"
+
+# ============================================================================
+# Theme Switching
+# ============================================================================
+
+# Unified theme switching for iTerm2, macOS, base16, vim, and tmux
+# Requires: dark-mode (brew install dark-mode)
+theme-switch() {
+  local theme="$1"
+
+  # Set iTerm2 profile
+  echo -e "\033]50;SetProfile=$theme\a"
+
+  if [[ "$theme" == "dark" ]]; then
+    # macOS dark mode
+    dark-mode on 2>/dev/null
+
+    # Shell colors (base16 or iTerm2 fallback)
+    base16_solarized-dark 2>/dev/null || it2setcolor preset 'Solarized Dark'
+
+    # Vim/Tmux line
+    nvim -c ":set background=dark" +Tmuxline +qall 2>/dev/null
+
+    # Tmux colors
+    if tmux info &>/dev/null; then
+      echo "Setting tmux environment to dark"
+      tmux set-environment ITERM_PROFILE dark
+      tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-dark.conf 2>/dev/null
     fi
-    nvim -c ":set background=dark" +Tmuxline +qall
-    if tmux info &> /dev/null; then
-        echo "Setting tmux environment to * $ITERM_PROFILE *"
-        tmux set-environment ITERM_PROFILE dark
-        tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-dark.conf
+  else
+    # macOS light mode
+    dark-mode off 2>/dev/null
+
+    # Shell colors (base16 or iTerm2 fallback)
+    base16_solarized-light 2>/dev/null || it2setcolor preset 'Solarized Light'
+
+    # Vim/Tmux line
+    nvim -c ":set background=light" +Tmuxline +qall 2>/dev/null
+
+    # Tmux colors
+    if tmux info &>/dev/null; then
+      echo "Setting tmux environment to light"
+      tmux set-environment ITERM_PROFILE light
+      tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-light.conf 2>/dev/null
     fi
- else
-    dark-mode off 2> /dev/null
-    if ! base16_solarized-light; then
-        it2setcolor preset 'Solarized Light'
-    fi
-    nvim -c ":set background=light" +Tmuxline +qall
-    if tmux info &> /dev/null; then
-        echo "Setting tmux environment to * $ITERM_PROFILE *"
-        tmux set-environment ITERM_PROFILE light
-        tmux source-file ~/.tmux/plugins/tmux-colors-solarized/tmuxcolors-light.conf
-    fi
- fi
+  fi
 }
 
-function go-dark {
-  theme-switch dark
-}
-
-function let-there-be-light {
-  theme-switch light
-}
+# Convenience aliases
+go-dark() { theme-switch dark; }
+let-there-be-light() { theme-switch light; }
