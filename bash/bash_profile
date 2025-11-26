@@ -109,8 +109,13 @@ fi
 # Editor Preferences
 # ============================================================================
 
-export VISUAL=nvim EDITOR=nvim GIT_EDITOR=nvim
-alias vim="nvim" vi="nvim" oldvim="\vim"
+# Use neovim if available, otherwise fall back to vim
+if command -v nvim &>/dev/null; then
+  export VISUAL=nvim EDITOR=nvim GIT_EDITOR=nvim
+  alias vim="nvim" vi="nvim" oldvim="\vim"
+else
+  export VISUAL=vim EDITOR=vim GIT_EDITOR=vim
+fi
 
 # ============================================================================
 # Interactive Mode
