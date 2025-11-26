@@ -61,42 +61,28 @@ trap '_sigint' SIGHUP SIGINT SIGTERM
 
 [[ ! -d "${DOTFILES_DIR}" ]] && errcho 'dotfiles directory not found' && exit 0
 
-# Helper to source modules with debug logging
-src() {
-  debug "sourcing $1"
-  source "${DOTFILES_DIR}/$1"
-}
+# Convention: Auto-load all modules from bash/source/ in numeric order
+for module in "${DOTFILES_DIR}"/bash/source/[0-9][0-9]-*.sh; do
+  if [[ -f "$module" ]]; then
+    debug "sourcing ${module##*/}"
+    source "$module"
+  fi
+done
 
-# Core modules (order matters)
-src "bash/utils.sh"
-src "bash/config.sh"
-src "bash/cache.sh"
-src "bash/lazy.sh"
-src "bash/autocomplete-lazy.sh"
-src "bash/dotfiles.sh"
-src "bash/prompt.sh"
+# Conditional: Homebrew (if brew exists)
+command_exists brew && source "${DOTFILES_DIR}/homebrew/homebrew.sh"
 
-# Conditional modules
-source_if_command_exists "brew" "${DOTFILES_DIR}/homebrew/homebrew.sh"
-[[ -f "${DOTFILES_DIR}/bash/history.sh" ]] && src "bash/history.sh"
-
-# Tool-specific modules
-src "bash/fzf.sh"
-src "bash/volta.sh"
+# Lazy loading setup (function calls, not file sourcing)
 setup_lazy_pyenv
 setup_lazy_direnv
-
-# Platform-specific modules
-if [[ $OSTYPE =~ darwin ]]; then
-  src "osx/osx.sh"
-  src "karabiner/karabiner.sh"
-  src "term/iterm2.sh"
-fi
-
-# Load completions and finalize
 load_completions
-src "bash/colors.sh"
-src "bash/aliases.sh"
+
+# Platform-specific modules (macOS only)
+if [[ $OSTYPE =~ darwin ]]; then
+  source "${DOTFILES_DIR}/osx/osx.sh"
+  source "${DOTFILES_DIR}/karabiner/karabiner.sh"
+  source "${DOTFILES_DIR}/term/iterm2.sh"
+fi
 
 # ============================================================================
 # Editor Preferences
