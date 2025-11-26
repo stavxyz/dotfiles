@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: dotfiles
+# Description: Checks for uncommitted changes in dotfiles directory
+# Dependencies: git
 
 # check for staged or unstaged changes in
 # the dotfiles dir

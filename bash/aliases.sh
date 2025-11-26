@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: aliases
+# Description: Shell aliases and utility functions
+# Dependencies: jq (for jsonvalue)
 
 errcho() {
   >&2 echo "$@"
