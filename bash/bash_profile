@@ -5,131 +5,109 @@
 # Dependencies: All dotfiles modules
 # URL: https://github.com/stavxyz/dotfiles
 
+# ============================================================================
+# Environment Setup
+# ============================================================================
+
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
-
-export PATH=~/local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/lib:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:~/.pyenv/bin:~/.local/bin:/opt/homebrew/opt/openjdk/bin:$PATH
-
-# The primary requirement for using the dotfiles project
-# is setting DOTFILES_DIR...
-# https://github.com/samstav/dotfiles
 export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
+
+# PATH construction
+export PATH="\
+~/local/bin:\
+/usr/local/bin:\
+/usr/local/sbin:\
+/usr/local/lib:\
+/usr/bin:\
+/bin:\
+/usr/sbin:\
+/sbin:\
+/opt/X11/bin:\
+~/.pyenv/bin:\
+~/.local/bin:\
+/opt/homebrew/opt/openjdk/bin:\
+$PATH"
 
 echo '💙'
 
-errcho() {
-  printf "%s\n" "$@" 1>&2
-}
+# ============================================================================
+# Bootstrap Utilities
+# ============================================================================
 
-errxit ()
-{
-  errcho "$@"
-  exit 1
-}
-
-#DOTFILES_DEBUG=1
-debug ()
-{
-  if [ -n "${DOTFILES_DEBUG:-''}" ]; then
-    errcho "$@"
-  fi
-}
-
-
+errcho() { printf "%s\n" "$@" 1>&2; }
+errxit() { errcho "$@"; exit 1; }
+debug() { [[ -n "${DOTFILES_DEBUG:-}" ]] && errcho "$@"; }
 
 # shellcheck disable=SC2120
 _err() {
   errcho "$@"
-  if [ -n "${1:-}" ]; then
-    _errmsg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
-    if [ -n "${2:-}" ]; then
-      _errmsg="${_errmsg} in function '${2}'"
-    fi
-    errcho "${_errmsg}"
+  if [[ -n "${1:-}" ]]; then
+    local msg="⏩ Error at line ${1} of ${BASH_SOURCE:-${0}}"
+    [[ -n "${2:-}" ]] && msg="${msg} in function '${2}'"
+    errcho "$msg"
   fi
   errcho "⛔️ Script failed."
 }
 
-_sigint() {
-  errcho "🍿 Script discontinued."
-  exit 1
-}
+_sigint() { errcho "🍿 Script discontinued."; exit 1; }
 
 trap '_err ${LINENO} ${FUNCNAME:-}' ERR
 trap '_sigint' SIGHUP SIGINT SIGTERM
 
-if [ ! -d "${DOTFILES_DIR}" ]; then
-  errcho 'dotfiles directory not found'
-else
-  # Load core modules first
-  debug "sourcing utils.sh"
-  source "${DOTFILES_DIR}/bash/utils.sh"
+# ============================================================================
+# Module Loading
+# ============================================================================
 
-  debug "sourcing config.sh"
-  source "${DOTFILES_DIR}/bash/config.sh"
+[[ ! -d "${DOTFILES_DIR}" ]] && errcho 'dotfiles directory not found' && exit 0
 
-  debug "sourcing cache.sh"
-  source "${DOTFILES_DIR}/bash/cache.sh"
+# Helper to source modules with debug logging
+src() {
+  debug "sourcing $1"
+  source "${DOTFILES_DIR}/$1"
+}
 
-  debug "sourcing lazy.sh"
-  source "${DOTFILES_DIR}/bash/lazy.sh"
+# Core modules (order matters)
+src "bash/utils.sh"
+src "bash/config.sh"
+src "bash/cache.sh"
+src "bash/lazy.sh"
+src "bash/autocomplete-lazy.sh"
+src "bash/dotfiles.sh"
+src "bash/prompt.sh"
 
-  debug "sourcing autocomplete-lazy.sh"
-  source "${DOTFILES_DIR}/bash/autocomplete-lazy.sh"
+# Conditional modules
+source_if_command_exists "brew" "${DOTFILES_DIR}/homebrew/homebrew.sh"
+[[ -f "${DOTFILES_DIR}/bash/history.sh" ]] && src "bash/history.sh"
 
-  debug "sourcing dotfiles.sh"
-  source "${DOTFILES_DIR}/bash/dotfiles.sh"
-  debug "sourcing prompt.sh"
-  source "${DOTFILES_DIR}/bash/prompt.sh"
+# Tool-specific modules
+src "bash/fzf.sh"
+src "bash/volta.sh"
+setup_lazy_pyenv
+setup_lazy_direnv
 
-  # Only source homebrew if brew command exists
-  debug "sourcing homebrew.sh"
-  source_if_command_exists "brew" "${DOTFILES_DIR}/homebrew/homebrew.sh"
-
-  # Setup lazy loading for pyenv (replaces direct python.sh sourcing)
-  debug "setting up lazy pyenv"
-  setup_lazy_pyenv
-
-  debug "looking for bash/history.sh"
-  if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
-    debug "sourcing bash/history.sh"
-    source "${DOTFILES_DIR}/bash/history.sh"
-  fi
-  debug "sourcing bash/fzf.sh"
-  source "${DOTFILES_DIR}/bash/fzf.sh"
-  debug "sourcing bash/volta.sh"
-  source "${DOTFILES_DIR}/bash/volta.sh"
-  if [[ $OSTYPE =~ "darwin" ]]; then
-    debug "sourcing osx.sh"
-    source "${DOTFILES_DIR}/osx/osx.sh"
-    debug "sourcing karabiner.sh"
-    source "${DOTFILES_DIR}/karabiner/karabiner.sh"
-
-    debug "sourcing iterm2.sh"
-    source "${DOTFILES_DIR}/term/iterm2.sh"
-  fi
-
-  # Load completions (async if lazy loading enabled)
-  debug "loading completions"
-  load_completions
-
-  # Setup lazy loading for direnv (replaces direct direnv.sh sourcing)
-  debug "setting up lazy direnv"
-  setup_lazy_direnv
-  debug "sourcing colors.sh"
-  source "${DOTFILES_DIR}/bash/colors.sh"
-  debug "sourcing aliases.sh"
-  source "${DOTFILES_DIR}/bash/aliases.sh"
+# Platform-specific modules
+if [[ $OSTYPE =~ darwin ]]; then
+  src "osx/osx.sh"
+  src "karabiner/karabiner.sh"
+  src "term/iterm2.sh"
 fi
 
-# vim please
-export VISUAL=nvim
-export EDITOR=nvim
-export GIT_EDITOR=nvim
+# Load completions and finalize
+load_completions
+src "bash/colors.sh"
+src "bash/aliases.sh"
 
-alias vim="nvim"
-alias vi="nvim"
-alias oldvim="\vim"
+# ============================================================================
+# Editor Preferences
+# ============================================================================
+
+export VISUAL=nvim EDITOR=nvim GIT_EDITOR=nvim
+alias vim="nvim" vi="nvim" oldvim="\vim"
+
+# ============================================================================
+# Interactive Mode
+# ============================================================================
 
 # Allow interactive commands to fail without triggering ERR trap
 set +e
