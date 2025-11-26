@@ -21,9 +21,6 @@ elif [[ $OSTYPE == *darwin* ]]; then
   alias la='ls -alsG'
 fi
 
-# grep colors (GREP_OPTIONS is deprecated, but still works)
-export GREP_OPTIONS='--color=auto'
-
 # ============================================================================
 # Terminal Title
 # ============================================================================
@@ -78,8 +75,8 @@ popd()  { builtin popd "$@" && chpwd; }
 # $
 export PS1="${PURPLE}[${BLUE}\$(hpwd)${PURPLE}] ${RED}\u${PURPLE}@${YELLOW}\h${PURPLE}${ICON}\n\$ ${RESET}"
 
-# Initialize HPWD
-cd
+# Initialize HPWD without changing directory
+chpwd
 # ============================================================================
 # Bash Completion
 # ============================================================================
