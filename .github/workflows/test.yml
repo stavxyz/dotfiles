@@ -1,0 +1,127 @@
+name: Test & Benchmark
+
+on:
+  pull_request:
+    branches: [ master, main ]
+  push:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        run: |
+          echo "Homebrew already installed on macos-latest"
+          brew --version
+
+      - name: Install bats
+        run: brew install bats-core coreutils
+
+      - name: Run validation tests
+        id: validate
+        run: |
+          echo "## Validation Tests" >> $GITHUB_STEP_SUMMARY
+          bats tests/test-validate.bats | tee validation-output.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat validation-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Run benchmark
+        id: benchmark
+        run: |
+          echo "## Performance Benchmark" >> $GITHUB_STEP_SUMMARY
+          bats tests/test-benchmark.bats | tee benchmark-output.txt
+
+          # Extract benchmark results
+          if [ -f "${HOME}/.cache/dotfiles/benchmark-results.txt" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "${HOME}/.cache/dotfiles/benchmark-results.txt" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            # Save for PR comment
+            cat "${HOME}/.cache/dotfiles/benchmark-results.txt" > benchmark-results.txt
+          fi
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Read benchmark results
+            let benchmarkResults = 'Benchmark results not available';
+            try {
+              benchmarkResults = fs.readFileSync('benchmark-results.txt', 'utf8');
+            } catch (e) {
+              console.log('Could not read benchmark results');
+            }
+
+            // Read validation output
+            let validationOutput = 'Validation results not available';
+            try {
+              validationOutput = fs.readFileSync('validation-output.txt', 'utf8');
+            } catch (e) {
+              console.log('Could not read validation output');
+            }
+
+            const body = `## 🧪 Test Results
+
+            ### ✅ Validation Tests
+            \`\`\`
+            ${validationOutput}
+            \`\`\`
+
+            ### ⚡ Performance Benchmark
+            \`\`\`
+            ${benchmarkResults}
+            \`\`\`
+
+            ---
+            *Tests run on macOS with bash 5.3.3*`;
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('🧪 Test Results')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            validation-output.txt
+            benchmark-output.txt
+            benchmark-results.txt
