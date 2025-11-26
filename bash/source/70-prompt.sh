@@ -84,6 +84,10 @@ cd
 # Bash Completion
 # ============================================================================
 
+# Temporarily disable ERR trap propagation for external completion scripts
+# Bash completion scripts often use non-zero returns as normal control flow
+set +E
+
 # Try to load system bash completion from various locations
 _completion_paths=(
   "/opt/homebrew/etc/profile.d/bash_completion.sh"      # macOS Homebrew (Apple Silicon)
@@ -106,3 +110,6 @@ if [[ "${_bash_completion_loaded:-false}" == "false" ]]; then
 fi
 
 unset _bash_completion_loaded _completion_paths
+
+# Re-enable ERR trap propagation for the rest of this module
+set -E
