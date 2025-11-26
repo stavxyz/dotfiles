@@ -123,3 +123,4 @@ fi
 
 # Allow interactive commands to fail without triggering ERR trap
 set +e
+trap - ERR
