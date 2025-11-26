@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#
+# Module: bash_profile
+# Description: Main bash profile - entry point for dotfiles
+# Dependencies: All dotfiles modules
+# URL: https://github.com/stavxyz/dotfiles
 
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -84,8 +89,7 @@ else
   # Setup lazy loading for pyenv (replaces direct python.sh sourcing)
   debug "setting up lazy pyenv"
   setup_lazy_pyenv
-  #debug "sourcing go.sh"
-  #source "${DOTFILES_DIR}/lang/go/go.sh"
+
   debug "looking for bash/history.sh"
   if [[ -f "${DOTFILES_DIR}/bash/history.sh" ]]; then
     debug "sourcing bash/history.sh"
@@ -100,10 +104,7 @@ else
     source "${DOTFILES_DIR}/osx/osx.sh"
     debug "sourcing karabiner.sh"
     source "${DOTFILES_DIR}/karabiner/karabiner.sh"
-    # debug "sourcing asdf.sh"
-    # source "${DOTFILES_DIR}/bash/asdf.sh"
-    # Can't get iterm2_shell_integration to play
-    # nicely with direnv, disabling for now :(
+
     debug "sourcing iterm2.sh"
     source "${DOTFILES_DIR}/term/iterm2.sh"
   fi
