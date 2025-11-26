@@ -59,6 +59,9 @@ _sigint() { errcho "🍿 Script discontinued."; exit 1; }
 trap '_err ${LINENO} ${FUNCNAME:-}' ERR
 trap '_sigint' SIGHUP SIGINT SIGTERM
 
+# Propagate ERR trap to sourced scripts and functions
+set -E
+
 # ============================================================================
 # Module Loading
 # ============================================================================
