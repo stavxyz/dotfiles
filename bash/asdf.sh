@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: asdf
+# Description: asdf version manager and direnv integration
+# Dependencies: brew, asdf, direnv
 
 eval "$(direnv hook bash)"
 
