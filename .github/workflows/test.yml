@@ -35,6 +35,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y bats
 
+      - name: Install ShellCheck (macOS)
+        if: runner.os == 'macOS'
+        run: brew install shellcheck
+
+      - name: Install ShellCheck (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck linting
+        run: |
+          # Check all shell scripts
+          find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" \) \
+            -exec shellcheck {} +
+
       - name: Run validation tests
         id: validate
         run: |

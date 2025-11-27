@@ -21,7 +21,8 @@ run_if_changed() {
   mkdir -p "$state_dir"
 
   # Calculate current hash
-  local current_hash=$(shasum "$file" 2>/dev/null | cut -d' ' -f1)
+  local current_hash
+  current_hash=$(shasum "$file" 2>/dev/null | cut -d' ' -f1)
 
   # Skip if file doesn't exist
   if [[ -z "$current_hash" ]]; then
@@ -31,7 +32,8 @@ run_if_changed() {
 
   # Check if hash changed
   if [[ -f "$hash_file" ]]; then
-    local stored_hash=$(cat "$hash_file")
+    local stored_hash
+    stored_hash=$(cat "$hash_file")
     if [[ "$current_hash" == "$stored_hash" ]]; then
       debug "run_if_changed: no changes detected for $name"
       return 0  # No change, skip
