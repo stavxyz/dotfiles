@@ -14,6 +14,7 @@ export CLICOLOR=1
 export LSCOLORS=exFxCxDxBxegedabagaced
 
 # Platform-specific ls aliases
+# shellcheck disable=SC2086  # Safe: word splitting doesn't occur in [[ ]]
 if [[ $OSTYPE == *linux* ]]; then
   alias ls='ls --color=auto'
 elif [[ $OSTYPE == *darwin* ]]; then
@@ -52,6 +53,7 @@ export RESET="\[\e[0m\]"
 # Examples: ~/foo/bar/baz → bar/baz, ~/projects → ~/projects, ~ → ~
 # shellcheck disable=SC2088  # Tilde in HPWD assignment is intentional for display
 chpwd() {
+  # shellcheck disable=SC2086  # Safe: case doesn't perform word splitting
   case $PWD in
     "$HOME")      HPWD="~" ;;
     "$HOME"/*/*)  HPWD="${PWD#"${PWD%/*/*}/"}" ;;

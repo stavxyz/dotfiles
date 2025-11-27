@@ -12,6 +12,7 @@ add_to_path() {
     [[ ! -d "$dir" ]] && return 1
 
     # Check if already in PATH
+    # shellcheck disable=SC2086  # Safe: pattern matching in [[ ]]
     if [[ ":$PATH:" == *":$dir:"* ]]; then
         return 0  # Already in PATH
     fi
@@ -28,6 +29,7 @@ append_to_path() {
     [[ ! -d "$dir" ]] && return 1
 
     # Check if already in PATH
+    # shellcheck disable=SC2086  # Safe: pattern matching in [[ ]]
     if [[ ":$PATH:" == *":$dir:"* ]]; then
         return 0  # Already in PATH
     fi
