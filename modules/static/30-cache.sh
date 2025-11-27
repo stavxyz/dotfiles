@@ -29,6 +29,7 @@ cache_eval() {
             cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file")))
         fi
 
+        # shellcheck disable=SC2086  # Safe: arithmetic comparison in [[ ]]
         if [[ $cache_age -lt $ttl ]]; then
             # Cache is still valid, source it
             source "$cache_file"

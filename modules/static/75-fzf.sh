@@ -2,4 +2,4 @@
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-alias vimf='vim $(fzf)'
+alias vimf='vim "$(fzf)"'
