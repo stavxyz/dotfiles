@@ -47,8 +47,8 @@ jobs:
 
       - name: Run ShellCheck linting
         run: |
-          # Check all shell scripts
-          find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" \) \
+          # Check all shell scripts and bash config files
+          find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -name "bash_aliases" \) \
             -exec shellcheck {} +
 
       - name: Run validation tests
