@@ -8,6 +8,8 @@ disable=SC2034  # Unused variables (many are exported for child processes)
 disable=SC2154  # Referenced but not assigned (exported vars from other modules)
 disable=SC2086  # Double quote to prevent globbing (low-risk in our usage)
 disable=SC2295  # Expansions in ${..} patterns (intentional pattern matching)
+disable=SC2317  # Command appears unreachable (lazy-loading wrapper functions)
+disable=SC2329  # Function never invoked (lazy-loading wrappers invoked indirectly)
 
 # Enable optional checks
 enable=quote-safe-variables
