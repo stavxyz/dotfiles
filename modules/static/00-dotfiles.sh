@@ -8,7 +8,19 @@
 # ============================================================================
 
 # Run command only if file hash has changed since last run
-# Usage: run_if_changed "name" "/path/to/file" "command to run"
+# Stores SHA256 hash of file and only executes command when hash changes.
+# Used for expensive operations that should only run when their input changes.
+#
+# Usage: run_if_changed <name> <file_path> <command>
+# Arguments:
+#   $1 - Unique name for this check (used in hash filename)
+#   $2 - Path to file to monitor for changes
+#   $3 - Command to execute when file changes
+# Returns:
+#   0 - Success (command executed or no change detected)
+#   1 - Error (file not found or command failed)
+# Example:
+#   run_if_changed "karabiner" "~/.config/karabiner/karabiner.json" "launchctl kickstart gui/501/org.pqrs.karabiner.karabiner_console_user_server"
 run_if_changed() {
   local name="$1"
   local file="$2"

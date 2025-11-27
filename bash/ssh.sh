@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: ssh
+# Description: SSH agent and key management
+# Dependencies: ssh-agent, ssh-add
 
 eval "$(ssh-agent -s)" > /dev/null
 
