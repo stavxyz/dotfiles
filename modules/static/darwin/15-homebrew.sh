@@ -4,6 +4,7 @@
 # Dependencies: cache.sh (optional)
 
 # macOS only
+# shellcheck disable=SC2086  # Safe: word splitting doesn't occur in [[ ]]
 [[ $OSTYPE != *darwin* ]] && return
 
 # Use cached eval if available (reduces startup time by ~200ms)

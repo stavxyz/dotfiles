@@ -93,7 +93,7 @@ getcert() {
 # Get Unix timestamp N hours ago (macOS only)
 ago() {
   local hours="${1:-24}"
-  date -j -f "%a %b %d %T %Z %Y" "$(date -v -${hours}H)" "+%s"
+  date -j -f "%a %b %d %T %Z %Y" "$(date -v -"${hours}"H)" "+%s"
 }
 
 # ============================================================================
