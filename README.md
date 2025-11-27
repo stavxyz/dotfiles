@@ -70,6 +70,57 @@ export DOTFILES_LAZY_PYENV=false          # Load pyenv eagerly
 - Restart terminal completely
 - Check PATH: `echo $PATH | grep homebrew`
 
+## Development
+
+### Dependencies
+
+For local development and testing:
+
+**Required:**
+- [bats-core](https://github.com/bats-core/bats-core) - Bash automated testing
+- [shellcheck](https://www.shellcheck.net/) - Shell script linting
+
+**Optional:**
+- [shfmt](https://github.com/mvdan/sh) - Shell script formatting
+
+**Install on macOS:**
+```bash
+brew install bats-core shellcheck shfmt
+```
+
+**Install on Linux:**
+```bash
+# Debian/Ubuntu
+sudo apt-get install bats shellcheck shfmt
+
+# Arch
+sudo pacman -S bats shellcheck shfmt
+```
+
+### Local Testing
+
+Before submitting changes:
+
+```bash
+# Run full test suite
+bats tests/
+
+# Run validation tests only
+bats tests/test-validate.bats
+
+# Run performance benchmarks
+bats tests/test-benchmark.bats
+
+# Lint all shell scripts
+find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -name "bash_aliases" \) \
+  -exec shellcheck {} +
+
+# Test shell startup
+time bash -l -c exit
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guidelines.
+
 ## Testing
 
 Run automated tests:
