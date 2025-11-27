@@ -13,7 +13,7 @@ if [[ ! -L "$KARABINER_JSON" ]]; then
 
   # Check if dotfiles version has uncommitted changes
   _git_status="$(git -C "${DOTFILES_DIR}" status --short)"
-  if [[ "$_git_status" =~ "karabiner.json" ]]; then
+  if [[ "$_git_status" =~ karabiner.json ]]; then
     errcho "karabiner.json has uncommitted changes in dotfiles!"
     errcho "Please review and commit those changes first."
     echo "$_git_status"

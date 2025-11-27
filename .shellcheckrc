@@ -1,0 +1,21 @@
+# ShellCheck configuration for dotfiles
+# Documentation: https://github.com/koalaman/shellcheck/wiki
+
+# Disable specific checks that conflict with our patterns
+disable=SC1090  # Can't follow non-constant source (we use dynamic sourcing)
+disable=SC1091  # Not following source files (external completions)
+disable=SC2034  # Unused variables (many are exported for child processes)
+disable=SC2154  # Referenced but not assigned (exported vars from other modules)
+disable=SC2086  # Double quote to prevent globbing (low-risk in our usage)
+disable=SC2295  # Expansions in ${..} patterns (intentional pattern matching)
+
+# Enable optional checks
+enable=quote-safe-variables
+# Note: require-variable-braces disabled as it's too strict for existing codebase
+# enable=require-variable-braces
+
+# Set shell dialect
+shell=bash
+
+# Source files are in multiple directories
+source-path=SCRIPTDIR

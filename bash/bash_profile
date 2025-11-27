@@ -15,7 +15,7 @@ export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
 
 # PATH construction
 export PATH="\
-~/local/bin:\
+$HOME/local/bin:\
 /usr/local/bin:\
 /usr/local/sbin:\
 /usr/local/lib:\
@@ -24,8 +24,8 @@ export PATH="\
 /usr/sbin:\
 /sbin:\
 /opt/X11/bin:\
-~/.pyenv/bin:\
-~/.local/bin:\
+$HOME/.pyenv/bin:\
+$HOME/.local/bin:\
 /opt/homebrew/opt/openjdk/bin:\
 $PATH"
 
