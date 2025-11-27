@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Module: ruby
+# Description: Ruby/chruby configuration and version management
+# Dependencies: brew, chruby
 
 #eval "$(rbenv init -)"
 
