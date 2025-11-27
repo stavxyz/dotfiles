@@ -50,6 +50,7 @@ export RESET="\[\e[0m\]"
 
 # Shorten pwd to show only last 2 directories
 # Examples: ~/foo/bar/baz → bar/baz, ~/projects → ~/projects, ~ → ~
+# shellcheck disable=SC2088  # Tilde in HPWD assignment is intentional for display
 chpwd() {
   case $PWD in
     "$HOME")      HPWD="~" ;;
