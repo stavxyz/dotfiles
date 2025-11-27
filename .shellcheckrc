@@ -6,10 +6,12 @@ disable=SC1090  # Can't follow non-constant source (we use dynamic sourcing)
 disable=SC1091  # Not following source files (external completions)
 disable=SC2034  # Unused variables (many are exported for child processes)
 disable=SC2154  # Referenced but not assigned (exported vars from other modules)
-disable=SC2086  # Double quote to prevent globbing (low-risk in our usage)
 disable=SC2295  # Expansions in ${..} patterns (intentional pattern matching)
 disable=SC2317  # Command appears unreachable (lazy-loading wrapper functions)
 disable=SC2329  # Function never invoked (lazy-loading wrappers invoked indirectly)
+
+# SC2086 enabled: Enforce proper variable quoting as documented in CONTRIBUTING.md
+# False positives are suppressed with inline directives where needed
 
 # Enable optional checks
 enable=quote-safe-variables
