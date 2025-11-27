@@ -102,7 +102,7 @@ find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -nam
 
 ## Development Workflow
 
-1. **Create feature branch** from `main` or `master`
+1. **Create feature branch** from `main`
    ```bash
    git checkout -b my-feature-branch
    ```
