@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # Module: asdf
-# Description: asdf version manager and direnv integration
-# Dependencies: brew, asdf, direnv
-
-# Check for direnv (may be redundant with lazy loading)
-if command -v direnv &>/dev/null; then
-    eval "$(direnv hook bash)"
-fi
+# Description: asdf version manager
+# Dependencies: brew, asdf
+# Note: direnv integration is handled in bash/direnv.sh
 
 # Check for asdf installation via brew
 if command -v brew &>/dev/null; then
