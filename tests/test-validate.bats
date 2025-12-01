@@ -3,7 +3,8 @@
 # Description: Validate functionality after changes
 
 setup() {
-    export DOTFILES_DIR="/Users/stavxyz/dotfiles"
+    # Dynamically detect dotfiles directory
+    export DOTFILES_DIR="$(cd "$(dirname "$BATS_TEST_DIRNAME")/.." && pwd)"
 }
 
 @test "bash profile loads without errors" {
