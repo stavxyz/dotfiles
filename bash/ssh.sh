@@ -26,8 +26,11 @@ is_agent_running() {
 
 # Start ssh-agent and save environment
 start_agent() {
-    ssh-agent -s > "$SSH_ENV"
-    chmod 600 "$SSH_ENV"
+    # Use umask to set permissions atomically (prevents race condition)
+    (
+        umask 077
+        ssh-agent -s > "$SSH_ENV"
+    )
     source "$SSH_ENV" > /dev/null
 }
 
