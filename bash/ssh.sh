@@ -3,8 +3,34 @@
 # Description: SSH agent and key management
 # Dependencies: ssh-agent, ssh-add
 
-if command -v ssh-agent &>/dev/null; then
-    eval "$(ssh-agent -s)" > /dev/null
+if ! command -v ssh-agent &>/dev/null; then
+    return 0
+fi
+
+# SSH agent environment file
+SSH_ENV="$HOME/.ssh/agent.env"
+
+# Check if agent is already running
+agent_is_running() {
+    [[ -n "$SSH_AUTH_SOCK" ]] && ssh-add -l &>/dev/null
+    return $?
+}
+
+# Start ssh-agent and save environment
+start_agent() {
+    ssh-agent -s > "$SSH_ENV"
+    chmod 600 "$SSH_ENV"
+    source "$SSH_ENV" > /dev/null
+}
+
+# Load existing agent environment if available
+if [[ -f "$SSH_ENV" ]]; then
+    source "$SSH_ENV" > /dev/null
+fi
+
+# Start new agent only if not already running
+if ! agent_is_running; then
+    start_agent
 fi
 
 if ! [[ -d "${HOME}/.ssh" ]]; then
