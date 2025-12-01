@@ -46,7 +46,7 @@ if command -v pyenv &>/dev/null; then
     pyenv update || echo "Warning: pyenv update failed"
 
     # Setup pyenv for this session
-    eval "$(pyenv init -)" || echo "Warning: pyenv init failed"
+    eval "$(pyenv init -)" || { echo "Error: pyenv init failed"; exit 1; }
 else
     echo "Error: pyenv installation failed"
     exit 1

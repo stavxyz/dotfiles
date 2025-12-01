@@ -4,9 +4,9 @@
 # Dependencies: pyenv, pyenv-virtualenvwrapper
 
 export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
 
 if command -v pyenv &>/dev/null; then
-    export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
 
     export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
