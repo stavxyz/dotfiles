@@ -3,7 +3,8 @@
 # Description: Capture current state before modernization
 
 setup() {
-    export DOTFILES_DIR="/Users/stavxyz/dotfiles"
+    # Dynamically detect dotfiles directory
+    export DOTFILES_DIR="$(cd "$(dirname "$BATS_TEST_DIRNAME")/.." && pwd)"
     export RESULTS_FILE="${HOME}/.cache/dotfiles/baseline-results.txt"
     mkdir -p "$(dirname "$RESULTS_FILE")"
 }
