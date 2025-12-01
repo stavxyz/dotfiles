@@ -7,18 +7,17 @@
 # shellcheck disable=SC2086  # Safe: word splitting doesn't occur in [[ ]]
 [[ $OSTYPE != *darwin* ]] && return
 
-# Detect homebrew path (Apple Silicon vs Intel)
-if [[ -x "/opt/homebrew/bin/brew" ]]; then
-    HOMEBREW_PREFIX="/opt/homebrew"
-elif [[ -x "/usr/local/bin/brew" ]]; then
-    HOMEBREW_PREFIX="/usr/local"
-else
+# Add common homebrew paths to PATH to find brew command
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Check if brew is available
+if ! command -v brew &>/dev/null; then
     return 0  # Homebrew not installed
 fi
 
 # Use cached eval if available (reduces startup time by ~200ms)
 if [[ "$DOTFILES_CACHE_EVALS" == "true" ]] && command -v cache_eval &>/dev/null; then
-    cache_eval "brew_shellenv" 3600 "${HOMEBREW_PREFIX}/bin/brew shellenv"
+    cache_eval "brew_shellenv" 3600 "brew shellenv"
 else
-    eval "$("${HOMEBREW_PREFIX}"/bin/brew shellenv)"
+    eval "$(brew shellenv)"
 fi
