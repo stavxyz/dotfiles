@@ -39,13 +39,18 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
 echo "Installing pyenv..."
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 
-echo "Updating pyenv..."
-pyenv update
-
-# Setup pyenv for this session
+# Verify pyenv installation
 export PATH="${HOME}/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+if command -v pyenv &>/dev/null; then
+    echo "Updating pyenv..."
+    pyenv update || echo "Warning: pyenv update failed"
+
+    # Setup pyenv for this session
+    eval "$(pyenv init -)" || echo "Warning: pyenv init failed"
+else
+    echo "Error: pyenv installation failed"
+    exit 1
+fi
 
 # ============================================================================
 # Python Virtual Environment Tools

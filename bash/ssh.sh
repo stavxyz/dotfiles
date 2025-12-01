@@ -3,7 +3,9 @@
 # Description: SSH agent and key management
 # Dependencies: ssh-agent, ssh-add
 
-eval "$(ssh-agent -s)" > /dev/null
+if command -v ssh-agent &>/dev/null; then
+    eval "$(ssh-agent -s)" > /dev/null
+fi
 
 if ! [[ -d "${HOME}/.ssh" ]]; then
   errcho "${HOME}/.ssh dir DNE, skipping."
