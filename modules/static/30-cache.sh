@@ -38,11 +38,17 @@ cache_eval() {
     fi
 
     # Cache is invalid or doesn't exist, regenerate
-    if eval "$eval_cmd" > "$cache_file" 2>/dev/null; then
+    # Use temporary file to avoid creating empty cache on failure
+    local tmp_cache
+    tmp_cache="$(mktemp "${cache_file}.tmp.XXXXXX" 2>/dev/null)" || tmp_cache="${cache_file}.tmp.$$"
+
+    if eval "$eval_cmd" > "$tmp_cache" 2>/dev/null; then
+        # Success: move temp file to cache and source it
+        mv "$tmp_cache" "$cache_file"
         source "$cache_file"
     else
-        # If eval fails, remove bad cache and try eval directly
-        rm -f "$cache_file"
+        # Failure: remove temp file and try eval directly without caching
+        rm -f "$tmp_cache" "$cache_file"
         eval "$eval_cmd"
     fi
 }
