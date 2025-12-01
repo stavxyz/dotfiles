@@ -38,6 +38,11 @@ cache_eval() {
     fi
 
     # Cache is invalid or doesn't exist, regenerate
-    eval "$eval_cmd" > "$cache_file" 2>/dev/null
-    source "$cache_file"
+    if eval "$eval_cmd" > "$cache_file" 2>/dev/null; then
+        source "$cache_file"
+    else
+        # If eval fails, remove bad cache and try eval directly
+        rm -f "$cache_file"
+        eval "$eval_cmd"
+    fi
 }
