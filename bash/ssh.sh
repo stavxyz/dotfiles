@@ -3,7 +3,7 @@
 # Description: SSH agent and key management
 # Dependencies: ssh-agent, ssh-add
 
-if ! command -v ssh-agent &>/dev/null; then
+if ! command -v ssh-agent &>/dev/null || ! command -v ssh-add &>/dev/null; then
     return 0
 fi
 
