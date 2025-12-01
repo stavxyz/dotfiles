@@ -48,7 +48,8 @@ is_linux() {
 }
 
 # Cache architecture detection (uname -m doesn't change during shell session)
-DOTFILES_ARCH="${DOTFILES_ARCH:-$(uname -m)}"
+# Export to avoid redundant uname calls in nested shells
+export DOTFILES_ARCH="${DOTFILES_ARCH:-$(uname -m)}"
 
 # Check if running on Apple Silicon (M1/M2/M3)
 # Usage: is_apple_silicon
