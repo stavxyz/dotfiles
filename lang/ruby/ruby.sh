@@ -15,7 +15,7 @@ if [[ -z "$HOMEBREW_PREFIX" ]]; then
     # Files are sourced alphabetically, but be defensive
     if declare -F is_apple_silicon &>/dev/null && is_apple_silicon; then
         HOMEBREW_PREFIX="/opt/homebrew"
-    elif declare -F is_apple_silicon &>/dev/null; then
+    elif declare -F is_apple_silicon &>/dev/null && ! is_apple_silicon; then
         HOMEBREW_PREFIX="/usr/local"
     else
         # Fallback: inline architecture detection if function not available
