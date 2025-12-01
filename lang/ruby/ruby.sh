@@ -13,10 +13,12 @@ fi
 if [[ -z "$HOMEBREW_PREFIX" ]]; then
     # Check if is_apple_silicon function is available (from 10-utils.sh)
     # Files are sourced alphabetically, but be defensive
-    if declare -F is_apple_silicon &>/dev/null && is_apple_silicon; then
-        HOMEBREW_PREFIX="/opt/homebrew"
-    elif declare -F is_apple_silicon &>/dev/null && ! is_apple_silicon; then
-        HOMEBREW_PREFIX="/usr/local"
+    if declare -F is_apple_silicon &>/dev/null; then
+        if is_apple_silicon; then
+            HOMEBREW_PREFIX="/opt/homebrew"
+        else
+            HOMEBREW_PREFIX="/usr/local"
+        fi
     else
         # Fallback: inline architecture detection if function not available
         if [[ "$DOTFILES_ARCH" == "arm64" ]] || [[ "$(uname -m)" == "arm64" ]]; then
