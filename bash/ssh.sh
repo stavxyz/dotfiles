@@ -14,8 +14,14 @@ SSH_ENV="$HOME/.ssh/agent.env"
 is_agent_running() {
     # Return failure if SSH_AUTH_SOCK is not set
     [[ -n "$SSH_AUTH_SOCK" ]] || return 1
+
     # Check if ssh-add can communicate with the agent
+    # Exit codes: 0=has keys, 1=no keys (but agent running!), 2=cannot connect
     ssh-add -l &>/dev/null
+    local rc=$?
+
+    # Return success (0) if agent is running, even with no keys loaded
+    [[ $rc -ne 2 ]]
 }
 
 # Start ssh-agent and save environment
