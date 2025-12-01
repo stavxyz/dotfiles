@@ -8,7 +8,20 @@ if ! command -v brew &>/dev/null; then
     return 0
 fi
 
-chrubypath="$(brew --prefix chruby 2>/dev/null)"
+# Detect chruby path using architecture-aware homebrew prefix
+# This avoids the slow 'brew --prefix chruby' call (100-200ms overhead)
+if [[ "$(uname -m)" == "arm64" ]]; then
+    HOMEBREW_PREFIX="/opt/homebrew"
+else
+    HOMEBREW_PREFIX="/usr/local"
+fi
+
+if [[ -d "${HOMEBREW_PREFIX}/opt/chruby" ]]; then
+    chrubypath="${HOMEBREW_PREFIX}/opt/chruby"
+else
+    # Fallback to brew --prefix if not in standard location
+    chrubypath="$(brew --prefix chruby 2>/dev/null)"
+fi
 
 if [[ -z "$chrubypath" ]]; then
     return 0
