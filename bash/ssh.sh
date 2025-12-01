@@ -12,7 +12,10 @@ SSH_ENV="$HOME/.ssh/agent.env"
 
 # Check if agent is already running
 is_agent_running() {
-    [[ -n "$SSH_AUTH_SOCK" ]] && ssh-add -l &>/dev/null
+    # Return failure if SSH_AUTH_SOCK is not set
+    [[ -n "$SSH_AUTH_SOCK" ]] || return 1
+    # Check if ssh-add can communicate with the agent
+    ssh-add -l &>/dev/null
 }
 
 # Start ssh-agent and save environment
