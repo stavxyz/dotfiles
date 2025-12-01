@@ -11,9 +11,8 @@ fi
 SSH_ENV="$HOME/.ssh/agent.env"
 
 # Check if agent is already running
-agent_is_running() {
+is_agent_running() {
     [[ -n "$SSH_AUTH_SOCK" ]] && ssh-add -l &>/dev/null
-    return $?
 }
 
 # Start ssh-agent and save environment
@@ -29,7 +28,7 @@ if [[ -f "$SSH_ENV" ]]; then
 fi
 
 # Start new agent only if not already running
-if ! agent_is_running; then
+if ! is_agent_running; then
     start_agent
 fi
 
