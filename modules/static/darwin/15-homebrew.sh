@@ -7,9 +7,12 @@
 # shellcheck disable=SC2086  # Safe: word splitting doesn't occur in [[ ]]
 [[ $OSTYPE != *darwin* ]] && return
 
-# Add common homebrew paths to PATH to find brew command (avoid duplicates)
-[[ ":$PATH:" != *":/opt/homebrew/bin:"* ]] && export PATH="/opt/homebrew/bin:$PATH"
-[[ ":$PATH:" != *":/usr/local/bin:"* ]] && export PATH="/usr/local/bin:$PATH"
+# Add the correct Homebrew path to PATH (avoid duplicates and prioritize correct arch)
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    [[ ":$PATH:" != *":/opt/homebrew/bin:"* ]] && export PATH="/opt/homebrew/bin:$PATH"
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    [[ ":$PATH:" != *":/usr/local/bin:"* ]] && export PATH="/usr/local/bin:$PATH"
+fi
 
 # Check if brew is available
 if ! command -v brew &>/dev/null; then

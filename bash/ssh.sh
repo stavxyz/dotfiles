@@ -42,7 +42,7 @@ if ! is_agent_running; then
 fi
 
 if ! [[ -d "${HOME}/.ssh" ]]; then
-  errcho "${HOME}/.ssh dir DNE, skipping."
+  errcho "${HOME}/.ssh directory does not exist, skipping."
 else
   for _key in ~/.ssh/*.pub; do
       # Skip if glob didn't match any files
