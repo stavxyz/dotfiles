@@ -8,14 +8,17 @@ if ! command -v brew &>/dev/null; then
     return 0
 fi
 
-# Detect chruby path using architecture-aware homebrew prefix
-# This avoids the slow 'brew --prefix chruby' call (100-200ms overhead)
-if [[ "$(uname -m)" == "arm64" ]]; then
-    HOMEBREW_PREFIX="/opt/homebrew"
-else
-    HOMEBREW_PREFIX="/usr/local"
+# Use HOMEBREW_PREFIX if already set by homebrew.sh module
+# Otherwise detect using architecture-aware logic
+if [[ -z "$HOMEBREW_PREFIX" ]]; then
+    if is_apple_silicon; then
+        HOMEBREW_PREFIX="/opt/homebrew"
+    else
+        HOMEBREW_PREFIX="/usr/local"
+    fi
 fi
 
+# Try standard Homebrew location first to avoid slow 'brew --prefix chruby' call
 if [[ -d "${HOMEBREW_PREFIX}/opt/chruby" ]]; then
     chrubypath="${HOMEBREW_PREFIX}/opt/chruby"
 else
