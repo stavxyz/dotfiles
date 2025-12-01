@@ -47,13 +47,13 @@ download_completion "docker-compose" \
   "$AUTOCOMPLETE_DIR/docker-compose-completion.bash"
 
 download_completion "virtualenvwrapper" \
-  "https://bitbucket.org/virtualenvwrapper/virtualenvwrapper/raw/master/virtualenvwrapper.sh" \
+  "https://raw.githubusercontent.com/python-virtualenvwrapper/virtualenvwrapper/refs/heads/main/virtualenvwrapper_lazy.sh" \
   "$AUTOCOMPLETE_DIR/virtualenvwrapper-completion.bash"
 
 # shellcheck disable=SC2086  # Safe: word splitting doesn't occur in [[ ]]
 if [[ $OSTYPE == *"darwin"* ]]; then
   download_completion "homebrew" \
-    "https://raw.githubusercontent.com/Homebrew/brew/master/completions/bash/brew" \
+    "https://raw.githubusercontent.com/Homebrew/brew/refs/heads/main/completions/bash/brew" \
     "$AUTOCOMPLETE_DIR/homebrew-completion.bash"
 fi
 
