@@ -3,15 +3,7 @@
 # Description: Platform detection utilities
 # Dependencies: none
 
-# Check if running on macOS
-is_macos() {
-    [[ "$OSTYPE" == darwin* ]]
-}
-
-# Check if running on Linux
-is_linux() {
-    [[ "$OSTYPE" == linux* ]]
-}
+# Note: is_macos() and is_linux() are defined in modules/static/10-utils.sh
 
 # Check if running on Apple Silicon (M1/M2/M3)
 is_apple_silicon() {
