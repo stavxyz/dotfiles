@@ -27,8 +27,6 @@ setup_ruby() {
         source "${chruby_path}/share/chruby/chruby.sh"
     [[ -f "${chruby_path}/share/chruby/auto.sh" ]] && \
         source "${chruby_path}/share/chruby/auto.sh"
-
-    return 0
 }
 
 # Ruby lazy loading optional (chruby is fast)
