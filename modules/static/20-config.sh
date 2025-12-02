@@ -7,13 +7,14 @@
 # Users can override these in ~/.bashrc before sourcing bash_profile
 
 # Language-specific lazy loading toggles
-export DOTFILES_LAZY_PYTHON=${DOTFILES_LAZY_PYTHON:-${DOTFILES_LAZY_PYENV:-true}}
+# Prioritize legacy DOTFILES_LAZY_PYENV for backward compatibility
+export DOTFILES_LAZY_PYTHON=${DOTFILES_LAZY_PYENV:-${DOTFILES_LAZY_PYTHON:-true}}
 export DOTFILES_LAZY_RUBY=${DOTFILES_LAZY_RUBY:-false}
 export DOTFILES_LAZY_ASDF=${DOTFILES_LAZY_ASDF:-true}
 export DOTFILES_LAZY_SSH=${DOTFILES_LAZY_SSH:-false}
 
-# Backward compatibility - DOTFILES_LAZY_PYENV now mirrors DOTFILES_LAZY_PYTHON
-export DOTFILES_LAZY_PYENV=${DOTFILES_LAZY_PYENV:-${DOTFILES_LAZY_PYTHON:-true}}
+# Backward compatibility - keep DOTFILES_LAZY_PYENV synchronized
+export DOTFILES_LAZY_PYENV=$DOTFILES_LAZY_PYTHON
 export DOTFILES_LAZY_DIRENV=${DOTFILES_LAZY_DIRENV:-true}
 export DOTFILES_LAZY_COMPLETIONS=${DOTFILES_LAZY_COMPLETIONS:-true}
 
