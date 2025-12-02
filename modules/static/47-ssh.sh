@@ -52,11 +52,11 @@ setup_ssh() {
             [[ -f "$_key" ]] || continue
 
             # Remove '.pub' to target corresponding private key
-            local priv_key="${_key%.pub}"
-            if [[ -f "${priv_key}" ]]; then
-                ssh-add -q "${priv_key}"
+            local _priv_key="${_key%.pub}"
+            if [[ -f "${_priv_key}" ]]; then
+                ssh-add -q "${_priv_key}"
             else
-                errcho "Corresponding private key ${priv_key} does not exist"
+                errcho "Corresponding private key ${_priv_key} does not exist"
             fi
         done
     fi
