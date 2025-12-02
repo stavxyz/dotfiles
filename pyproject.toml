@@ -10,7 +10,7 @@ readme = "README-dot.md"
 requires-python = ">=2.7"
 license = {text = "MIT"}
 authors = [
-    {name = "Stav Zemah-Shamir", email = "hi@stav.xyz"}
+    {name = "Sam Stavinoha", email = "hi@stav.xyz"}
 ]
 keywords = ["dotfiles", "symlink", "configuration", "cli"]
 classifiers = [
