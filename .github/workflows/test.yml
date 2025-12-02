@@ -45,11 +45,30 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+
       - name: Run ShellCheck linting
         run: |
           # Check all shell scripts and bash config files
           find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -name "bash_aliases" \) \
             -exec shellcheck {} +
+
+      - name: Run Python tests
+        id: pytest
+        run: |
+          echo "## Python Tests (dot.py)" >> $GITHUB_STEP_SUMMARY
+          pytest tests/ -v --tb=short | tee pytest-output.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat pytest-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Run validation tests
         id: validate
@@ -99,11 +118,24 @@ jobs:
               console.log('Could not read validation output');
             }
 
+            // Read pytest output
+            let pytestOutput = 'Python test results not available';
+            try {
+              pytestOutput = fs.readFileSync('pytest-output.txt', 'utf8');
+            } catch (e) {
+              console.log('Could not read pytest output');
+            }
+
             const os = '${{ matrix.os }}';
             const osEmoji = os.includes('macos') ? '🍎' : '🐧';
             const osName = os.includes('macos') ? 'macOS' : 'Linux';
 
             const body = `## ${osEmoji} Test Results (${osName})
+
+            ### 🐍 Python Tests (dot.py)
+            \`\`\`
+            ${pytestOutput}
+            \`\`\`
 
             ### ✅ Validation Tests
             \`\`\`
@@ -154,6 +186,7 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}
           path: |
+            pytest-output.txt
             validation-output.txt
             benchmark-output.txt
             benchmark-results.txt
