@@ -158,30 +158,30 @@ def cli(ctx, config=None, **options):
               help='Answer yes to all prompts')
 @click.pass_context
 def link(ctx, source=None, target=None, use_config=True,
-         confirm=True, yes=False):
+         do_confirm=True, yes=False):
     links = (ctx.obj['config'].get('links', {}) or {}) if use_config else {}
     if target or source:
         links[target] = source
-    links = _resolve_all_links(links)
+    links = _resolve_all_links(links, ctx.obj['config'])
     if DEBUG:
-        click.echo('Symlinks to create:')
-        click.echo(json.dumps(links, indent=2, sort_keys=True))
+        print_info('Symlinks to create:')
+        print_info(json.dumps(links, indent=2, sort_keys=True))
 
     for _target, _source in links.items():
         assert os.path.exists(_source)
         target_parent_dir = os.path.dirname(_target)
         # os.symlink will not create intermediate dirs
         if not os.path.isdir(target_parent_dir):
-            if confirm and not yes:
-                if not click.confirm(
+            if do_confirm and not yes:
+                if not confirm(
                     '\n\nCreate target parent dir(s) [ {} ] for symlink [ {} ] ?'.format(
                     target_parent_dir, _target)):
                     continue
             _mkdir_p(target_parent_dir)
         # create symlinks
         msg = '{} --> {}'.format(_target, _source)
-        if confirm and not yes:
-            if not click.confirm('Create symlink {} ?'.format(msg)):
+        if do_confirm and not yes:
+            if not confirm('Create symlink {} ?'.format(msg)):
                 continue
         try:
             os.symlink(_source, _target)
@@ -199,23 +199,22 @@ def link(ctx, source=None, target=None, use_config=True,
             if _source == _normalize_path(
                 _target, globbing=False, resolve=True):
                 if DEBUG:
-                    click.secho('Skipping [ {} ]. Symlink exists and points '
-                                'to matching source [ {} ]. Skipping.'.format(
-                                _target, _source))
+                    print_info('Skipping [ {} ]. Symlink exists and points '
+                               'to matching source [ {} ]. Skipping.'.format(
+                               _target, _source))
                 continue
             else:
                 # In this case, we could ask for confirmation,
                 # or respect a --force and overwrite.
                 # This is not a very "destructive" overwrite,
                 # thus it should be a relatively safe thing to do,
-                # since we could do it without affecting the 
+                # since we could do it without affecting the
                 # other (previous) source file/dir.
                 _errcho('Symlink {} already exists but does not point '
                         'to source {}. Not creating'.format(_target, _source))
                 continue
         else:
-            click.secho('Created symlink: {} --> {}'.format(_target, _source),
-                        fg='green', bold=True)
+            print_success('Created symlink: {} --> {}'.format(_target, _source))
 
 
 @cli.command(short_help='Remove symlinks')
@@ -227,35 +226,33 @@ def link(ctx, source=None, target=None, use_config=True,
 @click.option('--yes', '-y', is_flag=True, default=False, show_default=True,
               help='Answer yes to all prompts')
 @click.pass_context
-def unlink(ctx, target=None, use_config=True, confirm=True, yes=False):
+def unlink(ctx, target=None, use_config=True, do_confirm=True, yes=False):
     links = (ctx.obj['config'].get('links', {}) or {}) if use_config else {}
     if target:
         source = _normalize_path(target, globbing=False)
         target = _normalize_path(target, resolve=False, globbing=False)
         links[target] = source
-    links = _resolve_all_links(links)
+    links = _resolve_all_links(links, ctx.obj['config'])
     links = sorted([_l for _l in links.keys()
                     if os.path.exists(_l)], reverse=True)
     if DEBUG:
-        click.echo('Links found to remove:')
-        click.echo(json.dumps(links, indent=2, sort_keys=True))
+        print_info('Links found to remove:')
+        print_info(json.dumps(links, indent=2, sort_keys=True))
     for _target in links:
         # remove symlinks
         if not os.path.islink(_target):
-            click.secho('[ {} ] is not a symlink, skipping'.format(_target),
-                        fg='yellow', err=True)
+            print_warning('[ {} ] is not a symlink, skipping'.format(_target))
             continue
         msg = '{} (points to {} )'.format(
             _target, _normalize_path(_target))
-        if confirm and not yes:
-            if not click.confirm('Remove {} ?'.format(msg)):
+        if do_confirm and not yes:
+            if not confirm('Remove {} ?'.format(msg)):
                 continue
-        click.secho('Removing symlink: {}'.format(_target),
-                    fg='green', bold=True)
+        print_success('Removing symlink: {}'.format(_target))
         os.unlink(_target)
 
 
-def _resolve_all_links(links):
+def _resolve_all_links(links, config):
     links_expanded = {}
     for target, source in links.items():
         if target and not source:
@@ -267,7 +264,7 @@ def _resolve_all_links(links):
                 target, globbing=False, resolve=False).rstrip(os.path.sep)
         else:
             target = _normalize_path(
-                click.get_current_context().obj['config']['home'],
+                config['home'],
                 globbing=False, resolve=False).rstrip(os.path.sep)
             # special case:
             # we want to write _into_ the home dir, not overwrite it
