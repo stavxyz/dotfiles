@@ -47,10 +47,6 @@ setup_python() {
         # Try pip user install location
         elif [[ -f "$HOME/.local/bin/virtualenvwrapper_lazy.sh" ]]; then
             source "$HOME/.local/bin/virtualenvwrapper_lazy.sh"
-        # Try downloaded script from autocomplete directory
-        # Note: Despite the filename, this is the complete virtualenvwrapper_lazy.sh script, not just completions
-        elif [[ -f "${DOTFILES_DIR:-$HOME/.dotfiles}/autocomplete/virtualenvwrapper-completion.bash" ]]; then
-            source "${DOTFILES_DIR:-$HOME/.dotfiles}/autocomplete/virtualenvwrapper-completion.bash"
         fi
     fi
 }
