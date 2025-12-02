@@ -18,7 +18,7 @@ You need a dotfiles manager but:
 - ❌ Want something you can curl and run immediately
 - ✅ Just want simple, reliable symlink management
 
-**Result**: 366 lines of pure Python stdlib that works everywhere Python exists.
+**Result**: A compact, single-file implementation using pure Python stdlib that works everywhere Python exists.
 
 ## Features
 
