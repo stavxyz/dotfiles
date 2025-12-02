@@ -126,9 +126,7 @@ fi
 # Disable strict error checking for external scripts (completions, etc.)
 set +E
 
-# Lazy loading setup (function calls, not file sourcing)
-setup_lazy_pyenv
-setup_lazy_direnv
+# Load completions (lazy loading is now handled in individual language modules)
 load_completions
 
 # ============================================================================
