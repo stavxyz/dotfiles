@@ -9,7 +9,7 @@
 # Language-specific lazy loading toggles
 # Precedence: DOTFILES_LAZY_PYTHON (user override) > DOTFILES_LAZY_PYENV (legacy) > true (default)
 if [[ -n "${DOTFILES_LAZY_PYTHON+x}" ]]; then
-    export DOTFILES_LAZY_PYTHON="${DOTFILES_LAZY_PYTHON}"
+    export DOTFILES_LAZY_PYTHON
 elif [[ -n "${DOTFILES_LAZY_PYENV+x}" ]]; then
     export DOTFILES_LAZY_PYTHON="${DOTFILES_LAZY_PYENV}"
 else
