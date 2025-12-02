@@ -26,8 +26,7 @@ setup_python() {
         # Note: pyenv init is idempotent and won't duplicate PATH entries
         eval "$(command pyenv init - --path)"
         
-        # Load virtualenvwrapper via pyenv plugin if available
-        # _load_pyenv_virtualenvwrapper  # Moved inside pyenv() wrapper
+        # Load virtualenvwrapper via pyenv plugin if available (moved inside pyenv() wrapper)
 
         pyenv() {
             unset -f pyenv
