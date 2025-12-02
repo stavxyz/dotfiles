@@ -1,31 +1,97 @@
 #!/usr/bin/env python
+"""dot - Dotfiles symlink manager
 
+Zero dependencies, Python 2.7+ and 3.x compatible.
+"""
+
+from __future__ import print_function
+
+import argparse
 import collections
 import errno
 import functools
 import glob
 import json
 import os
+import sys
 
-import click
-import yaml
+# Python 2/3 compatibility
+try:
+    input = raw_input  # Python 2
+except NameError:
+    pass  # Python 3
 
-_CONTEXT = {}
-CONTEXT_SETTINGS = dict(
-    obj=_CONTEXT,
-    auto_envvar_prefix='DOTFILES',
-    help_option_names=['--help', '-h']
-)
-_DF = 'dotfiles.yaml'
-CHAIN = u'\U0001f517'
+VERSION = '1.0.0'
+DEFAULT_CONFIG = 'dotfiles.json'
 DEBUG = False
 
+# ANSI color codes
+class Colors:
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    BOLD = '\033[1m'
+    RESET = '\033[0m'
 
-def _errcho(text, abort=True, **kw):
-    "Write error to stderr and abort."
-    click.secho(text, err=True, fg='red', bold=True, **kw)
+
+def _use_color():
+    """Check if we should use color output."""
+    return sys.stdout.isatty() and os.getenv('NO_COLOR') is None
+
+
+def print_error(msg, abort=True):
+    """Print error message to stderr and optionally exit."""
+    if _use_color():
+        print("{}{}{}{}".format(Colors.RED, Colors.BOLD, msg, Colors.RESET), file=sys.stderr)
+    else:
+        print("ERROR: {}".format(msg), file=sys.stderr)
     if abort:
-        click.get_current_context().abort()
+        sys.exit(1)
+
+
+def print_success(msg):
+    """Print success message."""
+    if _use_color():
+        print("{}{}{}{}".format(Colors.GREEN, Colors.BOLD, msg, Colors.RESET))
+    else:
+        print(msg)
+
+
+def print_warning(msg):
+    """Print warning message."""
+    if _use_color():
+        print("{}{}{}".format(Colors.YELLOW, msg, Colors.RESET))
+    else:
+        print("WARNING: {}".format(msg))
+
+
+def print_info(msg):
+    """Print info message."""
+    print(msg)
+
+
+def confirm(prompt, default=False):
+    """Ask user for yes/no confirmation."""
+    prompt_str = "{} [Y/n] ".format(prompt) if default else "{} [y/N] ".format(prompt)
+    valid_yes = {'y', 'yes', ''} if default else {'y', 'yes'}
+
+    while True:
+        try:
+            choice = input(prompt_str).lower()
+            if choice in valid_yes:
+                return True
+            elif choice in {'n', 'no', ''} if not default else {'n', 'no'}:
+                return False
+            else:
+                print("Please respond with 'yes' or 'no'")
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return False
+
+
+# Legacy compatibility
+_errcho = print_error
 
 
 def _normalize_path(path, globbing=False, resolve=True):
