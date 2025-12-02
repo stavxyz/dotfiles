@@ -213,4 +213,4 @@ Contributions welcome! Please:
 
 ## Author
 
-Stav Zemah-Shamir ([@stavxyz](https://github.com/stavxyz))
+Sam Stavinoha ([@stavxyz](https://github.com/stavxyz))
