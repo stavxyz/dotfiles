@@ -30,7 +30,7 @@ Most dotfiles repositories force you to choose between **speed** and **features*
 **This Solution**:
 - 📦 **Zero dependencies**: Pure Python stdlib (argparse, json, os, sys)
 - 🐍 **Universal compatibility**: Works with Python 2.7+ and 3.6+ (old servers to modern systems)
-- 📄 **Single file**: 366 lines you can curl and run directly
+- 📄 **Single file**: Compact implementation you can curl and run directly
 - 🎯 **Simple**: Just creates symlinks with glob pattern support
 - 🔧 **Standalone**: Use it for ANY dotfiles repo, not just this one
 
