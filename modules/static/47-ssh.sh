@@ -54,7 +54,7 @@ setup_ssh() {
             if [[ -f "${priv_key}" ]]; then
                 ssh-add -q "${priv_key}"
             else
-                errcho "corresponding private key ${priv_key} does not exist"
+                errcho "Corresponding private key ${priv_key} does not exist"
             fi
         done
     fi
