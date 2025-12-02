@@ -12,7 +12,6 @@
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=1
 export BASH_SILENCE_DEPRECATION_WARNING=1
 export DOTFILES_DIR=${DOTFILES_DIR:-~/dotfiles}
-export DOTFILES_LAZY_PYENV=false  # Load pyenv eagerly so workon is available immediately
 
 # PATH construction
 export PATH="\
