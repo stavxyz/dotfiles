@@ -16,7 +16,7 @@ setup_python() {
         # Lazy load pyenv, but load virtualenvwrapper immediately
         eval "$(command pyenv init - --path)"
         [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
-            eval "$(pyenv sh-virtualenvwrapper_lazy)"
+            eval "$(command pyenv sh-virtualenvwrapper_lazy)"
 
         pyenv() {
             unset -f pyenv
@@ -25,9 +25,9 @@ setup_python() {
         }
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
-        eval "$(pyenv init -)"
+        eval "$(command pyenv init -)"
         [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
-            eval "$(pyenv sh-virtualenvwrapper_lazy)"
+            eval "$(command pyenv sh-virtualenvwrapper_lazy)"
     fi
 }
 
