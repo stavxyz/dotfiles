@@ -9,17 +9,24 @@ export WORKON_HOME="$HOME/.virtualenvs"
 
 [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
+# Helper function to load virtualenvwrapper via pyenv plugin
+_load_pyenv_virtualenvwrapper() {
+    if [[ -d "$(command pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
+        eval "$(command pyenv sh-virtualenvwrapper_lazy)"
+    fi
+}
+
 setup_python() {
     local lazy_mode="${DOTFILES_LAZY_PYTHON:-${DOTFILES_LAZY_PYENV:-true}}"
 
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
         # Lazy load pyenv, but load virtualenvwrapper immediately
+        # Path initialization must happen immediately to ensure correct Python path precedence
+        # The full pyenv init is deferred to the pyenv function wrapper for faster shell startup
         eval "$(command pyenv init - --path)"
         
         # Load virtualenvwrapper via pyenv plugin if available
-        if [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
-            eval "$(command pyenv sh-virtualenvwrapper_lazy)"
-        fi
+        _load_pyenv_virtualenvwrapper
 
         pyenv() {
             unset -f pyenv
@@ -31,9 +38,7 @@ setup_python() {
         eval "$(command pyenv init -)"
         
         # Load virtualenvwrapper via pyenv plugin if available
-        if [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
-            eval "$(command pyenv sh-virtualenvwrapper_lazy)"
-        fi
+        _load_pyenv_virtualenvwrapper
     fi
     
     # Fallback to raw virtualenvwrapper if pyenv plugin is not available
