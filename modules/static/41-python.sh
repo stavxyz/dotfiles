@@ -17,13 +17,13 @@ setup_python() {
             unset -f pyenv
             eval "$(command pyenv init -)"
             [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
-                eval "$(pyenv sh-virtualenvwrapper_lazy)"
+                eval "$(pyenv virtualenvwrapper_lazy)"
             pyenv "$@"
         }
     elif command_exists pyenv; then
         eval "$(pyenv init -)"
         [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
-            eval "$(pyenv sh-virtualenvwrapper_lazy)"
+            eval "$(pyenv virtualenvwrapper_lazy)"
     fi
 }
 
