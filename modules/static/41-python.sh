@@ -27,11 +27,12 @@ setup_python() {
         eval "$(command pyenv init - --path)"
         
         # Load virtualenvwrapper via pyenv plugin if available
-        _load_pyenv_virtualenvwrapper
+        # _load_pyenv_virtualenvwrapper  # Moved inside pyenv() wrapper
 
         pyenv() {
             unset -f pyenv
             eval "$(command pyenv init -)"
+            _load_pyenv_virtualenvwrapper
             pyenv "$@"
         }
     elif command_exists pyenv; then
