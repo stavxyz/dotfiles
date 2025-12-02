@@ -136,7 +136,7 @@ def link(ctx, source=None, target=None, use_config=True,
                     click.secho('Skipping [ {} ]. Symlink exists and points '
                                 'to matching source [ {} ]. Skipping.'.format(
                                 _target, _source))
-                    continue
+                continue
             else:
                 # In this case, we could ask for confirmation,
                 # or respect a --force and overwrite.
