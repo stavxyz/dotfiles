@@ -9,3 +9,10 @@ doc/tags
 .claude
 .coverage
 venv/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+*.pyc
+__pycache__/
