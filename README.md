@@ -4,6 +4,27 @@ Fast, stable shell configuration for macOS and Linux.
 
 **Performance**: 113ms average shell startup time ⚡️
 
+## Why This Project?
+
+Most dotfiles repositories force you to choose between **speed** and **features**. This project proves you can have both.
+
+**The Problem**: Traditional shell configurations are slow (500ms+ startup), fragile (break across systems), or bloated (load everything eagerly).
+
+**This Solution**:
+- ⚡️ **Fast**: 113ms startup via lazy loading, async completions, and eval caching
+- 🔧 **Practical**: Battle-tested configs for Bash, Vim, Git, and Tmux that actually work
+- 🌍 **Cross-platform**: Same config works on macOS and Linux without conditionals everywhere
+- 📦 **Zero dependencies**: Includes `dot.py`, a pure Python stdlib dotfiles manager (no Click, no Stow)
+- ✅ **Tested**: Automated tests for functionality and performance (keeps startup <150ms)
+
+**Who is this for?**
+- Developers who want a fast, reliable shell environment
+- Anyone tired of 1-second shell startup times
+- People managing configs across multiple machines/platforms
+
+**What makes it different?**
+Unlike other dotfiles repos, this prioritizes **performance metrics** and **cross-platform compatibility** as first-class features, not afterthoughts. Every change is benchmarked. Every module is tested on both macOS and Linux.
+
 ## Quick Start
 
 ```bash
