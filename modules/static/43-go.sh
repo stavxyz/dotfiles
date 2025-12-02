@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Module: go
 # Description: Go language configuration and PATH setup
-# Dependencies: go (optional)
+# Dependencies: none
 
 # gore
 alias gore='gore -autoimport'
