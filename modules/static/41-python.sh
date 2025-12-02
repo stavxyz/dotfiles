@@ -15,8 +15,11 @@ setup_python() {
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
         # Lazy load pyenv, but load virtualenvwrapper immediately
         eval "$(command pyenv init - --path)"
-        [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
+        
+        # Load virtualenvwrapper via pyenv plugin if available
+        if [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
             eval "$(command pyenv sh-virtualenvwrapper_lazy)"
+        fi
 
         pyenv() {
             unset -f pyenv
@@ -26,8 +29,28 @@ setup_python() {
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
         eval "$(command pyenv init -)"
-        [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
+        
+        # Load virtualenvwrapper via pyenv plugin if available
+        if [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
             eval "$(command pyenv sh-virtualenvwrapper_lazy)"
+        fi
+    fi
+    
+    # Fallback to raw virtualenvwrapper if pyenv plugin is not available
+    # This allows virtualenvwrapper to work independently of pyenv
+    if ! command_exists workon; then
+        # Try system virtualenvwrapper installation
+        if [[ -f "/usr/local/bin/virtualenvwrapper_lazy.sh" ]]; then
+            source "/usr/local/bin/virtualenvwrapper_lazy.sh"
+        elif [[ -f "/usr/bin/virtualenvwrapper_lazy.sh" ]]; then
+            source "/usr/bin/virtualenvwrapper_lazy.sh"
+        # Try pip user install location
+        elif [[ -f "$HOME/.local/bin/virtualenvwrapper_lazy.sh" ]]; then
+            source "$HOME/.local/bin/virtualenvwrapper_lazy.sh"
+        # Try downloaded completion script from autocomplete directory
+        elif [[ -f "${DOTFILES_DIR:-$HOME/.dotfiles}/autocomplete/virtualenvwrapper-completion.bash" ]]; then
+            source "${DOTFILES_DIR:-$HOME/.dotfiles}/autocomplete/virtualenvwrapper-completion.bash"
+        fi
     fi
 }
 
