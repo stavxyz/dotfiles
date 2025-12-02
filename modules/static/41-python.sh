@@ -13,18 +13,14 @@ setup_python() {
     local lazy_mode="${DOTFILES_LAZY_PYTHON:-${DOTFILES_LAZY_PYENV:-true}}"
 
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
-        # Lazy load pyenv, but load virtualenvwrapper immediately
-        eval "$(command pyenv init - --path)"
-        [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
-            eval "$(pyenv sh-virtualenvwrapper_lazy)"
-
         pyenv() {
             unset -f pyenv
             eval "$(command pyenv init -)"
+            [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
+                eval "$(pyenv sh-virtualenvwrapper_lazy)"
             pyenv "$@"
         }
     elif command_exists pyenv; then
-        # Eager mode: load everything immediately
         eval "$(pyenv init -)"
         [[ -d "$(pyenv root)/plugins/pyenv-virtualenvwrapper" ]] && \
             eval "$(pyenv sh-virtualenvwrapper_lazy)"
