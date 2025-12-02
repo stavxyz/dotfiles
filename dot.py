@@ -119,50 +119,30 @@ def _filetype(path):
     )
 
 
-@click.group(context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
-@click.option('--config', '-c', type=click.File(mode='r'), show_default=True,
-              help='dotfiles config file',
-              default=_DF if os.path.isfile(_DF) else None)
-@click.option('--debug/--no-debug', default=False)
-@click.option('--home-dir', 'home',
-              type=click.Path(exists=True, file_okay=False, dir_okay=True),
-              default=_normalize_path('~/', globbing=False))
-@click.pass_context
-def cli(ctx, config=None, **options):
-    """dotfiles CLI"""
-    if config:
-        config = yaml.safe_load(config)
-    ctx.obj['config'] = config or {}
-    if not ctx.obj['config'].get('home'):
-        ctx.obj['config']['home'] = options['home']
-    ctx.obj.update(options)
-    if ctx.obj['debug']:
-        global DEBUG
-        DEBUG = True
-    if DEBUG:
-        click.echo('Context obj:')
-        click.echo(json.dumps(ctx.obj, indent=2, sort_keys=True))
+def load_config(config_path):
+    """Load config from JSON file."""
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except (IOError, ValueError) as e:
+        print_error('Failed to load config file {}: {}'.format(config_path, e))
+        return {}
 
 
 # what happens if --source uses a glob?
 
-@cli.command(short_help='Create symlinks')
-@click.option('--source', '-s', type=click.Path(exists=True),
-              help='Symlink source file/dir to link to')
-@click.option('--target', '-t', type=click.Path(),
-              help='Symlink target file/dir')
-@click.option('--from-config/--skip-config', 'use_config',
-              default=True, show_default=True)
-@click.option('--confirm/--no-confirm', default=True, show_default=True)
-@click.option('--yes', '-y', is_flag=True, default=False, show_default=True,
-              help='Answer yes to all prompts')
-@click.pass_context
-def link(ctx, source=None, target=None, use_config=True,
-         do_confirm=True, yes=False):
-    links = (ctx.obj['config'].get('links', {}) or {}) if use_config else {}
+def cmd_link(args, config):
+    """Create symlinks."""
+    use_config = not args.skip_config
+    do_confirm = not args.no_confirm
+    yes = args.yes
+    source = args.source
+    target = args.target
+
+    links = (config.get('links', {}) or {}) if use_config else {}
     if target or source:
         links[target] = source
-    links = _resolve_all_links(links, ctx.obj['config'])
+    links = _resolve_all_links(links, config)
     if DEBUG:
         print_info('Symlinks to create:')
         print_info(json.dumps(links, indent=2, sort_keys=True))
@@ -217,22 +197,19 @@ def link(ctx, source=None, target=None, use_config=True,
             print_success('Created symlink: {} --> {}'.format(_target, _source))
 
 
-@cli.command(short_help='Remove symlinks')
-@click.option('--target', '-t', type=click.Path(exists=True),
-              help='Symlink target file/dir')
-@click.option('--from-config/--skip-config', 'use_config',
-              default=True, show_default=True)
-@click.option('--confirm/--no-confirm', default=True, show_default=True)
-@click.option('--yes', '-y', is_flag=True, default=False, show_default=True,
-              help='Answer yes to all prompts')
-@click.pass_context
-def unlink(ctx, target=None, use_config=True, do_confirm=True, yes=False):
-    links = (ctx.obj['config'].get('links', {}) or {}) if use_config else {}
+def cmd_unlink(args, config):
+    """Remove symlinks."""
+    use_config = not args.skip_config
+    do_confirm = not args.no_confirm
+    yes = args.yes
+    target = args.target
+
+    links = (config.get('links', {}) or {}) if use_config else {}
     if target:
         source = _normalize_path(target, globbing=False)
         target = _normalize_path(target, resolve=False, globbing=False)
         links[target] = source
-    links = _resolve_all_links(links, ctx.obj['config'])
+    links = _resolve_all_links(links, config)
     links = sorted([_l for _l in links.keys()
                     if os.path.exists(_l)], reverse=True)
     if DEBUG:
@@ -318,6 +295,72 @@ def _mkdir_p(path):
         else:
             raise
 
-if __name__ == '__main__':
 
-    cli()
+def main():
+    """Main entry point for dot CLI."""
+    parser = argparse.ArgumentParser(
+        prog='dot',
+        description='Dotfiles symlink manager'
+    )
+    parser.add_argument('--version', action='version', version='dot {}'.format(VERSION))
+    parser.add_argument('--config', '-c', default=DEFAULT_CONFIG,
+                        help='dotfiles config file (default: {})'.format(DEFAULT_CONFIG))
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='enable debug output')
+    parser.add_argument('--home-dir', default=_normalize_path('~/', globbing=False),
+                        help='home directory (default: ~)')
+
+    subparsers = parser.add_subparsers(dest='command', help='available commands')
+
+    # link command
+    link_parser = subparsers.add_parser('link', help='Create symlinks')
+    link_parser.add_argument('-s', '--source', help='Symlink source file/dir to link to')
+    link_parser.add_argument('-t', '--target', help='Symlink target file/dir')
+    link_parser.add_argument('--skip-config', action='store_true', default=False,
+                             help='Do not use config file')
+    link_parser.add_argument('--no-confirm', action='store_true', default=False,
+                             help='Do not ask for confirmation')
+    link_parser.add_argument('-y', '--yes', action='store_true', default=False,
+                             help='Answer yes to all prompts')
+
+    # unlink command
+    unlink_parser = subparsers.add_parser('unlink', help='Remove symlinks')
+    unlink_parser.add_argument('-t', '--target', help='Symlink target file/dir')
+    unlink_parser.add_argument('--skip-config', action='store_true', default=False,
+                                help='Do not use config file')
+    unlink_parser.add_argument('--no-confirm', action='store_true', default=False,
+                                help='Do not ask for confirmation')
+    unlink_parser.add_argument('-y', '--yes', action='store_true', default=False,
+                                help='Answer yes to all prompts')
+
+    args = parser.parse_args()
+
+    # Set global DEBUG
+    if args.debug:
+        global DEBUG
+        DEBUG = True
+
+    # Load config if it exists
+    config = {}
+    if os.path.isfile(args.config):
+        config = load_config(args.config)
+
+    # Set home directory in config if not already set
+    if not config.get('home'):
+        config['home'] = args.home_dir
+
+    if DEBUG:
+        print_info('Config:')
+        print_info(json.dumps(config, indent=2, sort_keys=True))
+
+    # Dispatch to command
+    if args.command == 'link':
+        cmd_link(args, config)
+    elif args.command == 'unlink':
+        cmd_unlink(args, config)
+    else:
+        parser.print_help()
+
+
+if __name__ == '__main__':
+    main()
