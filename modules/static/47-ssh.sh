@@ -45,12 +45,12 @@ setup_ssh() {
 
     # Load SSH keys
     if [[ -d "${HOME}/.ssh" ]]; then
-        for _key in ~/.ssh/*.pub; do
+        for _key in "${HOME}"/.ssh/*.pub; do
             # Skip if glob didn't match any files
             [[ -f "$_key" ]] || continue
 
             # Remove '.pub' to target corresponding private key
-            local _priv="${_key%????}"
+            local _priv="${_key%.pub}"
             if [[ -f "${_priv}" ]]; then
                 ssh-add -q "${_priv}"
             else
