@@ -8,7 +8,9 @@ setup_ssh() {
         return 0
     fi
 
-    # SSH agent environment file
+    # SSH agent environment file (local variable, not exported)
+    # Note: Renamed from SSH_ENV to ssh_env for better conventions
+    # (uppercase is reserved for exported environment variables)
     local ssh_env="$HOME/.ssh/agent.env"
 
     # Check if agent is already running

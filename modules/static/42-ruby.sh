@@ -17,6 +17,8 @@ setup_ruby() {
         fi
     fi
 
+    # Detect chruby installation path
+    # Note: Renamed from chrubypath to chruby_path for better conventions
     local chruby_path="${HOMEBREW_PREFIX}/opt/chruby"
     if [[ ! -d "$chruby_path" ]]; then
         chruby_path="$(brew --prefix chruby 2>/dev/null)" || return 0
