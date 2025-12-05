@@ -9,6 +9,7 @@ doc/tags
 .claude
 .coverage
 venv/
+.envrc
 
 # Python packaging
 *.egg-info/
