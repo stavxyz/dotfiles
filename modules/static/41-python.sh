@@ -7,6 +7,9 @@ export PYENV_ROOT="$HOME/.pyenv"
 export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV="true"
 export WORKON_HOME="$HOME/.virtualenvs"
 
+# Add pyenv binary and shims to PATH
+# Shims must be first in PATH for pyenv to intercept python/pip commands
+[[ -d "$PYENV_ROOT/shims" ]] && export PATH="$PYENV_ROOT/shims:$PATH"
 [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
 # Helper function to load virtualenvwrapper via pyenv plugin
@@ -16,17 +19,42 @@ _load_pyenv_virtualenvwrapper() {
     fi
 }
 
+# Shared lazy loader for pyenv - can be triggered by any command
+_lazy_load_pyenv() {
+    # Only load once
+    if [[ -n "${PYENV_LAZY_LOADED:-}" ]]; then
+        return 0
+    fi
+
+    # Unset all lazy wrapper functions
+    unset -f pyenv python pip workon mkvirtualenv deactivate 2>/dev/null
+
+    # Initialize pyenv (rehash shims, install sh dispatcher)
+    eval "$(command pyenv init - bash)"
+
+    # Load virtualenvwrapper
+    _load_pyenv_virtualenvwrapper
+
+    # Mark as loaded
+    export PYENV_LAZY_LOADED=1
+}
+
 setup_python() {
     local lazy_mode="${DOTFILES_LAZY_PYTHON:-${DOTFILES_LAZY_PYENV:-true}}"
 
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
         # Lazy load pyenv: defer full initialization to first use for faster startup
-        pyenv() {
-            unset -f pyenv
-            eval "$(command pyenv init - bash)"
-            _load_pyenv_virtualenvwrapper
-            pyenv "$@"
-        }
+        # Create wrapper functions that trigger initialization on first use
+        pyenv() { _lazy_load_pyenv && pyenv "$@"; }
+        python() { _lazy_load_pyenv && python "$@"; }
+        pip() { _lazy_load_pyenv && pip "$@"; }
+
+        # Virtualenvwrapper commands (if plugin is installed)
+        if [[ -d "$(command pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
+            workon() { _lazy_load_pyenv && workon "$@"; }
+            mkvirtualenv() { _lazy_load_pyenv && mkvirtualenv "$@"; }
+            deactivate() { _lazy_load_pyenv && deactivate "$@"; }
+        fi
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
         eval "$(command pyenv init - bash)"
