@@ -20,24 +20,17 @@ setup_python() {
     local lazy_mode="${DOTFILES_LAZY_PYTHON:-${DOTFILES_LAZY_PYENV:-true}}"
 
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
-        # Lazy load pyenv using the recommended two-step initialization:
-        # 1. `pyenv init - --path` sets up PATH immediately for correct Python precedence
-        # 2. `pyenv init -` (full init) is deferred to the function wrapper for faster startup
-        # Note: pyenv init is idempotent and won't duplicate PATH entries
-        eval "$(command pyenv init - --path)"
-        
-        # Load virtualenvwrapper via pyenv plugin if available (moved inside pyenv() wrapper)
-
+        # Lazy load pyenv: defer full initialization to first use for faster startup
         pyenv() {
             unset -f pyenv
-            eval "$(command pyenv init -)"
+            eval "$(command pyenv init - bash)"
             _load_pyenv_virtualenvwrapper
             pyenv "$@"
         }
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
-        eval "$(command pyenv init -)"
-        
+        eval "$(command pyenv init - bash)"
+
         # Load virtualenvwrapper via pyenv plugin if available
         _load_pyenv_virtualenvwrapper
     fi
