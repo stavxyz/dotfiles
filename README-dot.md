@@ -5,6 +5,21 @@
 
 A lightweight, zero-dependency dotfiles symlink manager for Unix systems. Single file, pure Python stdlib, works everywhere.
 
+**Origin**: Born from this [dotfiles repository](https://github.com/stavxyz/dotfiles) to replace heavy dependency managers like GNU Stow. Now a standalone PyPI package anyone can use.
+
+**Philosophy**: Dotfiles managers shouldn't require more dependencies than the dotfiles themselves. This tool uses only Python stdlib—no Click, no PyYAML, no external packages.
+
+## Why Use This?
+
+You need a dotfiles manager but:
+- ❌ Don't want to install GNU Stow and its dependencies
+- ❌ Don't want Click/PyYAML/other Python packages
+- ❌ Need it to work on old servers with Python 2.7
+- ❌ Want something you can curl and run immediately
+- ✅ Just want simple, reliable symlink management
+
+**Result**: A compact, single-file implementation using pure Python stdlib that works everywhere Python exists.
+
 ## Features
 
 - **Zero runtime dependencies** - Uses only Python stdlib (argparse, json, os, sys)
