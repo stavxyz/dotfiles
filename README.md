@@ -48,7 +48,6 @@ Customize in `~/.bashrc` (before dotfiles load):
 ```bash
 # Performance toggles (defaults shown)
 export DOTFILES_LAZY_PYENV=true           # Lazy load pyenv
-export DOTFILES_LAZY_DIRENV=true          # Lazy load direnv
 export DOTFILES_LAZY_COMPLETIONS=true     # Async completion loading
 export DOTFILES_CACHE_EVALS=true          # Cache expensive evals
 

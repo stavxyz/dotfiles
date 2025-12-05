@@ -2,12 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+**direnv Integration**:
+- direnv now loads immediately by default instead of lazy loading
+- Removed `DOTFILES_LAZY_DIRENV` configuration option
+- Rationale: Lazy loading broke direnv's core auto-loading feature
+- Performance impact: ~4-5ms overhead per command (negligible)
+
 ## [2.0.0] - 2025-11-25
 
 ### Added
 
 **Performance System**:
-- Configurable lazy loading for pyenv, direnv, and completions
+- Configurable lazy loading for pyenv and completions
 - Eval result caching with TTL for expensive operations
 - Async completion loading (13,000+ lines load in background)
 - PATH optimization utilities
@@ -34,7 +44,6 @@ All notable changes to this project will be documented in this file.
 - Completions now load asynchronously by default
 - Homebrew shellenv results cached
 - Pyenv initialization deferred until first use
-- Direnv initialization deferred until first use
 
 **Documentation**:
 - Complete README rewrite with ultra-minimal, modern format
@@ -46,7 +55,6 @@ All notable changes to this project will be documented in this file.
 **Configuration**:
 - Users can now toggle lazy loading via environment variables:
   - `DOTFILES_LAZY_PYENV` (default: true)
-  - `DOTFILES_LAZY_DIRENV` (default: true)
   - `DOTFILES_LAZY_COMPLETIONS` (default: true)
   - `DOTFILES_CACHE_EVALS` (default: true)
 
