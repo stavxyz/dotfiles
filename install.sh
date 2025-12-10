@@ -52,7 +52,9 @@ fi
 if command -v pyenv &>/dev/null && [[ -d ~/.pyenv ]]; then
     echo "✓ pyenv already installed"
     export PATH="${HOME}/.pyenv/bin:$PATH"
-    eval "$(pyenv init - bash)" || { echo "Error: pyenv init failed."; exit 1; }
+    # Detect shell type for cross-shell compatibility
+    shell_type="$(basename "${SHELL:-bash}")"
+    eval "$(pyenv init - "$shell_type")" || { echo "Error: pyenv init failed."; exit 1; }
 else
     # pyenv not found or incomplete - install via pyenv-installer
     echo "Installing pyenv via pyenv-installer..."
@@ -60,7 +62,9 @@ else
 
     export PATH="${HOME}/.pyenv/bin:$PATH"
     if command -v pyenv &>/dev/null; then
-        eval "$(pyenv init - bash)" || { echo "Error: pyenv init failed."; exit 1; }
+        # Detect shell type for cross-shell compatibility
+        shell_type="$(basename "${SHELL:-bash}")"
+        eval "$(pyenv init - "$shell_type")" || { echo "Error: pyenv init failed."; exit 1; }
     else
         echo "Error: pyenv installation failed"
         exit 1
