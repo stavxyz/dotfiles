@@ -30,7 +30,10 @@ _lazy_load_pyenv() {
     unset -f pyenv python pip workon mkvirtualenv deactivate 2>/dev/null
 
     # Initialize pyenv (rehash shims, install sh dispatcher)
-    eval "$(command pyenv init - bash)"
+    # Detect shell type for cross-shell compatibility
+    local shell_type
+    shell_type="$(basename "${SHELL:-bash}")"
+    eval "$(command pyenv init - "$shell_type")"
 
     # Load virtualenvwrapper
     _load_pyenv_virtualenvwrapper
@@ -57,7 +60,10 @@ setup_python() {
         fi
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
-        eval "$(command pyenv init - bash)"
+        # Detect shell type for cross-shell compatibility
+        local shell_type
+        shell_type="$(basename "${SHELL:-bash}")"
+        eval "$(command pyenv init - "$shell_type")"
 
         # Load virtualenvwrapper via pyenv plugin if available
         _load_pyenv_virtualenvwrapper
