@@ -37,7 +37,7 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Please review this pull request and provide feedback on:
-            - Code quality and adherence to engineering standards (CONTRIBUTING.md)
+            - Code quality and adherence to engineering standards (docs/ENGINEERING_STANDARDS.md)
             - Shell script best practices (ShellCheck compliance, quoting, error handling)
             - Module headers and documentation
             - Platform detection and compatibility
