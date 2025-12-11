@@ -26,6 +26,8 @@ jobs:
         uses: anthropics/claude-code-action@3a38b377b30c75102b420405ed9516b57ca2e248 # v1
         with:
           allowed_bots: "Copilot,copilot-swe-agent"
+          # Uses API key for automated reviews - simpler authentication for
+          # single-purpose, non-interactive workflows with limited scope
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: true
@@ -34,11 +36,14 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Please review this pull request and provide feedback on:
-            - Code quality and adherence to engineering standards (docs/ENGINEERING_STANDARDS.md)
-            - Python best practices (type hints, error handling, docstrings)
+            - Code quality and adherence to engineering standards (CONTRIBUTING.md)
+            - Shell script best practices (ShellCheck compliance, quoting, error handling)
+            - Module headers and documentation
+            - Platform detection and compatibility
             - Potential bugs or issues
             - Security concerns
-            - Test coverage
+            - Test coverage (bats tests)
+            - Performance considerations
 
             Be constructive and helpful in your feedback. Focus on substantive issues, not nitpicks.
 
