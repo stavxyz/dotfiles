@@ -11,7 +11,7 @@ on:
     types: [submitted]
 
 jobs:
-  claude:
+  claude-respond:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot') ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot') ||
@@ -22,7 +22,6 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-      id-token: write
       actions: read # Required for Claude to read CI results on PRs
 
     steps:
@@ -32,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Claude Code
-        id: claude
+        id: claude-respond
         uses: anthropics/claude-code-action@3a38b377b30c75102b420405ed9516b57ca2e248 # v1
         with:
           # Uses OAuth token for interactive workflows where Claude may need

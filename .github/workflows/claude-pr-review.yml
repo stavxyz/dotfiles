@@ -23,6 +23,7 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
+        continue-on-error: true  # Don't block PR if Claude fails
         uses: anthropics/claude-code-action@3a38b377b30c75102b420405ed9516b57ca2e248 # v1
         with:
           allowed_bots: "Copilot,copilot-swe-agent"

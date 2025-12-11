@@ -182,12 +182,58 @@ To maintain performance:
 - Document any `eval` usage with clear comments
 - Be careful with file permissions when creating files
 
+## AI-Assisted Code Review
+
+This repository uses Claude Code for automated assistance and code review.
+
+### Automated PR Reviews
+
+When you open or update a PR, Claude will automatically review your changes against:
+- Code quality standards (this CONTRIBUTING.md file)
+- ShellCheck compliance
+- Module headers and documentation
+- Platform compatibility
+- Test coverage (bats tests)
+- Performance considerations
+
+**Note:** Claude's suggestions should be reviewed by human maintainers before merging. Automated reviews are advisory, not blocking.
+
+### Interactive Assistance
+
+Tag `@claude` in any issue, PR, or comment to get help with:
+- Code review requests
+- Bug investigation
+- Implementation questions
+- Documentation clarification
+- ShellCheck error explanations
+- Module design suggestions
+
+**Example:**
+```
+@claude can you help me understand why this ShellCheck warning is appearing?
+```
+
+Claude will respond with context-aware assistance based on the repository's code and standards.
+
+### Configuration
+
+The workflows require two secrets to be configured in the repository:
+- `CLAUDE_CODE_OAUTH_TOKEN`: For interactive Claude sessions (mentions)
+- `ANTHROPIC_API_KEY`: For automated PR reviews
+
+### Limitations
+
+- Claude cannot push code directly to `main` (repository rules apply)
+- Review suggestions are advisory and should be validated
+- Complex architectural decisions still require human review
+
 ## Getting Help
 
 - Check existing modules for examples
 - Run `shellcheck <file>` to catch common issues
 - Look at recent PRs for patterns
 - Ask questions in PR comments
+- Tag `@claude` for AI-assisted help
 
 ## Code Review Expectations
 
