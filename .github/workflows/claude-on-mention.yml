@@ -12,11 +12,12 @@ on:
 
 jobs:
   claude-respond:
+    timeout-minutes: 30
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot') ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot') ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && github.event.review.user.type != 'Bot') ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.type != 'Bot')
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot' && github.event.comment.user.type != 'bot') ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.type != 'Bot' && github.event.comment.user.type != 'bot') ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && github.event.review.user.type != 'Bot' && github.event.review.user.type != 'bot') ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.type != 'Bot' && github.event.issue.user.type != 'bot')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,10 +38,6 @@ jobs:
           # Uses OAuth token for interactive workflows where Claude may need
           # extended permissions and session management across multiple operations
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          # Allow Claude to read CI results on PRs
-          additional_permissions: |
-            actions: read
 
           # When @claude is mentioned in an issue, pull request, or comment,
           # Claude will read and execute the instructions in that mention.
