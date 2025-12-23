@@ -1,8 +1,49 @@
 # dotfiles
 
-Fast, stable shell configuration for macOS and Linux.
+Fast, stable shell configuration for macOS and Linux, plus a zero-dependency dotfiles manager.
 
 **Performance**: 113ms average shell startup time ⚡️
+
+## Why This Project?
+
+This repository serves **two purposes**:
+
+1. **Production-ready dotfiles** - Fast, tested configs for Bash, Vim, Git, and Tmux
+2. **Standalone dotfiles manager** - `dot.py`, a zero-dependency Python tool (published to PyPI)
+
+Most dotfiles repositories force you to choose between **speed** and **features**. This project proves you can have both.
+
+### The Dotfiles
+
+**The Problem**: Traditional shell configurations are slow (500ms+ startup), fragile (break across systems), or bloated (load everything eagerly).
+
+**This Solution**:
+- ⚡️ **Fast**: 113ms startup via lazy loading, async completions, and eval caching
+- 🔧 **Practical**: Battle-tested configs for Bash, Vim, Git, and Tmux that actually work
+- 🌍 **Cross-platform**: Same config works on macOS and Linux without conditionals everywhere
+- ✅ **Tested**: Automated tests for functionality and performance (keeps startup <150ms)
+
+### The Tool (`dot.py`)
+
+**The Problem**: Existing dotfiles managers like GNU Stow are powerful but complex, or they require heavy dependencies like Click/PyYAML.
+
+**This Solution**:
+- 📦 **Zero dependencies**: Pure Python stdlib (argparse, json, os, sys)
+- 🐍 **Universal compatibility**: Works with Python 2.7+ and 3.6+ (old servers to modern systems)
+- 📄 **Single file**: Compact implementation you can curl and run directly
+- 🎯 **Simple**: Just creates symlinks with glob pattern support
+- 🔧 **Standalone**: Use it for ANY dotfiles repo, not just this one
+
+See [README-dot.md](README-dot.md) for `dot.py` documentation.
+
+**Who is this for?**
+- Developers who want a fast, reliable shell environment
+- Anyone tired of 1-second shell startup times
+- People managing configs across multiple machines/platforms
+- Anyone who needs a lightweight dotfiles manager without dependencies
+
+**What makes it different?**
+Unlike other dotfiles repos, this prioritizes **performance metrics** and **cross-platform compatibility** as first-class features, not afterthoughts. Every change is benchmarked. Every module is tested on both macOS and Linux. And it includes a reusable tool (`dot.py`) that you can use with any dotfiles repository.
 
 ## Quick Start
 
