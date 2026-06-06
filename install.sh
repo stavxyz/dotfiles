@@ -9,12 +9,14 @@
 #
 # Prerequisites installed:
 # - vim-plug (Vim plugin manager)
+# - TPM (tmux plugin manager)
 # - pyenv (Python version manager via pyenv-installer)
 # - pyenv-virtualenvwrapper (Python virtual environment tools)
 #
 # Note: This script only installs missing components. It does not update
 # existing installations. Use the appropriate update method for each tool:
 #   - vim-plug: Run :PlugUpdate in Vim
+#   - TPM: Run `prefix + U` inside tmux to update plugins
 #   - pyenv: Run `pyenv update` (if installed via pyenv-installer) or `brew upgrade pyenv`
 #   - pyenv-virtualenvwrapper: `cd $(pyenv root)/plugins/pyenv-virtualenvwrapper && git pull`
 #
@@ -42,6 +44,17 @@ else
     echo "Installing vim-plug..."
     curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+# ============================================================================
+# TMUX Plugin Manager (TPM)
+# ============================================================================
+
+if [[ -d ~/.tmux/plugins/tpm ]]; then
+    echo "✓ TPM (tmux plugin manager) already installed"
+else
+    echo "Installing TPM (tmux plugin manager)..."
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
 # ============================================================================
@@ -89,4 +102,5 @@ echo ""
 echo "Next steps:"
 echo "  1. Restart your terminal (to load pyenv)"
 echo "  2. Run: ./dot.py link"
+echo "  3. Inside tmux, press 'prefix + I' to install tmux plugins"
 echo ""
