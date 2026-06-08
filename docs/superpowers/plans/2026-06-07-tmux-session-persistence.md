@@ -1,3 +1,17 @@
+---
+validated:
+  sha: 5468123758741fe40418f9f9ab8601ed92bf244a
+  date: 2026-06-08T03:32:45Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 0
+    medium: 0
+    low: 2
+    nitpick: 0
+  net_negative_remaining: 0
+---
+
 # tmux Session Persistence Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -17,7 +31,7 @@
 ## File Structure
 
 - **Modify:** `tmux/tmux.conf` — add a "session persistence" block (3 option lines + 1 comment) immediately after the last `set -g @plugin` line (line 53) and before the `# Initialize TMUX plugin manager` comment (line 55). This is the only repo source change.
-- **Create:** `tests/test-tmux-persistence.bats` — bats test asserting the persistence options are set when the config is sourced. Follows the existing `tests/*.bats` convention.
+- **Create:** `tests/test-tmux-persistence.bats` — bats test asserting the persistence options are set when the config is sourced. Mirrors the existing `tests/*.bats` structure (`setup`/`teardown`, `@test` blocks) but derives `DOTFILES_DIR` with a single `..` so it resolves to the repo root — deliberately diverging from the existing three bats files, whose `$(dirname "$BATS_TEST_DIRNAME")/..` form resolves one level *above* the repo. *(Verified 2026-06-07: was incorrect — the new test does not match the existing `DOTFILES_DIR` derivation; it intentionally uses the correct single-`..` form.)*
 
 No new scripts, no hook files: per the spec's Design note (2026-06-07), the Claude-restore behavior has exactly **one** owner — the inline `@resurrect-processes` rule. The post-restore-hook alternative from the spec's fallback ladder is deliberately NOT built unless Task 4 proves the inline rule cannot match (documented limitation, not a second owner).
 
@@ -39,6 +53,8 @@ Create `tests/test-tmux-persistence.bats`:
 # Description: Assert resurrect/continuum persistence options are set by tmux.conf
 
 setup() {
+    # NOTE: single '..' resolves to the repo root. The existing tests/*.bats use
+    # $(dirname "$BATS_TEST_DIRNAME")/.. which resolves ABOVE the repo — do not copy that form here.
     export DOTFILES_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
     export TMUX_CONF="$DOTFILES_DIR/tmux/tmux.conf"
     export SOCKET="tmux-persistence-test-$$"
