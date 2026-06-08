@@ -1,3 +1,17 @@
+---
+validated:
+  sha: 05651179c138c5ebab7f1173513b8152fe32bf4b
+  date: 2026-06-08T03:08:50Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 0
+    medium: 0
+    low: 1
+    nitpick: 0
+  net_negative_remaining: 0
+---
+
 # Design: tmux session persistence across reboot
 
 **Date:** 2026-06-07
@@ -72,6 +86,13 @@ Verification + fallbacks, in order of preference:
 Known caveat of `--continue`: it picks the most recent conversation for a directory. Two
 panes sharing one cwd would both resume the same conversation; distinct project dirs (the
 normal case here) map cleanly one-to-one.
+
+> **Design note (2026-06-07):** The claude-restore behavior must have exactly one owner.
+> At implementation, commit to a single mechanism — the inline `@resurrect-processes` rule
+> OR the `@resurrect-hook-post-restore-all` script — and delete the unused half rather than
+> leaving both partially specified. Add a one-line comment in `tmux.conf` next to the chosen
+> mechanism so a future reader can find where claude-restore actually lives. The fallback
+> ladder above is a verification sequence, not a license to ship two dormant owners.
 
 ## Verification
 
