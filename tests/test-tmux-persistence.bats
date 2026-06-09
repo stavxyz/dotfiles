@@ -30,3 +30,15 @@ teardown() {
     [ "$status" -eq 0 ]
     [ "$output" = "on" ]
 }
+
+@test "resurrect treats claude as a restorable process" {
+    run tmux -L "$SOCKET" show-options -gv @resurrect-processes
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"~claude"* ]]
+}
+
+@test "resurrect post-save hook points at the deployed injection script" {
+    run tmux -L "$SOCKET" show-options -gv @resurrect-hook-post-save-all
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"tmux-claude-resume/resurrect-inject-claude-resume.sh"* ]]
+}
