@@ -56,3 +56,13 @@ teardown() { rm -rf "$WORK"; }
     run grep -c ':vim$' "$RESDIR/last"
     [ "$output" = "1" ]
 }
+
+@test "duplicate flags are collapsed (Claude re-adds --dangerously-skip-permissions each launch)" {
+    # A pane whose captured command already accumulated the flag (doubled/tripled).
+    printf 'pane\tmain\t1\t0\t:\t0\t title\t:/tmp/proj\t1\t2.1.168\t:claude --dangerously-skip-permissions --dangerously-skip-permissions --dangerously-skip-permissions -r\n' > "$RESDIR/last"
+    HOME="$FAKE_HOME" run bash "$INJECT"
+    [ "$status" -eq 0 ]
+    # Exactly one --dangerously-skip-permissions, then --resume <id>.
+    run grep -c ':claude --dangerously-skip-permissions --resume live-sess$' "$RESDIR/last"
+    [ "$output" = "1" ]
+}
