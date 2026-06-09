@@ -31,6 +31,10 @@ rewrite_cmd() {
     # Strip any existing resume/continue flags; keep the rest (e.g. --dangerously-skip-permissions).
     flags="$(printf '%s' "$cmd" \
         | sed -E 's/(^| )(-r|--resume([= ][^ ]+)?|-c|--continue)( |$)/ /g; s/  +/ /g; s/ +$//')"
+    # Collapse repeated identical tokens, keeping first occurrence. Claude's launcher re-adds
+    # --dangerously-skip-permissions on every launch, so without this it would accumulate
+    # unbounded across reboot/restore cycles.
+    flags="$(printf '%s' "$flags" | awk '{for(i=1;i<=NF;i++) if(!seen[$i]++) printf "%s%s",(n++?OFS:""),$i}')"
     sid="$(tcr_session_id "$pane_id")"
     if [ -n "$sid" ] && compgen -G "$projects/*/$sid.jsonl" > /dev/null; then
         printf '%s --resume %s' "$flags" "$sid"
