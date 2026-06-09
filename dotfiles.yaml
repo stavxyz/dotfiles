@@ -44,6 +44,7 @@ links:
     ~/.config/karabiner/karabiner.json:     karabiner/karabiner.json
     ~/.inputrc:                             osx/inputrc
     ~/.config/base16-shell:                 shell/base16-shell
+    ~/.config/tmux-claude-resume/:          tmux-claude-resume/*
 
 brew:
     install:
