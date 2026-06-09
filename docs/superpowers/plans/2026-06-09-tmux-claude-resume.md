@@ -444,7 +444,11 @@ mv "$tmp" "$real"
 # --- Phase 2: prune registry entries for panes that no longer exist ---
 # Guard: never call tcr_prune with zero live panes (that would wipe the registry).
 mapfile -t live < <(tmux list-panes -a -F '#{pane_id}')
-[ "${#live[@]}" -gt 0 ] && tcr_prune "${live[@]}"
+# Full `if` (not `&&`): as the script's last statement, a false `&&` would exit 1
+# under `set -e` in exactly the no-live-panes case the guard handles.
+if [ "${#live[@]}" -gt 0 ]; then
+    tcr_prune "${live[@]}"
+fi
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
