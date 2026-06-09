@@ -19,8 +19,20 @@ Restart your terminal.
 - **Bash**: Fast startup, git-aware prompt, cross-platform completions
 - **Vim**: Modern config with vim-plug, Go/Ruby/JavaScript support
 - **Git**: Powerful aliases (fpush, reup, changelog, main sync)
-- **Tmux**: Vim keybindings, session persistence, Solarized colors
+- **Tmux**: Vim keybindings, TPM plugins, session persistence across reboot, per-pane Claude Code resume, Solarized colors
 - **Tools**: pyenv, direnv, fzf, volta integration
+
+### Tmux session persistence
+
+Tmux plugins are managed by [TPM](https://github.com/tmux-plugins/tpm), which `install.sh`
+bootstraps automatically — run `prefix + I` inside tmux once to install the declared plugins.
+With [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) +
+[tmux-continuum](https://github.com/tmux-plugins/tmux-continuum), your windows, panes, layout,
+working directories, and scrollback survive a reboot.
+
+If you run Claude Code in tmux panes, [`tmux-claude-resume/`](tmux-claude-resume/README.md)
+makes each restored pane resume **its own** conversation by session ID (no same-directory
+collision). See its README to enable it.
 
 ## Requirements
 

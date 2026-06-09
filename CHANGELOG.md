@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+**Tmux Plugin Bootstrap**:
+- `install.sh` now installs TPM (Tmux Plugin Manager) into `~/.tmux/plugins/tpm` if missing,
+  so the plugins declared in `tmux.conf` actually load (run `prefix + I` to install them)
+- Hardened the Solarized colorscheme source lines with `source -q` so a missing plugin no
+  longer errors on tmux startup
+
+**Tmux Session Persistence** (tmux-resurrect + tmux-continuum):
+- `@continuum-restore` — sessions auto-restore the next time you start tmux after a reboot
+- `@resurrect-capture-pane-contents` — pre-reboot scrollback is restored too
+- Restores windows, panes, layout, and per-pane working directories
+
+**Per-Pane Claude Code Resume** (`tmux-claude-resume/`):
+- After a reboot, each restored tmux pane resumes *its own* Claude Code conversation by
+  session ID — eliminating the same-directory collision that `claude --continue` suffers
+- A `SessionStart` hook records `pane → session_id`; a resurrect post-save hook rewrites each
+  claude pane's restore command to `claude <your-flags> --resume <id>` (or the `-r` picker if
+  the session is gone). Your launch flags (e.g. `--dangerously-skip-permissions`) are preserved
+- Idempotent installer wires the hook into `~/.claude/settings.json`; scripts deploy via
+  `dotfiles.yaml` to `~/.config/tmux-claude-resume/`
+- See `tmux-claude-resume/README.md` for setup and how it works
+
+**Development Infrastructure**:
+- Claude Code GitHub workflows (`claude-on-mention`, `claude-pr-review`)
+- `docs/ENGINEERING_STANDARDS.md` and `CONTRIBUTING.md`
+- bats test suites for the tmux persistence and Claude-resume features
+
 ### Changed
 
 **direnv Integration**:
