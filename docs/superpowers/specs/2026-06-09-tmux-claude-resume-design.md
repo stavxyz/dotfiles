@@ -1,9 +1,23 @@
+---
+validated:
+  sha: 8dc69ad81c2e54591b3d6c08d8a4f0c6fcf3a048
+  date: 2026-06-09T19:15:31Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 2
+    medium: 2
+    low: 9
+    nitpick: 0
+  net_negative_remaining: 0
+---
+
 # Design: bulletproof per-pane Claude Code resume across reboot
 
 **Date:** 2026-06-09
 **Status:** Approved
 **Branch:** ccc-config-1 (branch/PR strategy decided at implementation time)
-**Builds on:** tmux session persistence (`2026-06-07-tmux-session-persistence-design.md`, Tasks 1–3 shipped: continuum restore + resurrect pane-contents capture). Supersedes that plan's parked Tasks 4–5.
+**Builds on:** tmux session persistence (`2026-06-07-tmux-session-persistence-design.md`, Tasks 1–3 shipped: continuum restore + resurrect pane-contents capture). Supersedes the parked Claude-resume work — Tasks 4–5 of the *implementation plan* derived from that spec, not the design doc.
 
 ## Goal
 
@@ -31,8 +45,10 @@ sessions).
 - Sessions are stored at `~/.claude/projects/<encoded-cwd>/<session-uuid>.jsonl`; existence of
   that file confirms a session is resumable.
 - tmux-resurrect's save file records each pane's full command line (e.g.
-  `:claude --dangerously-skip-permissions -r`) and identifies panes by
-  `(session_name, window_index, pane_index)`.
+  `:claude --dangerously-skip-permissions -r` — empirically confirmed in a real save, not just
+  the bare command name) and identifies panes by `(session_name, window_index, pane_index)`.
+  That the command field carries the full launch line (with flags) is part of load-bearing
+  assumption #1 below.
 
 ## Architecture (B1: post-save rewrite)
 
@@ -47,26 +63,43 @@ must re-map freshly-assigned pane IDs).
 
 ### Components
 
-All scripts live in the dotfiles repo (public, generic). The hook registration is injected into
-`~/.claude/settings.json` by an idempotent installer — that file is personal and is **never
-committed**.
+All scripts live together in one repo feature directory `tmux-claude-resume/` (public, generic)
+— grouped so the feature's files and their shared contract sit in one place, and named
+distinctly from the repo's existing *project-local* `.claude/` tooling dir to avoid confusion.
+They deploy to stable paths under `~/.config/tmux-claude-resume/` via a `dotfiles.yaml` symlink
+entry (`~/.config/tmux-claude-resume/: tmux-claude-resume/*`), matching the repo's existing
+`~/.config/...` link convention — so nothing references a hardcoded repo-checkout path.
 
-1. **Capture hook — `claude/hooks/record-tmux-session.sh`**
+The hook registration is injected into the user's **global** `~/.claude/settings.json` by an
+idempotent installer. That file is personal and is **never committed**. Note: the repo also
+contains an *untracked, unrelated* project-local `.claude/settings.json` (this repo's own Claude
+config) — a distinct file at a different path. The installer targets the absolute
+`~/.claude/settings.json` and must not be conflated with the repo-local one.
+
+**Registry helper — `tmux-claude-resume/registry.sh` (single owner of the registry contract).**
+Defines, in exactly one place, the registry directory (`~/.cache/tmux-claude-resume/`), the
+`pane_id → filename` sanitization, the `session_id<TAB>cwd` line format, and read/write/prune
+functions. Both hooks source it, so a format change can't silently desync the two scripts into
+universal `-r` fallback.
+
+1. **Capture hook — `tmux-claude-resume/record-tmux-session.sh`** (deployed to
+   `~/.config/tmux-claude-resume/record-tmux-session.sh`)
    - Registered as a `SessionStart` hook (matchers `startup`, `resume`).
    - If `$TMUX` is unset → no-op (not in tmux).
-   - Else write `~/.cache/tmux-claude-resume/<sanitized-pane-id>` containing
-     `session_id<TAB>cwd` from `$CLAUDE_CODE_SESSION_ID`, `$TMUX_PANE`, `$PWD`.
+   - Else records `{pane_id → session_id, cwd}` **via the shared registry helper**, reading
+     `$CLAUDE_CODE_SESSION_ID`, `$TMUX_PANE`, `$PWD`. (Does not hand-roll the path/format.)
    - Idempotent; overwrites on every start/resume so the entry is always current.
    - Inputs: env vars. Output: one registry file. Independently testable.
 
-2. **Injection hook — `tmux/resurrect-inject-claude-resume.sh`**
+2. **Injection hook — `tmux-claude-resume/resurrect-inject-claude-resume.sh`** (deployed to
+   `~/.config/tmux-claude-resume/resurrect-inject-claude-resume.sh`)
    - Wired via `@resurrect-hook-post-save-all`. Runs after resurrect writes its save file.
    - Resolves the save file (`<@resurrect-dir>/last`).
    - Builds a live join table: `tmux list-panes -a -F
      '#{session_name}\t#{window_index}\t#{pane_index}\t#{pane_id}'`.
    - For each save-file `pane` line whose command field contains `claude`:
      - Find `pane_id` via the join on `(session_name, window_index, pane_index)`.
-     - Look up `session_id` in the registry by `pane_id`.
+     - Look up `session_id` **via the shared registry helper**, keyed by `pane_id`.
      - If found AND `~/.claude/projects/<slug>/<session_id>.jsonl` exists → rewrite command to
        `claude <preserved-flags> --resume <session_id>`.
      - Else → rewrite to `claude <preserved-flags> -r` (the chosen fallback).
@@ -78,11 +111,24 @@ committed**.
 
 3. **tmux.conf additions** (in the existing persistence block):
    - `set -g @resurrect-processes '~claude'` (so resurrect restores claude panes at all).
-   - `set -g @resurrect-hook-post-save-all 'bash <repo>/tmux/resurrect-inject-claude-resume.sh'`.
+   - `set -g @resurrect-hook-post-save-all 'bash ~/.config/tmux-claude-resume/resurrect-inject-claude-resume.sh'`
+     — the deployed symlink path, so the committed `tmux.conf` carries no hardcoded
+     repo-checkout location (consistent with the rest of the file using `$HOME`/`~` paths).
 
-4. **Installer** — idempotently merges the `SessionStart` hook entry into
-   `~/.claude/settings.json` (jq or python), skipping if already present. Does not commit
-   settings.json.
+4. **Installer** — idempotently merges the `SessionStart` hook entry into the absolute
+   `~/.claude/settings.json` (jq or python), skipping if already present; never a relative
+   `.claude/settings.json` (which would hit the repo-local file). Does not commit settings.json.
+   Deployment of the scripts themselves is handled by the new `dotfiles.yaml` link entry
+   (`~/.config/tmux-claude-resume/: tmux-claude-resume/*`) run via `./dot.py link`, keeping
+   deployment single-mechanism rather than an installer-managed side path.
+
+> **Design note (2026-06-09, validate):** Reviewer feedback tightened three seams in this
+> section: (1) the registry is now a **single-owner contract** (`registry.sh` sourced by both
+> hooks) instead of a format duplicated across two scripts; (2) script **deployment is defined**
+> — one feature dir `tmux-claude-resume/` symlinked to `~/.config/tmux-claude-resume/` via
+> `dotfiles.yaml`, with no hardcoded repo-checkout path in the committed `tmux.conf`; (3) the
+> installer targets the **absolute** `~/.claude/settings.json`, explicitly distinct from the
+> repo's untracked project-local `.claude/settings.json`.
 
 ### Data flow
 
@@ -108,7 +154,10 @@ resumes its own conversation.
 2. `@resurrect-hook-post-save-all` fires after save, with the save file resolvable.
 
 If either is false, fall back to architecture B2 (post-restore keystroke injection) — but only
-after the spikes, not speculatively.
+after the spikes, not speculatively. Switching to B2 discards Components 2–3 (the injection hook
+and the `@resurrect-*` wiring) and changes the testing strategy; the capture hook (Component 1)
+and the registry helper survive unchanged. Therefore do NOT build Components 2–3 until
+assumption #1 is confirmed — the spike gates a possible redesign, not a tweak.
 
 ## Testing
 
