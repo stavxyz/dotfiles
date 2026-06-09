@@ -1,3 +1,17 @@
+---
+validated:
+  sha: e397914ac165f85d1319ccc198623711834a751e
+  date: 2026-06-09T19:28:59Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 0
+    medium: 2
+    low: 4
+    nitpick: 0
+  net_negative_remaining: 0
+---
+
 # Bulletproof Per-Pane Claude Resume — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -141,7 +155,9 @@ Create `tmux-claude-resume/registry.sh`:
 # Single source of truth for the tmux-claude-resume pane->session registry.
 # Schema: one file per tmux pane under the registry dir, named by a sanitized
 # pane id, containing a single line: "<session_id>\t<cwd>".
-# Override the dir with $TMUX_CLAUDE_RESUME_DIR (used by tests).
+# The cwd field is diagnostic/reserved — no consumer reads it today; only field 1
+# (session_id) is load-bearing. Override the dir with $TMUX_CLAUDE_RESUME_DIR (tests).
+# Prune contract: tcr_prune requires a NON-EMPTY live-pane set (see resurrect-inject).
 
 tcr_registry_dir() {
     echo "${TMUX_CLAUDE_RESUME_DIR:-$HOME/.cache/tmux-claude-resume}"
@@ -311,7 +327,8 @@ setup() {
 #!/usr/bin/env bash
 case "\$*" in
   "show-options -gv @resurrect-dir") echo "$RESDIR" ;;
-  "list-panes -a -F"*) printf 'main\t1\t0\t%%1\nmain\t1\t1\t%%2\n' ;;
+  "list-panes -a -F #{pane_id}") printf '%%1\n%%2\n' ;;          # bare pane-id query (prune)
+  "list-panes -a -F"*) printf 'main\t1\t0\t%%1\nmain\t1\t1\t%%2\n' ;;  # 4-field join query
   *) exit 0 ;;
 esac
 EOF
@@ -373,6 +390,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$here/registry.sh"
 
 res_dir="$(tmux show-options -gv @resurrect-dir 2>/dev/null || true)"
+# Fallback mirrors tmux-resurrect's own default; Task 1 confirms the live dir.
 res_dir="${res_dir:-$HOME/.tmux/resurrect}"
 save="$res_dir/last"
 [ -f "$save" ] || exit 0
@@ -401,26 +419,32 @@ rewrite_cmd() {
     fi
 }
 
+# --- Phase 1: rewrite each claude pane's restore command in the save file ---
 tmp="$(mktemp)"
 while IFS= read -r line || [ -n "$line" ]; do
-    if [ "${line%%$'\t'*}" = "pane" ] && printf '%s' "$line" | grep -q 'claude'; then
+    if [ "${line%%$'\t'*}" = "pane" ]; then
         IFS=$'\t' read -r -a f <<< "$line"
-        s="${f[1]}"; w="${f[2]}"; pidx="${f[5]}"
-        pane_id="${paneid["$s|$w|$pidx"]:-}"
         last=$(( ${#f[@]} - 1 ))
-        cmd="${f[$last]#:}"
-        if [ -n "$pane_id" ]; then
-            f[$last]=":$(rewrite_cmd "$cmd" "$pane_id")"
-            line="$(printf '%s\t' "${f[@]}")"; line="${line%$'\t'}"
+        cmd="${f[$last]#:}"   # trailing field = the full command resurrect replays
+        # Anchor on the COMMAND field, not the whole line: a pane whose cwd merely
+        # contains "claude" must not be misclassified as a claude pane.
+        if [[ "$cmd" == "claude" || "$cmd" == claude\ * ]]; then
+            s="${f[1]}"; w="${f[2]}"; pidx="${f[5]}"
+            pane_id="${paneid["$s|$w|$pidx"]:-}"
+            if [ -n "$pane_id" ]; then
+                f[$last]=":$(rewrite_cmd "$cmd" "$pane_id")"
+                line="$(printf '%s\t' "${f[@]}")"; line="${line%$'\t'}"
+            fi
         fi
     fi
     printf '%s\n' "$line"
 done < "$real" > "$tmp"
 mv "$tmp" "$real"
 
-# Prune registry entries for panes that no longer exist.
+# --- Phase 2: prune registry entries for panes that no longer exist ---
+# Guard: never call tcr_prune with zero live panes (that would wipe the registry).
 mapfile -t live < <(tmux list-panes -a -F '#{pane_id}')
-tcr_prune "${live[@]}"
+[ "${#live[@]}" -gt 0 ] && tcr_prune "${live[@]}"
 ```
 
 - [ ] **Step 4: Run the test to verify it passes**
@@ -603,7 +627,7 @@ No repo changes. This is the real proof; it touches the user's live tmux and glo
 
 - [ ] **Step 1: Full suite + shellcheck green**
 
-Run: `bats tests/ && shellcheck tmux-claude-resume/*.sh install.sh`
+Run: `bats tests/ && shellcheck tmux-claude-resume/*.sh`
 Expected: new suites pass; pre-existing baseline failures unchanged; shellcheck clean.
 
 - [ ] **Step 2: Deploy the scripts and register the hook**
@@ -651,3 +675,13 @@ Note in the PR what restored correctly (per-pane resume, same-cwd disambiguation
 - **`jq` is required** by the installer; it is already on this machine (`/opt/homebrew/bin/jq`, and listed in `dotfiles.yaml` brew installs).
 - **Do not build Tasks 4 or 6 before Task 1 passes.** If a spike fails, stop and revisit architecture B2 (post-restore keystroke injection) per the spec — that invalidates Tasks 4–5.
 - `prefix` is `Ctrl-b`; continuum auto-save interval is the 15-min default (unchanged).
+
+> **Design note (2026-06-09, validate):** Plan tightened after review — the injection
+> script now (a) anchors the claude match to the **command field** (not the whole line, so a
+> cwd containing "claude" isn't misclassified), (b) is split into clearly-commented Phase 1
+> (rewrite) / Phase 2 (prune) sections, and (c) guards `tcr_prune` against an empty live-pane
+> set (which would otherwise wipe the registry). `registry.sh` documents that `cwd` is
+> diagnostic/reserved and that prune requires a non-empty set. Task 4's `tmux` test stub now
+> answers the bare `#{pane_id}` prune query distinctly from the 4-field join query. All
+> reviewer-confirmed facts (resurrect field order, trailing-field replay, `~` match,
+> `CLAUDE_CODE_SESSION_ID`) verified true.
