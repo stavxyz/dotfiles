@@ -27,3 +27,13 @@ teardown() { rm -rf "$FAKE_HOME"; }
     run jq '[.. | objects | .command? // empty | select(test("record-tmux-session.sh"))] | length' "$FAKE_HOME/.claude/settings.json"
     [ "$output" = "1" ]
 }
+
+@test "corrupt settings.json: clear error, exits non-zero, file left untouched" {
+    printf 'this is { not json' > "$FAKE_HOME/.claude/settings.json"
+    HOME="$FAKE_HOME" run bash "$INSTALL"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"not valid JSON"* ]]
+    # original (corrupt) content is preserved, not clobbered
+    run cat "$FAKE_HOME/.claude/settings.json"
+    [ "$output" = "this is { not json" ]
+}
