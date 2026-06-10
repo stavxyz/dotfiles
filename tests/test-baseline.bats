@@ -4,7 +4,7 @@
 
 setup() {
     # Dynamically detect dotfiles directory
-    export DOTFILES_DIR="$(cd "$(dirname "$BATS_TEST_DIRNAME")/.." && pwd)"
+    export DOTFILES_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
     export RESULTS_FILE="${HOME}/.cache/dotfiles/baseline-results.txt"
     mkdir -p "$(dirname "$RESULTS_FILE")"
 }
@@ -21,9 +21,11 @@ setup() {
 }
 
 @test "aliases are defined" {
-    run bash -l -c 'alias | wc -l'
+    # Count actual alias definitions; tolerate any login-banner output on stdout
+    # (a login shell may print a banner, which would otherwise pollute a bare line count).
+    run bash -l -c 'alias'
     [ "$status" -eq 0 ]
-    [ "$output" -gt 0 ]
+    [ "$(printf '%s\n' "$output" | grep -c '^alias ')" -gt 0 ]
 }
 
 @test "PATH is set correctly" {
