@@ -1,6 +1,6 @@
 [user]
-        name = Sam Stavinoha
-        email = hi@stav.xyz
+	name = samuel
+	email = hi@stav.xyz
 [alias]
         stashes = stash list
         branches = branch -a -v --color
@@ -26,13 +26,22 @@
         username = samstav
 [push]
         default = current
-
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
-
 [core]
         excludesfile = ~/.gitignore_global
 [pull]
 	rebase = true
 [init]
 	defaultBranch = main
+[credential "https://github.com"]
+	helper = 
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !gh auth git-credential
+[url "ssh://git@github.com/"]
+	insteadof = https://github.com/
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
