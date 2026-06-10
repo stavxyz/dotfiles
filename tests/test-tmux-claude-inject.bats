@@ -57,6 +57,19 @@ teardown() { rm -rf "$WORK"; }
     [ "$output" = "1" ]
 }
 
+@test "adjacent resume-family flags are fully stripped (no contradictory leftover)" {
+    # Two resume-family flags in a row must BOTH be removed before --resume <id> is appended;
+    # a single non-looped sed pass would leave the second (shared separator gets consumed).
+    printf 'pane\tmain\t1\t0\t:\t0\t title\t:/tmp/proj\t1\t2.1.168\t:claude --dangerously-skip-permissions --resume oldid -c\n' > "$RESDIR/last"
+    HOME="$FAKE_HOME" run bash "$INJECT"
+    [ "$status" -eq 0 ]
+    run grep -c ':claude --dangerously-skip-permissions --resume live-sess$' "$RESDIR/last"
+    [ "$output" = "1" ]
+    # no stray -c / -r / old id left behind
+    run grep -cE 'oldid| -c$| -c | -r$| -r ' "$RESDIR/last"
+    [ "$output" = "0" ]
+}
+
 @test "duplicate flags are collapsed (Claude re-adds --dangerously-skip-permissions each launch)" {
     # A pane whose captured command already accumulated the flag (doubled/tripled).
     printf 'pane\tmain\t1\t0\t:\t0\t title\t:/tmp/proj\t1\t2.1.168\t:claude --dangerously-skip-permissions --dangerously-skip-permissions --dangerously-skip-permissions -r\n' > "$RESDIR/last"
