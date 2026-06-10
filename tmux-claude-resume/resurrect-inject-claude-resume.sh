@@ -49,14 +49,14 @@ while IFS= read -r line || [ -n "$line" ]; do
     if [ "${line%%$'\t'*}" = "pane" ]; then
         IFS=$'\t' read -r -a f <<< "$line"
         last=$(( ${#f[@]} - 1 ))
-        cmd="${f[$last]#:}"   # trailing field = the full command resurrect replays
+        cmd="${f[last]#:}"   # trailing field = the full command resurrect replays
         # Anchor on the COMMAND field, not the whole line: a pane whose cwd merely
         # contains "claude" must not be misclassified as a claude pane.
         if [[ "$cmd" == "claude" || "$cmd" == claude\ * ]]; then
             s="${f[1]}"; w="${f[2]}"; pidx="${f[5]}"
             pane_id="${paneid["$s|$w|$pidx"]:-}"
             if [ -n "$pane_id" ]; then
-                f[$last]=":$(rewrite_cmd "$cmd" "$pane_id")"
+                f[last]=":$(rewrite_cmd "$cmd" "$pane_id")"
                 line="$(printf '%s\t' "${f[@]}")"; line="${line%$'\t'}"
             fi
         fi

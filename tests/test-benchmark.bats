@@ -4,7 +4,7 @@
 
 setup() {
     # Dynamically detect dotfiles directory
-    export DOTFILES_DIR="$(cd "$(dirname "$BATS_TEST_DIRNAME")/.." && pwd)"
+    export DOTFILES_DIR="$(cd "$BATS_TEST_DIRNAME/.." && pwd)"
     export BENCHMARK_FILE="${HOME}/.cache/dotfiles/benchmark-results.txt"
     mkdir -p "$(dirname "$BENCHMARK_FILE")"
 }
