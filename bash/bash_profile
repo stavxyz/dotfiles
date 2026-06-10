@@ -148,3 +148,9 @@ fi
 # Allow interactive commands to fail without triggering ERR trap
 set +e
 trap - ERR
+
+# add Pulumi to the PATH
+[ -d "$HOME/.pulumi/bin" ] && export PATH="$PATH:$HOME/.pulumi/bin"
+
+test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+
