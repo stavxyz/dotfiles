@@ -27,10 +27,19 @@ projects="$HOME/.claude/projects"
 
 # Given the original full command + pane_id, produce the restore command.
 rewrite_cmd() {
-    local cmd="$1" pane_id="$2" flags sid
+    local cmd="$1" pane_id="$2" flags sid prev
     # Strip any existing resume/continue flags; keep the rest (e.g. --dangerously-skip-permissions).
-    flags="$(printf '%s' "$cmd" \
-        | sed -E 's/(^| )(-r|--resume([= ][^ ]+)?|-c|--continue)( |$)/ /g; s/  +/ /g; s/ +$//')"
+    # Pad with spaces and LOOP until stable so two ADJACENT resume-family flags are both removed —
+    # a single pass consumes the shared separator and would leave the second flag behind (e.g.
+    # `--resume x -c` -> `-c`), contradicting the appended id. (A bash loop, not sed's `:a;ta`,
+    # because BSD/macOS sed doesn't accept the label/branch form on one line.)
+    flags=" $cmd "
+    while :; do
+        prev="$flags"
+        flags="$(printf '%s' "$flags" | sed -E 's/ (-r|--resume([= ][^ ]+)?|-c|--continue) / /g')"
+        [ "$flags" = "$prev" ] && break
+    done
+    flags="$(printf '%s' "$flags" | sed -E 's/^ +//; s/ +$//; s/  +/ /g')"
     # Collapse repeated identical tokens, keeping first occurrence. Claude's launcher re-adds
     # --dangerously-skip-permissions on every launch, so without this it would accumulate
     # unbounded across reboot/restore cycles.
@@ -45,6 +54,7 @@ rewrite_cmd() {
 
 # --- Phase 1: rewrite each claude pane's restore command in the save file ---
 tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT   # don't leak the temp file if interrupted mid-rewrite
 while IFS= read -r line || [ -n "$line" ]; do
     if [ "${line%%$'\t'*}" = "pane" ]; then
         IFS=$'\t' read -r -a f <<< "$line"
