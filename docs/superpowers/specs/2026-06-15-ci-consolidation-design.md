@@ -1,3 +1,17 @@
+---
+validated:
+  sha: 42dd6ed3d9bb3c22402efc5dd2cb45b17655177c
+  date: 2026-06-17T21:26:10Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 2
+    medium: 1
+    low: 1
+    nitpick: 0
+  net_negative_remaining: 1
+---
+
 # Design: CI consolidation + Python lint/type fixes
 
 **Date:** 2026-06-15
@@ -15,7 +29,7 @@ the project's existing Python 2.7 support.
 Three workflow files exist; two are untracked WIP and overlap the tracked `test.yml`:
 
 - **`test.yml`** (tracked, active CI) — on push/PR to `main`, macOS + Ubuntu matrix:
-  `find .`-based shellcheck, `pytest tests/`, `bats test-validate.bats`, `bats test-benchmark.bats`.
+  `find .`-based shellcheck, `pytest tests/`, `bats tests/test-validate.bats`, `bats tests/test-benchmark.bats`.
 - **`python-quality.yml`** (untracked) — `ruff check`, `ruff format --check`, `mypy`,
   `pytest` + coverage on a 3.11/3.12 matrix. Its `pytest` **duplicates** `test.yml`.
 - **`shellcheck.yml`** (untracked) — shellcheck limited to `.claude/**`; **redundant** with
@@ -64,6 +78,24 @@ Py2 classifiers and `requires-python` are left untouched.
 A single CI workflow runs: shellcheck → ruff check → ruff format check → mypy → pytest →
 validation bats → benchmark bats, on macOS + Ubuntu. No duplicated pytest, no redundant
 shellcheck.
+
+> **Accepted net-negative tradeoff (2026-06-17):** The design hard-codes `mypy .` (with no
+> `[tool.mypy]` scoping) into the canonical `test.yml`, which a reviewer flagged as relying on
+> mypy's package-walk defaults rather than an explicit scope. Accepted with explicit operator
+> approval: verified that `mypy . --ignore-missing-imports` checks only the 3 first-party files
+> ("checked 3 source files") because `venv/` is not a Python package and is therefore not
+> recursed; the minimal, config-free scope is intentional for a 3-file Python surface.
+
+> **Design note (2026-06-17):** Tool configuration is deliberately kept out of `pyproject.toml`
+> (no `[tool.ruff]`/`[tool.mypy]`); behavior lives in the pinned tool versions
+> (`requirements-quality.txt`) plus the CLI invocations in `test.yml`. If a third Python file,
+> a per-rule ignore, or a `target-version` is ever needed, `pyproject.toml` is the place to
+> centralize it — the consolidation doesn't preclude that, it just doesn't pre-build it (YAGNI).
+
+> **Design note (2026-06-17):** Running ruff/format/mypy on both matrix legs (macOS + Ubuntu)
+> duplicates OS-independent work; this is an accepted simplicity tradeoff (uniform, branch-free
+> matrix) for a tiny repo. If CI minutes ever matter, factor the OS-independent quality checks
+> into a single-runner job.
 
 ## Testing
 
