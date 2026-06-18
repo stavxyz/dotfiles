@@ -1,3 +1,17 @@
+---
+validated:
+  sha: f072b4e5efd6fbf90b5ee724ed5b5882dcfc522b
+  date: 2026-06-18T00:11:34Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 0
+    medium: 0
+    low: 2
+    nitpick: 1
+  net_negative_remaining: 0
+---
+
 # CI Consolidation + Python Lint/Type Fixes — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -163,7 +177,7 @@ Expected: `test.yml: valid YAML`; `all quality gates green`.
 Run:
 ```bash
 ls .github/workflows/                       # expect: requirements-quality.txt  test.yml
-grep -E 'ruff check|ruff format --check|mypy . --ignore-missing-imports|requirements-quality.txt' .github/workflows/test.yml
+grep -E 'ruff check|ruff format --check|mypy \. --ignore-missing-imports|requirements-quality\.txt' .github/workflows/test.yml
 ```
 Expected: only `test.yml` + `requirements-quality.txt` present; all four grep patterns found.
 
@@ -174,6 +188,15 @@ git add .github/workflows/test.yml .github/workflows/requirements-quality.txt
 git commit -m "ci: consolidate ruff/format/mypy into test.yml; drop redundant workflows"
 ```
 
+> **Design note (2026-06-17):** Deleting `shellcheck.yml` removes a gate that `test.yml` does
+> NOT replicate: a "global ShellCheck disables FORBIDDEN" policy step that fails CI if a script
+> carries a top-of-file `# shellcheck disable=` directive (forcing per-line disables instead),
+> plus an advisory script-executability check. The shellcheck *linting* coverage is fully
+> preserved (test.yml's `find .` scope is a superset of `.claude/**`), so only that policy gate
+> is retired. This is an intentional, documented consequence of the blessed spec's deletion —
+> not an oversight. If the no-blanket-disable policy is worth keeping, fold its one `grep`-based
+> guard into `test.yml`'s ShellCheck step as a follow-up (out of scope for this plan).
+
 ---
 
 ## Notes for the implementer
@@ -183,3 +206,4 @@ git commit -m "ci: consolidate ruff/format/mypy into test.yml; drop redundant wo
 - **`requirements-quality.txt` already exists untracked** with the right pins; Task 2 just tracks it. Do not rewrite it.
 - **Keep commits attribution-free** (Global Constraints).
 - The full `bats tests/` suite should also stay green (it's unaffected), but `test.yml` only runs `test-validate.bats` + `test-benchmark.bats`.
+- **Local `ruff`/`mypy` may resolve to pyenv shims** (newer versions) rather than the pinned `0.8.4`/`1.13.0`; only CI (`pip install -r requirements-quality.txt`) guarantees the pins. The baselines match across versions here, but if you want the local dry-runs to exactly mirror CI, `pip install -r .github/workflows/requirements-quality.txt` into the venv first.
