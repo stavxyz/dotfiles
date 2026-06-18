@@ -61,8 +61,10 @@ jobs:
           # scripts (git hooks, bin/ tools) are covered too — not just *.sh. Scanning git-tracked
           # files matches what CI checks out and auto-skips gitignored/vendored content. Exclude
           # the vendored completions dir, bats tests (bats syntax shellcheck can't parse), and md.
+          # (uses [[ ]] not case: bash 3.2 — the macOS runner shell — misparses case-pattern
+          # ")" as the closing paren of $(...), so case here is a syntax error there.)
           scripts=$(git ls-files -z | while IFS= read -r -d '' f; do
-            case "$f" in autocomplete/*|*.bats|*.md) continue;; esac
+            if [[ "$f" == autocomplete/* || "$f" == *.bats || "$f" == *.md ]]; then continue; fi
             [ -f "$f" ] || continue
             if head -n1 "$f" | grep -qE '^#!.*(bash|/sh|env sh)'; then printf '%s\n' "$f"; fi
           done | sort -u)
