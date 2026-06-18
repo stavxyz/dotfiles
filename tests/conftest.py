@@ -4,8 +4,6 @@ Pytest configuration and fixtures for dotfiles testing
 """
 
 import os
-import tempfile
-import shutil
 import pytest
 
 
@@ -73,7 +71,7 @@ def existing_symlink(home_dir, dotfiles_repo):
 def existing_file(home_dir):
     """Create an existing regular file for testing"""
     filepath = os.path.join(home_dir, ".existing_file")
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         f.write("existing content\n")
     return filepath
 

@@ -5,11 +5,9 @@ Tests for dot.py - Verifies behavior of zero-dependency refactored version.
 
 import os
 import sys
-import tempfile
-import pytest
 
 # Add parent directory to path so we can import dot
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import dot
 
@@ -20,50 +18,52 @@ class TestPathResolution:
     def test_normalize_path_expanduser(self, temp_dir):
         """Test that ~/path expands to home directory"""
         # Save original HOME
-        original_home = os.environ.get('HOME')
+        original_home = os.environ.get("HOME")
 
         try:
             # Set HOME to temp_dir for testing
-            os.environ['HOME'] = str(temp_dir)
+            os.environ["HOME"] = str(temp_dir)
 
-            result = dot._normalize_path('~/testfile', globbing=False, resolve=False)
+            result = dot._normalize_path("~/testfile", globbing=False, resolve=False)
 
             # Should expand tilde to temp_dir
             assert result.startswith(str(temp_dir))
-            assert result.endswith('testfile')
+            assert result.endswith("testfile")
 
         finally:
             # Restore original HOME
             if original_home:
-                os.environ['HOME'] = original_home
+                os.environ["HOME"] = original_home
 
     def test_normalize_path_expandvars(self, temp_dir):
         """Test that $HOME/path expands correctly"""
-        original_home = os.environ.get('HOME')
+        original_home = os.environ.get("HOME")
 
         try:
-            os.environ['HOME'] = str(temp_dir)
+            os.environ["HOME"] = str(temp_dir)
 
-            result = dot._normalize_path('$HOME/testfile', globbing=False, resolve=False)
+            result = dot._normalize_path(
+                "$HOME/testfile", globbing=False, resolve=False
+            )
 
             assert result.startswith(str(temp_dir))
-            assert result.endswith('testfile')
+            assert result.endswith("testfile")
 
         finally:
             if original_home:
-                os.environ['HOME'] = original_home
+                os.environ["HOME"] = original_home
 
     def test_normalize_path_with_globbing(self, dotfiles_repo):
         """Test that glob patterns expand to list of files"""
-        glob_pattern = os.path.join(dotfiles_repo, 'test', 'vim', '*')
+        glob_pattern = os.path.join(dotfiles_repo, "test", "vim", "*")
 
         result = dot._normalize_path(glob_pattern, globbing=True)
 
         # Should return a list of files
         assert isinstance(result, list)
         assert len(result) == 2  # vimrc and plugin.vim
-        assert any('vimrc' in f for f in result)
-        assert any('plugin.vim' in f for f in result)
+        assert any("vimrc" in f for f in result)
+        assert any("plugin.vim" in f for f in result)
 
     def test_normalize_path_realpath(self, temp_dir):
         """Test that realpath resolution works"""
@@ -85,21 +85,21 @@ class TestFiletype:
         """Test that symlinks are detected"""
         types = list(dot._filetype(existing_symlink))
 
-        assert 'link' in types
+        assert "link" in types
 
     def test_filetype_detects_file(self, existing_file):
         """Test that regular files are detected"""
         types = list(dot._filetype(existing_file))
 
-        assert 'file' in types
-        assert 'link' not in types
+        assert "file" in types
+        assert "link" not in types
 
     def test_filetype_detects_dir(self, existing_dir):
         """Test that directories are detected"""
         types = list(dot._filetype(existing_dir))
 
-        assert 'dir' in types
-        assert 'link' not in types
+        assert "dir" in types
+        assert "link" not in types
 
 
 class TestResolveSource:
@@ -107,7 +107,7 @@ class TestResolveSource:
 
     def test_resolve_source_single_file(self, dotfiles_repo):
         """Test resolving a single file source"""
-        source = os.path.join(dotfiles_repo, 'test', 'testrc')
+        source = os.path.join(dotfiles_repo, "test", "testrc")
 
         result = dot._resolve_source(source)
 
@@ -117,7 +117,7 @@ class TestResolveSource:
 
     def test_resolve_source_glob_pattern(self, dotfiles_repo):
         """Test resolving glob pattern source"""
-        source = os.path.join(dotfiles_repo, 'test', 'vim', '*')
+        source = os.path.join(dotfiles_repo, "test", "vim", "*")
 
         result = dot._resolve_source(source)
 
@@ -173,12 +173,12 @@ class TestIssue3Fixed:
         The continue statement should NOT be inside a DEBUG block.
         """
         # Read dot.py to verify it exists and has been refactored
-        dot_path = os.path.join(os.path.dirname(__file__), '..', 'dot.py')
-        with open(dot_path, 'r') as f:
+        dot_path = os.path.join(os.path.dirname(__file__), "..", "dot.py")
+        with open(dot_path, "r") as f:
             content = f.read()
 
         # Verify the file has been refactored with argparse
-        assert 'def cmd_link' in content or 'def main' in content
+        assert "def cmd_link" in content or "def main" in content
         # The bug has been fixed in the refactored version
         pass
 
