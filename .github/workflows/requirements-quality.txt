@@ -1,0 +1,7 @@
+# Python code quality tools
+# Pin versions for reproducible builds
+
+ruff==0.8.4
+mypy==1.13.0
+pytest==8.3.4
+pytest-cov==6.0.0
