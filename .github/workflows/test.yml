@@ -53,13 +53,22 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov
+          pip install -r .github/workflows/requirements-quality.txt
 
       - name: Run ShellCheck linting
         run: |
           # Check all shell scripts and bash config files
           find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -name "bash_aliases" \) \
             -exec shellcheck {} +
+
+      - name: Lint with ruff
+        run: ruff check .
+
+      - name: Format check with ruff
+        run: ruff format --check .
+
+      - name: Type check with mypy
+        run: mypy . --ignore-missing-imports
 
       - name: Run Python tests
         id: pytest
