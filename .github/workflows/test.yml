@@ -55,11 +55,39 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r .github/workflows/requirements-quality.txt
 
-      - name: Run ShellCheck linting
+      - name: ShellCheck (lint + forbid blanket disables)
         run: |
-          # Check all shell scripts and bash config files
-          find . -type f \( -name "*.sh" -o -name "bash_profile" -o -name "bashrc" -o -name "bash_aliases" \) \
-            -exec shellcheck {} +
+          # Lint every TRACKED shell script, detected by first-line shebang so extensionless
+          # scripts (git hooks, bin/ tools) are covered too — not just *.sh. Scanning git-tracked
+          # files matches what CI checks out and auto-skips gitignored/vendored content. Exclude
+          # the vendored completions dir, bats tests (bats syntax shellcheck can't parse), and md.
+          scripts=$(git ls-files -z | while IFS= read -r -d '' f; do
+            case "$f" in autocomplete/*|*.bats|*.md) continue;; esac
+            [ -f "$f" ] || continue
+            if head -n1 "$f" | grep -qE '^#!.*(bash|/sh|env sh)'; then printf '%s\n' "$f"; fi
+          done | sort -u)
+          if [ -z "$scripts" ]; then echo "No shell scripts found"; exit 0; fi
+          echo "Shell scripts under shellcheck:"; echo "$scripts" | sed 's/^/  /'
+
+          # Policy: no blanket (file-level) disables. A `# shellcheck disable=` must annotate
+          # the next line of code; one followed by a blank line or another comment is a global
+          # suppression and is forbidden — use a targeted per-line disable instead.
+          policy_fail=0
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            awk -v file="$f" '
+              prev==1 { if ($0 ~ /^[[:space:]]*$/ || $0 ~ /^[[:space:]]*#/) {
+                          printf "::error file=%s,line=%d::blanket \"# shellcheck disable\" is forbidden — put a per-line disable directly above the offending line\n", file, NR-1; bad=1 }
+                        prev=0 }
+              /^[[:space:]]*#[[:space:]]*shellcheck[[:space:]]+disable=/ { prev=1 }
+              END { exit bad }
+            ' "$f" || policy_fail=1
+          done <<< "$scripts"
+
+          # Lint every detected script (null-delimited to be filename-safe).
+          echo "$scripts" | tr '\n' '\0' | xargs -0 shellcheck
+
+          [ "$policy_fail" -eq 0 ]
 
       - name: Lint with ruff
         run: ruff check .
