@@ -3,8 +3,10 @@
 "
 call plug#begin()
 
-" fzf
-Plug '/usr/local/opt/fzf'
+" fzf — upstream plugin instead of a hardcoded Homebrew path (which
+" differs across Intel/Apple Silicon/Linux); it uses fzf from PATH or
+" installs its own binary
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 " did you mean?

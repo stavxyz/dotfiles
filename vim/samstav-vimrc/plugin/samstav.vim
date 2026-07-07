@@ -234,11 +234,11 @@ augroup END
 
 """""""""" match iterm / colors
 
-" Default to dark; an explicit light profile (e.g. iTerm2) overrides.
-" $ITERM_PROFILE is unset in other terminals (Terminal.app etc.), and
+" Default to dark; an explicit light theme overrides. DOTFILES_THEME is
+" the canonical theme variable (set by theme-switch); ITERM_PROFILE is
+" honored as a legacy fallback. Both are unset in most terminals, and
 " defaulting to light there was wrong far more often than not.
-let iterm_profile = $ITERM_PROFILE
-if iterm_profile == "light"
+if $DOTFILES_THEME == "light" || ($DOTFILES_THEME == "" && $ITERM_PROFILE == "light")
     set background=light
 else
     set background=dark
