@@ -11,6 +11,7 @@ A lightweight, zero-dependency dotfiles symlink manager for Unix systems. Single
 - **Python 2.7+ and 3.6+ compatible** - Works on old servers and modern systems
 - **Single file** - Easy to curl and run directly
 - **JSON configuration** - Simple, readable config format
+- **Optional YAML configuration** - `dotfiles.yaml`/`.yml` works when PyYAML is installed (never required; JSON always works)
 - **Glob pattern support** - Link multiple files with wildcards
 - **Smart conflict handling** - Detects existing files and symlinks
 - **Cross-platform** - Works on macOS, Linux, BSD, and other Unix systems

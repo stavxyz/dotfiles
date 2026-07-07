@@ -6,6 +6,8 @@ Tests for dot.py - Verifies behavior of zero-dependency refactored version.
 import os
 import sys
 
+import pytest
+
 # Add parent directory to path so we can import dot
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -181,6 +183,43 @@ class TestIssue3Fixed:
         assert "def cmd_link" in content or "def main" in content
         # The bug has been fixed in the refactored version
         pass
+
+
+class TestLoadConfig:
+    """Test config loading: JSON always, YAML when PyYAML is available"""
+
+    def test_load_config_json(self, temp_dir):
+        """Test loading a JSON config"""
+        config_file = temp_dir / "dotfiles.json"
+        config_file.write_text('{"home": "~/", "links": {"~/.testrc": "test/testrc"}}')
+
+        config = dot.load_config(str(config_file))
+
+        assert config["home"] == "~/"
+        assert config["links"] == {"~/.testrc": "test/testrc"}
+
+    @pytest.mark.skipif(dot.yaml is None, reason="PyYAML not installed")
+    def test_load_config_yaml(self, sample_yaml_config):
+        """Test loading a YAML config when PyYAML is available"""
+        config = dot.load_config(sample_yaml_config)
+
+        assert config["home"] == "~/"
+        assert config["links"]["~/.testrc"] == "test/testrc"
+
+    def test_load_config_yaml_without_pyyaml(self, sample_yaml_config, monkeypatch):
+        """Test that a YAML config without PyYAML aborts with an error"""
+        monkeypatch.setattr(dot, "yaml", None)
+
+        with pytest.raises(SystemExit):
+            dot.load_config(sample_yaml_config)
+
+    def test_load_config_invalid_json(self, temp_dir):
+        """Test that invalid JSON aborts with an error"""
+        config_file = temp_dir / "dotfiles.json"
+        config_file.write_text("not json {")
+
+        with pytest.raises(SystemExit):
+            dot.load_config(str(config_file))
 
 
 # Note: Full integration tests for link/unlink commands with argparse CLI
