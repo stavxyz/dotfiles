@@ -12,6 +12,7 @@
 # - TPM (tmux plugin manager)
 # - pyenv (Python version manager via pyenv-installer)
 # - pyenv-virtualenvwrapper (Python virtual environment tools)
+# - extensions (repos under ~/.dot/extensions/) are bootstrapped and linked
 #
 # Also checks that the login shell is a modern bash (the dotfiles are
 # bash-centric) and offers to switch it — always asks first.
@@ -34,8 +35,8 @@ echo "Installing dotfiles prerequisites..."
 # ============================================================================
 
 echo "Creating dotfiles framework directories..."
-mkdir -p "${HOME}/.dot/state"
-echo "✓ Created ~/.dot/state/"
+mkdir -p "${HOME}/.dot/state" "${HOME}/.dot/extensions"
+echo "✓ Created ~/.dot/state/ and ~/.dot/extensions/"
 
 # ============================================================================
 # Git Submodules (base16-shell etc.)
@@ -201,6 +202,21 @@ else
         echo "  chsh -s '${preferred_bash}'"
     fi
 fi
+
+# ============================================================================
+# Extensions
+# ============================================================================
+#
+# Extensions are repos cloned (or symlinked) into ~/.dot/extensions/<name>/
+# that mirror this repo's shape. See README.md "Extensions" and
+# lib/dot-extensions.sh (the single owner of the discovery rules).
+
+echo ""
+echo "Checking for extensions..."
+# shellcheck source=lib/dot-extensions.sh
+source "${script_dir}/lib/dot-extensions.sh"
+dot_bootstrap_extensions "${script_dir}/dot.py"
+echo "✓ Extensions processed"
 
 echo ""
 echo "✅ Installation complete!"
