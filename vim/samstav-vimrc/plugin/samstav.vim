@@ -234,11 +234,14 @@ augroup END
 
 """""""""" match iterm / colors
 
+" Default to dark; an explicit light profile (e.g. iTerm2) overrides.
+" $ITERM_PROFILE is unset in other terminals (Terminal.app etc.), and
+" defaulting to light there was wrong far more often than not.
 let iterm_profile = $ITERM_PROFILE
-if iterm_profile == "dark"
-    set background=dark
-else
+if iterm_profile == "light"
     set background=light
+else
+    set background=dark
 endif
 
 if filereadable(expand("~/.vimrc_background"))
