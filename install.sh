@@ -13,6 +13,9 @@
 # - pyenv (Python version manager via pyenv-installer)
 # - pyenv-virtualenvwrapper (Python virtual environment tools)
 #
+# Also checks that the login shell is a modern bash (the dotfiles are
+# bash-centric) and offers to switch it — always asks first.
+#
 # Note: This script only installs missing components. It does not update
 # existing installations. Use the appropriate update method for each tool:
 #   - vim-plug: Run :PlugUpdate in Vim
@@ -61,8 +64,10 @@ fi
 # Python Environment Manager (pyenv)
 # ============================================================================
 
-# Check if pyenv is already working
-if command -v pyenv &>/dev/null && [[ -d ~/.pyenv ]]; then
+# Check if pyenv is already installed. Look in ~/.pyenv/bin too: pyenv is
+# only on PATH once the dotfiles are loaded, and this script must stay
+# idempotent when run from a stock shell.
+if [[ -d ~/.pyenv ]] && { command -v pyenv &>/dev/null || [[ -x "${HOME}/.pyenv/bin/pyenv" ]]; }; then
     echo "✓ pyenv already installed"
     export PATH="${HOME}/.pyenv/bin:$PATH"
     # Detect shell type for cross-shell compatibility
@@ -94,6 +99,84 @@ if [[ -d "$VENVWRAPPER_DIR" ]]; then
 else
     echo "Installing pyenv-virtualenvwrapper..."
     git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git "$VENVWRAPPER_DIR"
+fi
+
+# ============================================================================
+# Login Shell (optional)
+# ============================================================================
+#
+# The dotfiles are bash-centric (~/.bash_profile, ~/.bashrc, modules/) and
+# only load when bash is the login shell. macOS defaults to zsh and ships
+# bash 3.2; the config needs bash 4.3+ (macOS: bash 5+ via `brew install
+# bash`). Detect the situation and offer to switch. Never switches without
+# asking; prints the manual commands when run non-interactively.
+
+echo ""
+echo "Checking login shell..."
+
+# Require bash >= 4.3
+_bash_version_ok() {
+    local major minor
+    # shellcheck disable=SC2016  # expand in the candidate bash, not here
+    major="$("$1" -c 'echo "${BASH_VERSINFO[0]}"' 2>/dev/null)" || return 1
+    # shellcheck disable=SC2016  # expand in the candidate bash, not here
+    minor="$("$1" -c 'echo "${BASH_VERSINFO[1]}"' 2>/dev/null)" || return 1
+    [[ "$major" -gt 4 ]] || [[ "$major" -eq 4 && "$minor" -ge 3 ]]
+}
+
+current_user="${USER:-$(id -un)}"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    login_shell="$(dscl . -read "/Users/${current_user}" UserShell 2>/dev/null | awk '{print $2}')"
+else
+    login_shell="$(getent passwd "${current_user}" 2>/dev/null | cut -d: -f7)"
+fi
+login_shell="${login_shell:-${SHELL:-unknown}}"
+
+brew_prefix="$(brew --prefix 2>/dev/null || true)"
+preferred_bash=""
+for candidate in "${brew_prefix:+${brew_prefix}/bin/bash}" /opt/homebrew/bin/bash /usr/local/bin/bash /usr/bin/bash /bin/bash; do
+    [[ -n "$candidate" && -x "$candidate" ]] || continue
+    if _bash_version_ok "$candidate"; then
+        preferred_bash="$candidate"
+        break
+    fi
+done
+
+if [[ -z "$preferred_bash" ]]; then
+    echo "⚠️  No bash >= 4.3 found; the dotfiles will not load without one."
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+        echo "   Install one with: brew install bash  (then re-run ./install.sh)"
+    fi
+elif [[ "$login_shell" == "$preferred_bash" ]]; then
+    echo "✓ Login shell is already ${preferred_bash}"
+else
+    echo "Your login shell is ${login_shell}, but these dotfiles only load under bash."
+    echo "Suitable bash found: ${preferred_bash}"
+    change_shell="no"
+    if [[ -t 0 ]]; then
+        read -r -p "Change your login shell to ${preferred_bash}? [y/N] " reply
+        [[ "$reply" =~ ^[Yy]([Ee][Ss])?$ ]] && change_shell="yes"
+    else
+        echo "(non-interactive run — not changing your shell)"
+    fi
+    if [[ "$change_shell" == "yes" ]]; then
+        # chsh only accepts shells listed in /etc/shells
+        if ! grep -qx "$preferred_bash" /etc/shells; then
+            echo "Adding ${preferred_bash} to /etc/shells (requires sudo)..."
+            echo "$preferred_bash" | sudo tee -a /etc/shells >/dev/null
+        fi
+        if chsh -s "$preferred_bash"; then
+            echo "✓ Login shell changed to ${preferred_bash} (takes effect in new terminals)"
+        else
+            echo "⚠️  chsh failed; login shell unchanged."
+            change_shell="no"
+        fi
+    fi
+    if [[ "$change_shell" == "no" ]]; then
+        echo "To change it later:"
+        echo "  grep -qx '${preferred_bash}' /etc/shells || echo '${preferred_bash}' | sudo tee -a /etc/shells"
+        echo "  chsh -s '${preferred_bash}'"
+    fi
 fi
 
 echo ""
