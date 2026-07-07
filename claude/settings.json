@@ -1,12 +1,9 @@
 {
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "model": "Fable",
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "model": "Fable",
   "hooks": {
     "SessionStart": [
       {
@@ -19,5 +16,20 @@
         ]
       }
     ]
-  }
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "stavxyz@skills": true
+  },
+  "extraKnownMarketplaces": {
+    "skills": {
+      "source": {
+        "source": "github",
+        "repo": "stavxyz/skills"
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark"
 }
