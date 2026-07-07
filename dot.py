@@ -155,6 +155,20 @@ def load_config(config_path):
         return {}
 
 
+def _config_base_dir(config, config_path):
+    """Directory that relative link sources resolve against.
+
+    Precedence: the manifest's `dotfiles` key, then the config file's
+    directory, then the process cwd (no config file at all).
+    """
+    base = config.get("dotfiles")
+    if base:
+        return _normalize_path(base, globbing=False)
+    if config_path and os.path.isfile(config_path):
+        return os.path.dirname(_normalize_path(config_path, globbing=False))
+    return os.getcwd()
+
+
 # what happens if --source uses a glob?
 
 
@@ -169,7 +183,7 @@ def cmd_link(args, config):
     links = (config.get("links", {}) or {}) if use_config else {}
     if target or source:
         links[target] = source
-    links = _resolve_all_links(links, config)
+    links = _resolve_all_links(links, config, args.base_dir)
     if DEBUG:
         print_info("Symlinks to create:")
         print_info(json.dumps(links, indent=2, sort_keys=True))
@@ -241,7 +255,7 @@ def cmd_unlink(args, config):
         source = _normalize_path(target, globbing=False)
         target = _normalize_path(target, resolve=False, globbing=False)
         links[target] = source
-    links = _resolve_all_links(links, config)
+    links = _resolve_all_links(links, config, args.base_dir)
     links = sorted([_l for _l in links.keys() if os.path.exists(_l)], reverse=True)
     if DEBUG:
         print_info("Links found to remove:")
@@ -259,13 +273,13 @@ def cmd_unlink(args, config):
         os.unlink(_target)
 
 
-def _resolve_all_links(links, config):
+def _resolve_all_links(links, config, base_dir):
     links_expanded = {}
     for target, source in links.items():
         if target and not source:
             _errcho("You specified a target {} but no source".format(target))
         if source:
-            source = _resolve_source(source)
+            source = _resolve_source(source, base_dir)
         if target:
             target = _normalize_path(target, globbing=False, resolve=False).rstrip(
                 os.path.sep
@@ -304,7 +318,10 @@ def _resolve_all_links(links, config):
     return collections.OrderedDict(sorted(links_expanded.items()))
 
 
-def _resolve_source(source):
+def _resolve_source(source, base_dir=None):
+    expanded = os.path.expandvars(os.path.expanduser(source))
+    if base_dir and not os.path.isabs(expanded):
+        source = os.path.join(base_dir, expanded)
     abs_sources = _normalize_path(source, globbing=True)
     # at this point we have 1 or more sources
     # source may be a single dir, a single file, or a bunch of files like ones/in/here/*
@@ -422,6 +439,9 @@ def main():
     # Set home directory in config if not already set
     if not config.get("home"):
         config["home"] = args.home_dir
+
+    # Resolve relative link sources against the manifest, not the cwd
+    args.base_dir = _config_base_dir(config, config_path)
 
     if DEBUG:
         print_info("Config:")

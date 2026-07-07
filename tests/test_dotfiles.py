@@ -3,7 +3,9 @@
 Tests for dot.py - Verifies behavior of zero-dependency refactored version.
 """
 
+import json
 import os
+import subprocess
 import sys
 
 import pytest
@@ -225,3 +227,74 @@ class TestLoadConfig:
 # Note: Full integration tests for link/unlink commands with argparse CLI
 # are possible but require more setup. The core logic tests above provide
 # good coverage of the key helper functions in dot.py.
+
+
+def _run_dot(config_file, cwd, *link_args):
+    """Run dot.py link against a config file from a given cwd."""
+    dot_path = os.path.join(os.path.dirname(__file__), "..", "dot.py")
+    cmd = [sys.executable, dot_path, "--config", str(config_file), "link", "--yes"]
+    cmd.extend(link_args)
+    return subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True)
+
+
+class TestSourceBaseDir:
+    """dot.py 1.1: relative sources resolve against the manifest, not the cwd"""
+
+    def _setup(self, tmp_path, extra_config=None):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        (repo / "bashrc").write_text("# payload\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        config = {"links": {str(home / ".bashrc"): "bashrc"}}
+        if extra_config:
+            config.update(extra_config)
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(json.dumps(config))
+        return repo, home, elsewhere, config_file
+
+    def test_relative_source_resolves_against_config_dir(self, tmp_path):
+        repo, home, elsewhere, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, elsewhere)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        target = home / ".bashrc"
+        assert target.is_symlink()
+        assert os.path.realpath(str(target)) == str(repo / "bashrc")
+
+    def test_dotfiles_key_overrides_config_dir(self, tmp_path):
+        payload = tmp_path / "payload"
+        payload.mkdir()
+        (payload / "bashrc").write_text("# payload\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        cfg_dir = tmp_path / "cfg"
+        cfg_dir.mkdir()
+        config_file = cfg_dir / "dotfiles.json"
+        config_file.write_text(
+            json.dumps(
+                {
+                    "dotfiles": str(payload),
+                    "links": {str(home / ".bashrc"): "bashrc"},
+                }
+            )
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(home / ".bashrc")) == str(payload / "bashrc")
+
+    def test_absolute_source_unchanged(self, tmp_path):
+        repo, home, elsewhere, config_file = self._setup(tmp_path)
+        config_file.write_text(
+            json.dumps({"links": {str(home / ".bashrc"): str(repo / "bashrc")}})
+        )
+
+        result = _run_dot(config_file, elsewhere)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(home / ".bashrc")) == str(repo / "bashrc")
