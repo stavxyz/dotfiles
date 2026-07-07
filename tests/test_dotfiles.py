@@ -346,3 +346,50 @@ class TestForceRelink:
             result = _run_dot(config_file, tmp_path, *extra)
             assert result.returncode == 1
             assert target.read_text() == "# a real file\n"
+
+
+class TestGlobTargetDir:
+    """Regression: a glob source into a dir target that doesn't exist yet
+    (e.g. a fresh HOME on first bootstrap) must succeed, not abort."""
+
+    def test_nonexistent_target_dir_is_created(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        (src_dir / "two.sh").write_text("# two\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        target_dir = home / ".config" / "toolbox"
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(target_dir / "one.sh")) == str(src_dir / "one.sh")
+        assert os.path.realpath(str(target_dir / "two.sh")) == str(src_dir / "two.sh")
+
+    def test_existing_file_at_target_dir_still_aborts(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        (home / ".config").mkdir()
+        target_dir = home / ".config" / "toolbox"
+        target_dir.write_text("# not a directory\n")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 1
+        assert target_dir.read_text() == "# not a directory\n"
