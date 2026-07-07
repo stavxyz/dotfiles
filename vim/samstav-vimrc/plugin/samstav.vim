@@ -234,11 +234,14 @@ augroup END
 
 """""""""" match iterm / colors
 
-let iterm_profile = $ITERM_PROFILE
-if iterm_profile == "dark"
-    set background=dark
-else
+" Default to dark; an explicit light theme overrides. DOTFILES_THEME is
+" the canonical theme variable (set by theme-switch); ITERM_PROFILE is
+" honored as a legacy fallback. Both are unset in most terminals, and
+" defaulting to light there was wrong far more often than not.
+if $DOTFILES_THEME == "light" || ($DOTFILES_THEME == "" && $ITERM_PROFILE == "light")
     set background=light
+else
+    set background=dark
 endif
 
 if filereadable(expand("~/.vimrc_background"))

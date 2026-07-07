@@ -150,7 +150,11 @@ set +e
 trap - ERR
 
 # add Pulumi to the PATH
-[ -d "$HOME/.pulumi/bin" ] && export PATH="$PATH:$HOME/.pulumi/bin"
+if [ -d "$HOME/.pulumi/bin" ]; then
+  export PATH="$PATH:$HOME/.pulumi/bin"
+fi
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+if test -e "${HOME}/.iterm2_shell_integration.bash"; then
+  source "${HOME}/.iterm2_shell_integration.bash"
+fi
 

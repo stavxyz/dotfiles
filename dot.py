@@ -21,6 +21,13 @@ try:
 except NameError:
     pass  # Python 3
 
+# Optional YAML config support. PyYAML must never be a hard requirement:
+# dot.py is zero-dependency and JSON always works.
+try:
+    import yaml  # type: ignore[import-untyped]
+except ImportError:
+    yaml = None  # type: ignore[assignment]
+
 VERSION = "1.0.0"
 DEFAULT_CONFIG = "dotfiles.json"
 DEBUG = False
@@ -123,11 +130,27 @@ def _filetype(path):
 
 
 def load_config(config_path):
-    """Load config from JSON file."""
+    """Load config from a JSON or YAML file.
+
+    YAML configs require PyYAML; JSON configs always work.
+    """
+    load_errors = (
+        (IOError, ValueError) if yaml is None else (IOError, ValueError, yaml.YAMLError)
+    )
     try:
         with open(config_path, "r") as f:
+            if config_path.endswith((".yaml", ".yml")):
+                if yaml is None:
+                    print_error(
+                        "{} is a YAML config but PyYAML is not installed. "
+                        "Install it (pip install PyYAML) or use a JSON config.".format(
+                            config_path
+                        )
+                    )
+                    return {}
+                return yaml.safe_load(f) or {}
             return json.load(f)
-    except (IOError, ValueError) as e:
+    except load_errors as e:
         print_error("Failed to load config file {}: {}".format(config_path, e))
         return {}
 
@@ -314,7 +337,8 @@ def main():
         "--config",
         "-c",
         default=DEFAULT_CONFIG,
-        help="dotfiles config file (default: {})".format(DEFAULT_CONFIG),
+        help="dotfiles config file, JSON or YAML (default: {}, "
+        "falling back to dotfiles.yaml; YAML requires PyYAML)".format(DEFAULT_CONFIG),
     )
     parser.add_argument(
         "--debug", action="store_true", default=False, help="enable debug output"
@@ -385,8 +409,15 @@ def main():
 
     # Load config if it exists
     config = {}
-    if os.path.isfile(args.config):
-        config = load_config(args.config)
+    config_path = args.config
+    if config_path == DEFAULT_CONFIG and not os.path.isfile(config_path):
+        # Fall back to a YAML config when the default JSON one is absent
+        for candidate in ("dotfiles.yaml", "dotfiles.yml"):
+            if os.path.isfile(candidate):
+                config_path = candidate
+                break
+    if os.path.isfile(config_path):
+        config = load_config(config_path)
 
     # Set home directory in config if not already set
     if not config.get("home"):
