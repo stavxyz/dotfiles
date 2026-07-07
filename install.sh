@@ -49,6 +49,16 @@ else
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
+# Neovim shares the vimrc (linked to ~/.config/nvim/init.vim) but looks for
+# autoload scripts under its own data dir, not ~/.vim
+if [[ -f ~/.local/share/nvim/site/autoload/plug.vim ]]; then
+    echo "✓ vim-plug (neovim) already installed"
+else
+    echo "Installing vim-plug for neovim..."
+    curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
 # ============================================================================
 # TMUX Plugin Manager (TPM)
 # ============================================================================
