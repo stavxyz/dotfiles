@@ -14,6 +14,10 @@ cd ~/dotfiles
 
 Restart your terminal.
 
+`install.sh` also checks that your login shell is a modern bash (the dotfiles
+only load under bash) and offers to switch it — it always asks first, and
+prints the manual `chsh` commands instead when run non-interactively.
+
 ## What's Included
 
 - **Bash**: Fast startup, git-aware prompt, cross-platform completions
