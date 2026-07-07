@@ -1,0 +1,19 @@
+{
+  "home": "~",
+  "dotfiles": "~/dotfiles",
+  "links": {
+    "~/.bash_profile": "bash/bash_profile",
+    "~/.bash_aliases": "bash/bash_aliases",
+    "~/.bashrc": "bash/bashrc",
+    "~/.vimrc": "vim/vimrc",
+    "~/.vim/samstav-vimrc": "vim/samstav-vimrc",
+    "~/.config/nvim/init.vim": "vim/vimrc",
+    "~/.tmux.conf": "tmux/tmux.conf",
+    "~/.gitignore_global": "git/gitignore_global",
+    "~/.gitconfig": "git/gitconfig",
+    "~/.config/karabiner/karabiner.json": "karabiner/karabiner.json",
+    "~/.inputrc": "osx/inputrc",
+    "~/.config/base16-shell": "shell/base16-shell",
+    "~/.config/tmux-claude-resume/": "tmux-claude-resume/*"
+  }
+}
