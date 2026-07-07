@@ -298,3 +298,51 @@ class TestSourceBaseDir:
 
         assert result.returncode == 0, result.stdout + result.stderr
         assert os.path.realpath(str(home / ".bashrc")) == str(repo / "bashrc")
+
+
+class TestForceRelink:
+    """Differing-source symlink: warn+skip by default, repoint with --force-relink"""
+
+    def _setup(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        (repo / "bashrc").write_text("# new source\n")
+        old = tmp_path / "old"
+        old.mkdir()
+        (old / "bashrc").write_text("# old source\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        target = home / ".bashrc"
+        target.symlink_to(old / "bashrc")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(json.dumps({"links": {str(target): "bashrc"}}))
+        return repo, old, target, config_file
+
+    def test_default_warns_and_skips_and_continues(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, tmp_path)
+
+        # Regression: this used to abort the whole run (exit 1)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Skipping" in result.stdout + result.stderr
+        assert os.path.realpath(str(target)) == str(old / "bashrc")
+
+    def test_force_relink_repoints_with_warning(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, tmp_path, "--force-relink")
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Repointing" in result.stdout + result.stderr
+        assert os.path.realpath(str(target)) == str(repo / "bashrc")
+
+    def test_regular_file_target_still_aborts(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+        target.unlink()
+        target.write_text("# a real file\n")
+
+        for extra in ([], ["--force-relink"]):
+            result = _run_dot(config_file, tmp_path, *extra)
+            assert result.returncode == 1
+            assert target.read_text() == "# a real file\n"

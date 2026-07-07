@@ -179,6 +179,7 @@ def cmd_link(args, config):
     yes = args.yes
     source = args.source
     target = args.target
+    force_relink = args.force_relink
 
     links = (config.get("links", {}) or {}) if use_config else {}
     if target or source:
@@ -228,16 +229,25 @@ def cmd_link(args, config):
                     )
                 continue
             else:
-                # In this case, we could ask for confirmation,
-                # or respect a --force and overwrite.
-                # This is not a very "destructive" overwrite,
-                # thus it should be a relatively safe thing to do,
-                # since we could do it without affecting the
-                # other (previous) source file/dir.
-                _errcho(
-                    "Symlink {} already exists but does not point "
-                    "to source {}. Not creating".format(_target, _source)
-                )
+                old_source = _normalize_path(_target, globbing=False, resolve=True)
+                if force_relink:
+                    print_warning(
+                        "Repointing {}: was -> {}, now -> {}".format(
+                            _target, old_source, _source
+                        )
+                    )
+                    os.unlink(_target)
+                    os.symlink(_source, _target)
+                    print_success(
+                        "Created symlink: {} --> {}".format(_target, _source)
+                    )
+                else:
+                    print_warning(
+                        "Symlink {} exists but points to {}, not {}. "
+                        "Skipping (use --force-relink to repoint).".format(
+                            _target, old_source, _source
+                        )
+                    )
                 continue
         else:
             print_success("Created symlink: {} --> {}".format(_target, _source))
@@ -392,6 +402,13 @@ def main():
         action="store_true",
         default=False,
         help="Answer yes to all prompts",
+    )
+    link_parser.add_argument(
+        "--force-relink",
+        action="store_true",
+        default=False,
+        help="Repoint existing symlinks that point at a different source "
+        "(default: warn and skip them)",
     )
 
     # unlink command
