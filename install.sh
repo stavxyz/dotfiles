@@ -38,6 +38,19 @@ mkdir -p "${HOME}/.dot/state"
 echo "✓ Created ~/.dot/state/"
 
 # ============================================================================
+# Git Submodules (base16-shell etc.)
+# ============================================================================
+
+# A fresh clone has empty submodule dirs, which breaks base16 theming and
+# aborts `dot.py link`. Idempotent: a no-op when already initialized.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "${script_dir}/.gitmodules" ]] && command -v git &>/dev/null; then
+    echo "Initializing git submodules..."
+    git -C "$script_dir" submodule update --init --recursive
+    echo "✓ Submodules initialized"
+fi
+
+# ============================================================================
 # Vim Plugin Manager
 # ============================================================================
 
