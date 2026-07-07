@@ -1,3 +1,17 @@
+---
+validated:
+  sha: 4592b09ed5ad6b820c43b246c387922ebc60ac19
+  date: 2026-07-07T21:21:05Z
+  reviewers: [fact-check, solid-hygiene]
+  findings:
+    critical: 0
+    important: 0
+    medium: 3
+    low: 6
+    nitpick: 1
+  net_negative_remaining: 0
+---
+
 # dot Extensions Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -60,7 +74,7 @@ git status --short   # expected: empty
 
 **Interfaces:**
 - Consumes: existing `_normalize_path(path, globbing, resolve)` (dot.py), `load_config`, `main()`'s `config_path` variable (already computed for the YAML fallback).
-- Produces: `_config_base_dir(config, config_path) -> str`; `_resolve_source(source, base_dir=None)`; `_resolve_all_links(links, config)` reads `config["_base_dir"]`. Behavior later tasks rely on: `dot.py --config <abs path> link` works from any cwd.
+- Produces: `_config_base_dir(config, config_path) -> str` (sole owner of the cwd fallback); `_resolve_source(source, base_dir=None)`; `_resolve_all_links(links, config, base_dir)` (explicit required param); `main()` sets `args.base_dir`. Behavior later tasks rely on: `dot.py --config <abs path> link` works from any cwd.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -168,13 +182,9 @@ def _config_base_dir(config, config_path):
     return os.getcwd()
 ```
 
-In `_resolve_all_links(links, config)`, at the top add:
+Change `_resolve_all_links(links, config)` to take the base dir as an explicit required parameter — `_resolve_all_links(links, config, base_dir)` — and change the `_resolve_source(source)` call inside it to `_resolve_source(source, base_dir)`. Update both call sites: in `cmd_link` and `cmd_unlink`, change `links = _resolve_all_links(links, config)` to `links = _resolve_all_links(links, config, args.base_dir)`.
 
-```python
-    base_dir = config.get("_base_dir") or os.getcwd()
-```
-
-and change the `_resolve_source(source)` call to `_resolve_source(source, base_dir)`.
+> **Design note (2026-07-07):** two SOLID advisories addressed here — the base dir travels as an explicit parameter (and as `args.base_dir`, runtime state) instead of a magic `_base_dir` key smuggled into the user's config dict, and the cwd fallback now has exactly one owner (`_config_base_dir`); `_resolve_all_links` has no fallback of its own.
 
 Change `_resolve_source` signature and body:
 
@@ -192,10 +202,10 @@ In `main()`, right after the `config["home"]` default is set (after the `if not 
 
 ```python
     # Resolve relative link sources against the manifest, not the cwd
-    config["_base_dir"] = _config_base_dir(config, config_path)
+    args.base_dir = _config_base_dir(config, config_path)
 ```
 
-(`config_path` already exists in `main()` from the YAML-fallback logic.)
+(`config_path` already exists in `main()` from the YAML-fallback logic; `args` is the argparse namespace both `cmd_link` and `cmd_unlink` already receive.)
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -281,7 +291,7 @@ class TestForceRelink:
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `python3 -m pytest tests/test_dotfiles.py::TestForceRelink -v`
-Expected: first test FAILS (today the run aborts, exit 1); second FAILS (unrecognized argument `--force-relink`); third PASSES already.
+Expected: all three FAIL — first (today the run aborts with exit 1 instead of continuing), second (unrecognized argument `--force-relink`, argparse exits 2), third (its `--force-relink` iteration also exits 2 pre-implementation, and the test asserts 1). After Step 3, all three pass.
 
 - [ ] **Step 3: Implement**
 
@@ -363,10 +373,10 @@ In `dot.py`, change `VERSION = "1.0.0"` to `VERSION = "1.1.0"`.
 
 - [ ] **Step 2: CHANGELOG entry**
 
-Read `CHANGELOG.md` and prepend a new entry above the most recent one, matching its existing heading style:
+`CHANGELOG.md` uses keep-a-changelog style (`## [Unreleased]` at top, then `## [2.0.0] - 2025-11-25`, ...) tracking the *repo's* versioning. Insert this entry BELOW the `## [Unreleased]` section (dot.py is versioned independently, hence the explicit `dot` prefix):
 
 ```markdown
-## dot 1.1.0 (2026-07-07)
+## [dot 1.1.0] - 2026-07-07
 
 - Relative link sources now resolve against the manifest: the `dotfiles`
   config key (previously ignored) when present, else the config file's
@@ -382,7 +392,7 @@ Read `CHANGELOG.md` and prepend a new entry above the most recent one, matching 
 
 - [ ] **Step 3: README-dot.md updates**
 
-In `README-dot.md`: update the Features list — change the config bullet to mention that relative sources resolve against the config file's directory (or the `dotfiles` key), and add a bullet for `--force-relink`. In the Quick Start config example, add a note line after the JSON block:
+In `README-dot.md`: update the Features list — change the config bullet to mention that relative sources resolve against the config file's directory (or the `dotfiles` key), and add a bullet for `--force-relink`. Also update the "Conflict Handling" section (~lines 147-155), item 2 "Symlink exists but points elsewhere": it currently says "Error (won't overwrite)" — change to "Warns and skips (run continues); `link --force-relink` repoints it with a warning". In the Quick Start config example, add a note line after the JSON block:
 
 ```markdown
 Relative sources resolve against the `dotfiles` key if set, otherwise
@@ -399,6 +409,8 @@ python3 -c "import json; json.load(open('dotfiles.json'))" && cd /tmp && python3
 ```
 
 Expected: `RELOCATABLE_OK` (idempotent re-link from a foreign cwd).
+
+> **Design note (2026-07-07):** SOLID review flags the standing tax this step exemplifies: the host's link map lives in BOTH `dotfiles.json` and `dotfiles.yaml` with nothing enforcing agreement, so every links change is a lockstep two-file edit. Out of scope to fix in this plan; candidate follow-up: make one manifest canonical, or add a CI check asserting the two link maps are equivalent.
 
 - [ ] **Step 5: Run the full Python gate**
 
@@ -429,7 +441,9 @@ any clone outside ~/dotfiles."
 - Test: `tests/test-extensions.bats`
 
 **Interfaces:**
-- Consumes: nothing (self-contained; `debug` and `run_if_changed` are used by `load_dotfiles_modules` but resolved at call time — callers/tests must have them defined).
+- Consumes: `load_dotfiles_modules` has two DECLARED hook dependencies: `debug` (no-op fallback defined by the library itself when absent) and `run_if_changed` (checked fail-loud immediately before the dynamic phase — by which point the host's static phase has defined it in normal operation). The other three functions are fully self-contained.
+
+> **Design note (2026-07-07):** dependencies made explicit in response to SOLID review — the original draft billed the library as consuming "nothing" while `load_dotfiles_modules` silently required `debug`/`run_if_changed` from the caller's environment, a hidden temporal coupling (run_if_changed only exists mid-call because the loader itself sources 00-dotfiles.sh during the static phase).
 - Produces (all bash-3.2-safe, ERR-trap-clean, shellcheck-clean):
   - `dot_list_extensions` — prints valid extension dirs (from `${DOTFILES_EXTENSIONS_DIR:-$HOME/.dot/extensions}`) one per line, lexical order; follows symlinks; warns on stderr and skips broken/non-dir entries; prints nothing when the dir is absent/empty. Always returns 0.
   - `dot_extension_manifest <ext_dir>` — prints `<ext>/dotfiles.json` if present, else `<ext>/dotfiles.yaml`, else nothing. Always returns 0.
@@ -599,6 +613,15 @@ Expected: setup fails on every test — `lib/dot-extensions.sh: No such file or 
 # bash 3.2), so everything here must be bash-3.2-compatible and must not
 # produce a nonzero exit status when sourced under set -E / an ERR trap.
 
+# load_dotfiles_modules depends on two hooks from the caller's environment:
+# `debug` (bash_profile) and `run_if_changed` (host 00-dotfiles.sh, defined
+# during the static phase of the host's own load). Declare the cheap one's
+# fallback here; the load-bearing one is checked fail-loud at the point it
+# is first needed (see load_dotfiles_modules).
+if ! declare -f debug >/dev/null; then
+  debug() { :; }
+fi
+
 # Print valid extension directories in load (lexical) order, one per line.
 dot_list_extensions() {
   local ext_parent="${DOTFILES_EXTENSIONS_DIR:-${HOME}/.dot/extensions}"
@@ -659,6 +682,14 @@ load_dotfiles_modules() {
         source "$module"
       fi
     done
+  fi
+
+  # The dynamic phase requires run_if_changed. In normal operation the host's
+  # static phase (00-dotfiles.sh, sourced just above) has defined it by now;
+  # fail loudly rather than half-load if that contract is broken.
+  if ! declare -f run_if_changed >/dev/null; then
+    echo "load_dotfiles_modules: run_if_changed is not defined; skipping dynamic modules in $dir" >&2
+    return 1
   fi
 
   for module in "$dir"/modules/dynamic/*.sh; do
@@ -771,7 +802,7 @@ with:
   mkdir -p "$(dirname "$hash_file")"
 ```
 
-and move that line to AFTER `hash_file` is computed (it is computed just above the current `mkdir`; keep the order `state_dir` → `hash_file` → `mkdir`).
+The `mkdir` already sits after `hash_file` is computed (order is `state_dir` line 29 → `hash_file` line 30 → `mkdir` line 33), so the string replacement above is the whole change — no line moves. While in the function, update its header `Usage:` comment to note that `name` may contain a namespace subdirectory (e.g. `private/osx_defaults`).
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -1041,9 +1072,12 @@ if [[ -f "$_claude_settings" && ! -L "$_claude_settings" && -f "$_claude_ext_set
   else
     echo "Copying local claude settings.json to dotfiles-private..."
     cp -v "$_claude_settings" "$_claude_ext_settings"
-    echo "Re-linking claude settings.json to dotfiles-private..."
+    echo "Re-linking claude config via the extension manifest..."
+    # dot.py hard-refuses regular-file targets, so remove the plain file
+    # Claude Code left behind, then let the manifest own the relink — the
+    # guard never duplicates link definitions or repair logic.
     rm -f "$_claude_settings"
-    ln -s "$_claude_ext_settings" "$_claude_settings"
+    python3 "${DOTFILES_DIR}/dot.py" --config "${_claude_ext_dir}/dotfiles.json" link --yes --force-relink
   fi
   unset _git_status
 fi
@@ -1052,13 +1086,27 @@ unset _claude_ext_dir _claude_settings _claude_ext_settings
 
 Then: `shellcheck ~/.dot/extensions/private/modules/static/96-claude-config.sh` — expected clean.
 
+> **Design note (2026-07-07):** the healing branch now delegates the relink to `dot.py --force-relink` against the extension's own manifest, in response to SOLID review — the previous hand-rolled `rm`/`ln -s` made the guard a second owner of both the repair logic and the `claude/settings.json` link definition. Startup cost unchanged: the delegation runs only in the already-broken branch.
+
 - [ ] **Step 3: Remove Claude config from the public repo**
 
 In `~/dotfiles`:
 
 1. Remove these five entries from BOTH `dotfiles.json` and `dotfiles.yaml` `links:` maps: `~/.claude/settings.json`, `~/.claude/CLAUDE.md`, `~/.claude/skills`, `~/.claude/agents`, `~/.claude/commands`.
 2. `git rm -r claude/ && git rm modules/static/96-claude-config.sh`
-3. Validate the JSON: `python3 -c "import json; json.load(open('dotfiles.json'))"`.
+3. Verify BOTH manifests are clean (the yaml is easy to forget and would re-link removed payload on a yaml-driven run):
+
+```bash
+python3 - <<'EOF'
+import json
+links = json.load(open("dotfiles.json")).get("links", {})
+assert not any(k.startswith("~/.claude") for k in links), "claude links remain in dotfiles.json"
+print("json clean")
+EOF
+if grep -q '~/.claude' dotfiles.yaml; then echo "FAIL: claude links remain in dotfiles.yaml"; else echo "yaml clean"; fi
+```
+
+Expected: `json clean` and `yaml clean` (the JSON parse doubles as syntax validation).
 
 - [ ] **Step 4: Relink through the extension and verify**
 
