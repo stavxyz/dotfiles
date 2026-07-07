@@ -1,0 +1,23 @@
+{
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "model": "Fable",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/stavxyz/.config/tmux-claude-resume/record-tmux-session.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
