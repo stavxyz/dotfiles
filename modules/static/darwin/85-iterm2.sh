@@ -4,4 +4,6 @@
 # Dependencies: none
 
 # Load iTerm2 shell integration if available
-[[ -f "${HOME}/.iterm2_shell_integration.bash" ]] && source "${HOME}/.iterm2_shell_integration.bash"
+if [[ -f "${HOME}/.iterm2_shell_integration.bash" ]]; then
+  source "${HOME}/.iterm2_shell_integration.bash"
+fi
