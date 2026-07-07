@@ -40,6 +40,19 @@ All notable changes to this project will be documented in this file.
 - Rationale: Lazy loading broke direnv's core auto-loading feature
 - Performance impact: ~4-5ms overhead per command (negligible)
 
+## [dot 1.1.0] - 2026-07-07
+
+- Relative link sources now resolve against the manifest: the `dotfiles`
+  config key (previously ignored) when present, else the config file's
+  directory. Previously they resolved against the process cwd, so
+  `dot.py --config <path> link` only worked when run from the manifest's
+  directory.
+- New `link --force-relink` flag repoints existing symlinks that point at
+  a different source, with a loud `Repointing <target>: was -> X, now -> Y`
+  warning. Without the flag such symlinks are warned about and skipped;
+  previously they aborted the entire run.
+- Targets that exist as regular files or directories remain hard refusals.
+
 ## [2.0.0] - 2025-11-25
 
 ### Added

@@ -28,7 +28,7 @@ try:
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 DEFAULT_CONFIG = "dotfiles.json"
 DEBUG = False
 
@@ -238,9 +238,7 @@ def cmd_link(args, config):
                     )
                     os.unlink(_target)
                     os.symlink(_source, _target)
-                    print_success(
-                        "Created symlink: {} --> {}".format(_target, _source)
-                    )
+                    print_success("Created symlink: {} --> {}".format(_target, _source))
                 else:
                     print_warning(
                         "Symlink {} exists but points to {}, not {}. "

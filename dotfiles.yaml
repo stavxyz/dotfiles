@@ -30,7 +30,6 @@
 # links:
 #     ~/: dotfiles_repo/*
 
-dotfiles: ~/dotfiles
 links:
     ~/.bash_profile:                        bash/bash_profile
     ~/.bash_aliases:                        bash/bash_aliases
