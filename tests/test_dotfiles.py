@@ -393,3 +393,31 @@ class TestGlobTargetDir:
 
         assert result.returncode == 1
         assert target_dir.read_text() == "# not a directory\n"
+
+    def test_dangling_symlink_at_target_dir_aborts_cleanly(self, tmp_path):
+        """Regression: dangling symlink at glob-target path should error cleanly,
+        not crash with unhandled FileExistsError from os.makedirs."""
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        (home / ".config").mkdir()
+        target_dir = home / ".config" / "toolbox"
+        # Create a dangling symlink at the target path
+        target_dir.symlink_to(tmp_path / "nowhere")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        # Should error with returncode 1
+        assert result.returncode == 1
+        # Should show the clean error message
+        assert "not a directory" in (result.stdout + result.stderr)
+        # Should NOT have a Python traceback
+        assert "Traceback" not in result.stderr

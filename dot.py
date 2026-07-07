@@ -307,8 +307,8 @@ def _resolve_all_links(links, config, base_dir):
             # write sources into target dir
             # isdir() will resolve a symlink dir; a target that doesn't
             # exist yet is fine here (cmd_link creates it), only a target
-            # that exists as a non-directory (e.g. a plain file) is an error
-            if os.path.exists(target) and not os.path.isdir(target):
+            # that exists as a non-directory (e.g. a plain file or dangling symlink) is an error
+            if os.path.lexists(target) and not os.path.isdir(target):
                 # consider moving this check to the link() or unlink() funcs
                 _errcho(
                     "target ( {} ) already exists and is not a directory. "
