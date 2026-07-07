@@ -134,3 +134,15 @@ teardown() {
   run cat "$TEST_DIR/install.log"
   [ "${#lines[@]}" -eq 2 ]
 }
+
+@test "run_if_changed: namespaced name creates a state subdirectory" {
+  debug() { :; }
+  # shellcheck source=/dev/null
+  source "$REPO_ROOT/modules/static/00-dotfiles.sh"
+  export HOME="$TEST_DIR"
+  echo "true" > "$TEST_DIR/mod.sh"
+
+  run_if_changed "priv/mod" "$TEST_DIR/mod.sh" "true"
+
+  [ -f "$TEST_DIR/.dot/state/priv/mod.hash" ]
+}
