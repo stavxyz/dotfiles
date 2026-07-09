@@ -105,6 +105,16 @@ Rules:
   shell startup, host and extension alike.
 - `DOTFILES_EXTENSIONS_DIR` overrides the parent directory. Symlinked
   extension dirs work (clone anywhere, `ln -s` into place).
+- **Trust model:** an extension is arbitrary shell code, sourced into every
+  login shell and executed by `install.sh` with your full user privileges.
+  Only place repos you trust in `~/.dot/extensions/`.
+- One extension's failure never blocks the others: `install.sh` reports the
+  failing extension loudly and continues bootstrapping the rest.
+- Bootstrap ordering: if an app has already created a *real file* at a path
+  an extension wants to link (e.g. Claude Code writing
+  `~/.claude/settings.json` before the extension is cloned), the link phase
+  refuses loudly rather than overwrite it. Move the file aside (or absorb
+  its contents into the extension) and re-run `./install.sh`.
 
 ## Troubleshooting
 
