@@ -4,6 +4,7 @@ Tests for dot.py - Verifies behavior of zero-dependency refactored version.
 """
 
 import json
+import re
 import os
 import subprocess
 import sys
@@ -421,3 +422,26 @@ class TestGlobTargetDir:
         assert "not a directory" in (result.stdout + result.stderr)
         # Should NOT have a Python traceback
         assert "Traceback" not in result.stderr
+
+
+class TestReleaseHygiene:
+    """Guards against version and manifest drift (polish-pr findings)"""
+
+    def test_dot_version_matches_pyproject(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "pyproject.toml")) as f:
+            pyproject = f.read()
+        match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, re.MULTILINE)
+        assert match, "no version field found in pyproject.toml"
+        assert match.group(1) == dot.VERSION
+
+    def test_host_manifests_links_in_sync(self):
+        yaml_mod = pytest.importorskip("yaml")
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "dotfiles.json")) as f:
+            json_links = json.load(f)["links"]
+        with open(os.path.join(root, "dotfiles.yaml")) as f:
+            yaml_links = yaml_mod.safe_load(f)["links"]
+        assert (
+            json_links == yaml_links
+        ), "dotfiles.json and dotfiles.yaml link maps have drifted"
