@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+**Dot Extensions** (`lib/dot-extensions.sh`):
+- Extensions are repos cloned (or symlinked) into `~/.dot/extensions/<name>/` that mirror
+  this repo's shape — manifest, modules, optional `install.sh`, payload — every part
+  optional. Discovered in lexical order and loaded *after* the host (last writer wins)
+- `bash_profile` loads extension modules via the shared `load_dotfiles_modules` loader
+  (which also replaced the four duplicated host module-loading loops); `install.sh`
+  bootstraps and links every extension idempotently, isolating per-extension failures so
+  one broken extension never blocks the rest
+- `run_if_changed` state names support per-extension subdirectories
+  (`~/.dot/state/<ext>/<module>.hash`); host state names unchanged
+- See the README "Extensions" section for the contract, load order, override semantics,
+  and trust model
+
 **Tmux Plugin Bootstrap**:
 - `install.sh` now installs TPM (Tmux Plugin Manager) into `~/.tmux/plugins/tpm` if missing,
   so the plugins declared in `tmux.conf` actually load (run `prefix + I` to install them)
@@ -39,6 +52,47 @@ All notable changes to this project will be documented in this file.
 - Removed `DOTFILES_LAZY_DIRENV` configuration option
 - Rationale: Lazy loading broke direnv's core auto-loading feature
 - Performance impact: ~4-5ms overhead per command (negligible)
+
+### Fixed
+
+**Completions actually register now**:
+- Lazy mode sourced completion files in a backgrounded subshell and eager mode inside a
+  command substitution — in both cases the `complete` registrations were made in a child
+  process and silently lost. Lazy mode now loads via a one-shot `PROMPT_COMMAND` hook in
+  the parent shell at first prompt (startup stays fast); eager mode sources directly
+- `install.sh` now fetches the completion scripts (`bin/fetch_autocompleters.sh` was never
+  wired in, so fresh machines had no git/docker/brew completions to load)
+- Validation tests exercise the mechanism hermetically plus a real end-to-end login-shell
+  test; fixed the `autocomplete/.gitignore` whitelist naming the wrong file
+
+### Removed
+
+**BREAKING — Claude Code config moved to a private extension**:
+- `claude/` (settings.json, global CLAUDE.md, skills/, agents/, commands/) and its
+  symlink-guard module no longer live in this public repo; they moved to the private
+  `dotfiles-private` extension. On a machine that pulls this change, the five
+  `~/.claude/*` symlinks dangle until you clone your private extension to
+  `~/.dot/extensions/private` and re-run `./install.sh`
+
+## [dot 1.1.0] - 2026-07-07
+
+- Relative link sources now resolve against the manifest: the `dotfiles`
+  config key (previously ignored) when present, else the config file's
+  directory. Previously they resolved against the process cwd, so
+  `dot.py --config <path> link` only worked when run from the manifest's
+  directory.
+- New `link --force-relink` flag repoints existing symlinks that point at
+  a different source, with a loud `Repointing <target>: was -> X, now -> Y`
+  warning. Without the flag such symlinks are warned about and skipped;
+  previously they aborted the entire run.
+- Targets that exist as regular files or directories remain hard refusals.
+- Glob-target directories that don't exist yet are now created on first link
+  (previously "already exists and is not a directory" aborted a fresh bootstrap).
+- A dangling symlink at a glob-target path now aborts with the clean error
+  (`lexists`) instead of an unhandled traceback.
+- Repointing under `--force-relink` is atomic (temp symlink + rename), so an
+  interrupt can never leave the target missing.
+- Packaging version in `pyproject.toml` synced to 1.1.0 (guarded by a test).
 
 ## [2.0.0] - 2025-11-25
 

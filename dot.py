@@ -28,7 +28,7 @@ try:
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 DEFAULT_CONFIG = "dotfiles.json"
 DEBUG = False
 
@@ -155,6 +155,20 @@ def load_config(config_path):
         return {}
 
 
+def _config_base_dir(config, config_path):
+    """Directory that relative link sources resolve against.
+
+    Precedence: the manifest's `dotfiles` key, then the config file's
+    directory, then the process cwd (no config file at all).
+    """
+    base = config.get("dotfiles")
+    if base:
+        return _normalize_path(base, globbing=False)
+    if config_path and os.path.isfile(config_path):
+        return os.path.dirname(_normalize_path(config_path, globbing=False))
+    return os.getcwd()
+
+
 # what happens if --source uses a glob?
 
 
@@ -165,11 +179,12 @@ def cmd_link(args, config):
     yes = args.yes
     source = args.source
     target = args.target
+    force_relink = args.force_relink
 
     links = (config.get("links", {}) or {}) if use_config else {}
     if target or source:
         links[target] = source
-    links = _resolve_all_links(links, config)
+    links = _resolve_all_links(links, config, args.base_dir)
     if DEBUG:
         print_info("Symlinks to create:")
         print_info(json.dumps(links, indent=2, sort_keys=True))
@@ -214,16 +229,31 @@ def cmd_link(args, config):
                     )
                 continue
             else:
-                # In this case, we could ask for confirmation,
-                # or respect a --force and overwrite.
-                # This is not a very "destructive" overwrite,
-                # thus it should be a relatively safe thing to do,
-                # since we could do it without affecting the
-                # other (previous) source file/dir.
-                _errcho(
-                    "Symlink {} already exists but does not point "
-                    "to source {}. Not creating".format(_target, _source)
-                )
+                old_source = _normalize_path(_target, globbing=False, resolve=True)
+                if force_relink:
+                    print_warning(
+                        "Repointing {}: was -> {}, now -> {}".format(
+                            _target, old_source, _source
+                        )
+                    )
+                    # Repoint atomically: build the new link under a temp
+                    # name and rename over the target, so an interrupt never
+                    # leaves the target missing.
+                    _tmp_link = "{}.dot-relink-tmp".format(_target)
+                    if os.path.lexists(_tmp_link):
+                        os.unlink(_tmp_link)
+                    os.symlink(_source, _tmp_link)
+                    os.rename(_tmp_link, _target)
+                    print_success(
+                        "Repointed symlink: {} --> {}".format(_target, _source)
+                    )
+                else:
+                    print_warning(
+                        "Symlink {} exists but points to {}, not {}. "
+                        "Skipping (use --force-relink to repoint).".format(
+                            _target, old_source, _source
+                        )
+                    )
                 continue
         else:
             print_success("Created symlink: {} --> {}".format(_target, _source))
@@ -241,7 +271,7 @@ def cmd_unlink(args, config):
         source = _normalize_path(target, globbing=False)
         target = _normalize_path(target, resolve=False, globbing=False)
         links[target] = source
-    links = _resolve_all_links(links, config)
+    links = _resolve_all_links(links, config, args.base_dir)
     links = sorted([_l for _l in links.keys() if os.path.exists(_l)], reverse=True)
     if DEBUG:
         print_info("Links found to remove:")
@@ -259,13 +289,13 @@ def cmd_unlink(args, config):
         os.unlink(_target)
 
 
-def _resolve_all_links(links, config):
+def _resolve_all_links(links, config, base_dir):
     links_expanded = {}
     for target, source in links.items():
         if target and not source:
             _errcho("You specified a target {} but no source".format(target))
         if source:
-            source = _resolve_source(source)
+            source = _resolve_source(source, base_dir)
         if target:
             target = _normalize_path(target, globbing=False, resolve=False).rstrip(
                 os.path.sep
@@ -283,8 +313,10 @@ def _resolve_all_links(links, config):
         # all are normalized and absolute
         if isinstance(source, list):
             # write sources into target dir
-            # isdir() will resolve a symlink dir
-            if not os.path.isdir(target):
+            # isdir() will resolve a symlink dir; a target that doesn't
+            # exist yet is fine here (cmd_link creates it), only a target
+            # that exists as a non-directory (e.g. a plain file or dangling symlink) is an error
+            if os.path.lexists(target) and not os.path.isdir(target):
                 # consider moving this check to the link() or unlink() funcs
                 _errcho(
                     "target ( {} ) already exists and is not a directory. "
@@ -304,7 +336,10 @@ def _resolve_all_links(links, config):
     return collections.OrderedDict(sorted(links_expanded.items()))
 
 
-def _resolve_source(source):
+def _resolve_source(source, base_dir=None):
+    expanded = os.path.expandvars(os.path.expanduser(source))
+    if base_dir and not os.path.isabs(expanded):
+        source = os.path.join(base_dir, expanded)
     abs_sources = _normalize_path(source, globbing=True)
     # at this point we have 1 or more sources
     # source may be a single dir, a single file, or a bunch of files like ones/in/here/*
@@ -376,6 +411,13 @@ def main():
         default=False,
         help="Answer yes to all prompts",
     )
+    link_parser.add_argument(
+        "--force-relink",
+        action="store_true",
+        default=False,
+        help="Repoint existing symlinks that point at a different source "
+        "(default: warn and skip them)",
+    )
 
     # unlink command
     unlink_parser = subparsers.add_parser("unlink", help="Remove symlinks")
@@ -422,6 +464,9 @@ def main():
     # Set home directory in config if not already set
     if not config.get("home"):
         config["home"] = args.home_dir
+
+    # Resolve relative link sources against the manifest, not the cwd
+    args.base_dir = _config_base_dir(config, config_path)
 
     if DEBUG:
         print_info("Config:")

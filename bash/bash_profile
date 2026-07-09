@@ -78,50 +78,22 @@ set -E
 
 [[ ! -d "${DOTFILES_DIR}" ]] && errcho 'dotfiles directory not found' && exit 0
 
-# Detect platform (strip version numbers: darwin24.5.0 → darwin)
-platform="${OSTYPE%%[0-9]*}"
+# Load modules — host first, then extensions (see lib/dot-extensions.sh)
 
-# Static modules: Always sourced (fast operations)
+# The extension loader is the single owner of module-loading and
+# extension-discovery rules (see docs/superpowers/specs/2026-07-07-dot-extensions-design.md)
+source "${DOTFILES_DIR}/lib/dot-extensions.sh"
 
-# Cross-platform static modules
-for module in "${DOTFILES_DIR}"/modules/static/[0-9][0-9]-*.sh; do
-  if [[ -f "$module" ]]; then
-    debug "sourcing ${module##*/}"
-    source "$module"
+# Host modules first (empty namespace: state names stay bare)
+load_dotfiles_modules "${DOTFILES_DIR}" ""
+
+# Then extensions from ~/.dot/extensions/, lexical order, last one wins
+while IFS= read -r _dot_ext; do
+  if [[ -n "$_dot_ext" ]]; then
+    load_dotfiles_modules "$_dot_ext" "$(basename "$_dot_ext")"
   fi
-done
-
-# Platform-specific static modules
-if [[ -d "${DOTFILES_DIR}/modules/static/${platform}" ]]; then
-  for module in "${DOTFILES_DIR}"/modules/static/"${platform}"/[0-9][0-9]-*.sh; do
-    if [[ -f "$module" ]]; then
-      debug "sourcing platform-specific ${module##*/}"
-      source "$module"
-    fi
-  done
-fi
-
-# Dynamic modules: Only run if file content changed (system modifications)
-
-# Cross-platform dynamic modules
-for module in "${DOTFILES_DIR}"/modules/dynamic/*.sh; do
-  if [[ -f "$module" ]]; then
-    module_name="$(basename "$module" .sh)"
-    debug "checking dynamic module: $module_name"
-    run_if_changed "$module_name" "$module" "source \"$module\""
-  fi
-done
-
-# Platform-specific dynamic modules
-if [[ -d "${DOTFILES_DIR}/modules/dynamic/${platform}" ]]; then
-  for module in "${DOTFILES_DIR}"/modules/dynamic/"${platform}"/*.sh; do
-    if [[ -f "$module" ]]; then
-      module_name="$(basename "$module" .sh)"
-      debug "checking platform-specific dynamic module: $module_name"
-      run_if_changed "$module_name" "$module" "source \"$module\""
-    fi
-  done
-fi
+done < <(dot_list_extensions)
+unset _dot_ext
 
 # Disable strict error checking for external scripts (completions, etc.)
 set +E

@@ -12,8 +12,10 @@ A lightweight, zero-dependency dotfiles symlink manager for Unix systems. Single
 - **Single file** - Easy to curl and run directly
 - **JSON configuration** - Simple, readable config format
 - **Optional YAML configuration** - `dotfiles.yaml`/`.yml` works when PyYAML is installed (never required; JSON always works)
+- **Manifest-relative sources** - Relative link sources resolve against the config file's directory (or `dotfiles` key if set), not your shell's cwd
 - **Glob pattern support** - Link multiple files with wildcards
 - **Smart conflict handling** - Detects existing files and symlinks
+- **Force-relink capability** - Use `link --force-relink` to repoint existing symlinks that target different sources
 - **Cross-platform** - Works on macOS, Linux, BSD, and other Unix systems
 
 ## Installation
@@ -55,6 +57,10 @@ Create a `dotfiles.json` config:
   }
 }
 ```
+
+Relative sources resolve against the `dotfiles` key if set, otherwise
+against the directory containing the config file — never against your
+shell's current directory.
 
 Create symlinks:
 
@@ -149,7 +155,7 @@ This creates:
 When creating symlinks, `dot` handles conflicts intelligently:
 
 1. **Symlink exists and points to correct source** → Skipped silently
-2. **Symlink exists but points elsewhere** → Error (won't overwrite)
+2. **Symlink exists but points elsewhere** → Warns and skips (run continues); `link --force-relink` repoints it with a warning
 3. **Regular file/directory exists** → Error (won't overwrite)
 
 Use the interactive prompts or `--yes` flag to control behavior.

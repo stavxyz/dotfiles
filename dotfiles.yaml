@@ -30,7 +30,6 @@
 # links:
 #     ~/: dotfiles_repo/*
 
-dotfiles: ~/dotfiles
 links:
     ~/.bash_profile:                        bash/bash_profile
     ~/.bash_aliases:                        bash/bash_aliases
@@ -45,11 +44,6 @@ links:
     ~/.inputrc:                             osx/inputrc
     ~/.config/base16-shell:                 shell/base16-shell
     ~/.config/tmux-claude-resume/:          tmux-claude-resume/*
-    ~/.claude/settings.json:                claude/settings.json
-    ~/.claude/CLAUDE.md:                    claude/CLAUDE.md
-    ~/.claude/skills:                       claude/skills
-    ~/.claude/agents:                       claude/agents
-    ~/.claude/commands:                     claude/commands
 
 brew:
     install:

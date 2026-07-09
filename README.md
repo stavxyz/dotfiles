@@ -71,6 +71,51 @@ export DOTFILES_CACHE_EVALS=true          # Cache expensive evals
 export DOTFILES_LAZY_PYENV=false          # Load pyenv eagerly
 ```
 
+## Extensions
+
+Layer private, work, or experimental config on top of these dotfiles without
+forking them. An extension is any repo cloned (or symlinked) into
+`~/.dot/extensions/<name>/` that mirrors this repo's shape — every part
+optional:
+
+    <extension>/
+      dotfiles.json        # symlink manifest (dot.py); omit the "dotfiles"
+                           # key so sources resolve against the extension
+      modules/static/      # NN-*.sh, sourced every shell, after host modules
+      modules/static/<platform>/
+      modules/dynamic/     # run-once-on-change, after host
+      modules/dynamic/<platform>/
+      install.sh           # optional idempotent bootstrap
+      <payload>/           # whatever the manifest links to
+
+Setup on a new machine:
+
+    git clone git@github.com:you/dotfiles-private ~/.dot/extensions/private
+    cd ~/dotfiles && ./install.sh   # discovers, bootstraps, and links it
+
+Rules:
+
+- Extensions load **after** the host, in lexical order (`10-work` before
+  `50-private`) — last writer wins.
+- Extension links may repoint host-owned symlinks; the extension loop passes
+  `--force-relink`, and every repoint is warned loudly. Prefer layering via
+  native includes (git `[include]`, bash source order) over link overrides.
+- Modules must be ERR-trap-clean (never end a file with a possibly-false
+  bare conditional — use `if` statements): one bad module breaks every
+  shell startup, host and extension alike.
+- `DOTFILES_EXTENSIONS_DIR` overrides the parent directory. Symlinked
+  extension dirs work (clone anywhere, `ln -s` into place).
+- **Trust model:** an extension is arbitrary shell code, sourced into every
+  login shell and executed by `install.sh` with your full user privileges.
+  Only place repos you trust in `~/.dot/extensions/`.
+- One extension's failure never blocks the others: `install.sh` reports the
+  failing extension loudly and continues bootstrapping the rest.
+- Bootstrap ordering: if an app has already created a *real file* at a path
+  an extension wants to link (e.g. Claude Code writing
+  `~/.claude/settings.json` before the extension is cloned), the link phase
+  refuses loudly rather than overwrite it. Move the file aside (or absorb
+  its contents into the extension) and re-run `./install.sh`.
+
 ## Troubleshooting
 
 **Slow startup?**

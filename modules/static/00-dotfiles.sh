@@ -13,7 +13,8 @@
 #
 # Usage: run_if_changed <name> <file_path> <command>
 # Arguments:
-#   $1 - Unique name for this check (used in hash filename)
+#   $1 - Unique name for this check (used in hash filename). May contain a
+#        namespace subdirectory (e.g. "private/osx_defaults")
 #   $2 - Path to file to monitor for changes
 #   $3 - Command to execute when file changes
 # Returns:
@@ -29,8 +30,9 @@ run_if_changed() {
   local state_dir="${HOME}/.dot/state"
   local hash_file="${state_dir}/${name}.hash"
 
-  # Ensure state directory exists
-  mkdir -p "$state_dir"
+  # Ensure state directory exists ("$name" may contain a namespace
+  # subdirectory, e.g. "private/osx_defaults")
+  mkdir -p "$(dirname "$hash_file")"
 
   # Calculate current hash
   local current_hash

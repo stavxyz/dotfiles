@@ -3,7 +3,10 @@
 Tests for dot.py - Verifies behavior of zero-dependency refactored version.
 """
 
+import json
+import re
 import os
+import subprocess
 import sys
 
 import pytest
@@ -225,3 +228,220 @@ class TestLoadConfig:
 # Note: Full integration tests for link/unlink commands with argparse CLI
 # are possible but require more setup. The core logic tests above provide
 # good coverage of the key helper functions in dot.py.
+
+
+def _run_dot(config_file, cwd, *link_args):
+    """Run dot.py link against a config file from a given cwd."""
+    dot_path = os.path.join(os.path.dirname(__file__), "..", "dot.py")
+    cmd = [sys.executable, dot_path, "--config", str(config_file), "link", "--yes"]
+    cmd.extend(link_args)
+    return subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True)
+
+
+class TestSourceBaseDir:
+    """dot.py 1.1: relative sources resolve against the manifest, not the cwd"""
+
+    def _setup(self, tmp_path, extra_config=None):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        (repo / "bashrc").write_text("# payload\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        config = {"links": {str(home / ".bashrc"): "bashrc"}}
+        if extra_config:
+            config.update(extra_config)
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(json.dumps(config))
+        return repo, home, elsewhere, config_file
+
+    def test_relative_source_resolves_against_config_dir(self, tmp_path):
+        repo, home, elsewhere, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, elsewhere)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        target = home / ".bashrc"
+        assert target.is_symlink()
+        assert os.path.realpath(str(target)) == str(repo / "bashrc")
+
+    def test_dotfiles_key_overrides_config_dir(self, tmp_path):
+        payload = tmp_path / "payload"
+        payload.mkdir()
+        (payload / "bashrc").write_text("# payload\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        cfg_dir = tmp_path / "cfg"
+        cfg_dir.mkdir()
+        config_file = cfg_dir / "dotfiles.json"
+        config_file.write_text(
+            json.dumps(
+                {
+                    "dotfiles": str(payload),
+                    "links": {str(home / ".bashrc"): "bashrc"},
+                }
+            )
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(home / ".bashrc")) == str(payload / "bashrc")
+
+    def test_absolute_source_unchanged(self, tmp_path):
+        repo, home, elsewhere, config_file = self._setup(tmp_path)
+        config_file.write_text(
+            json.dumps({"links": {str(home / ".bashrc"): str(repo / "bashrc")}})
+        )
+
+        result = _run_dot(config_file, elsewhere)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(home / ".bashrc")) == str(repo / "bashrc")
+
+
+class TestForceRelink:
+    """Differing-source symlink: warn+skip by default, repoint with --force-relink"""
+
+    def _setup(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        (repo / "bashrc").write_text("# new source\n")
+        old = tmp_path / "old"
+        old.mkdir()
+        (old / "bashrc").write_text("# old source\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        target = home / ".bashrc"
+        target.symlink_to(old / "bashrc")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(json.dumps({"links": {str(target): "bashrc"}}))
+        return repo, old, target, config_file
+
+    def test_default_warns_and_skips_and_continues(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, tmp_path)
+
+        # Regression: this used to abort the whole run (exit 1)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Skipping" in result.stdout + result.stderr
+        assert os.path.realpath(str(target)) == str(old / "bashrc")
+
+    def test_force_relink_repoints_with_warning(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+
+        result = _run_dot(config_file, tmp_path, "--force-relink")
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "Repointing" in result.stdout + result.stderr
+        assert os.path.realpath(str(target)) == str(repo / "bashrc")
+
+    def test_regular_file_target_still_aborts(self, tmp_path):
+        repo, old, target, config_file = self._setup(tmp_path)
+        target.unlink()
+        target.write_text("# a real file\n")
+
+        for extra in ([], ["--force-relink"]):
+            result = _run_dot(config_file, tmp_path, *extra)
+            assert result.returncode == 1
+            assert target.read_text() == "# a real file\n"
+
+
+class TestGlobTargetDir:
+    """Regression: a glob source into a dir target that doesn't exist yet
+    (e.g. a fresh HOME on first bootstrap) must succeed, not abort."""
+
+    def test_nonexistent_target_dir_is_created(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        (src_dir / "two.sh").write_text("# two\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        target_dir = home / ".config" / "toolbox"
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert os.path.realpath(str(target_dir / "one.sh")) == str(src_dir / "one.sh")
+        assert os.path.realpath(str(target_dir / "two.sh")) == str(src_dir / "two.sh")
+
+    def test_existing_file_at_target_dir_still_aborts(self, tmp_path):
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        (home / ".config").mkdir()
+        target_dir = home / ".config" / "toolbox"
+        target_dir.write_text("# not a directory\n")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        assert result.returncode == 1
+        assert target_dir.read_text() == "# not a directory\n"
+
+    def test_dangling_symlink_at_target_dir_aborts_cleanly(self, tmp_path):
+        """Regression: dangling symlink at glob-target path should error cleanly,
+        not crash with unhandled FileExistsError from os.makedirs."""
+        repo = tmp_path / "repo"
+        repo.mkdir()
+        src_dir = repo / "toolbox"
+        src_dir.mkdir()
+        (src_dir / "one.sh").write_text("# one\n")
+        home = tmp_path / "home"
+        home.mkdir()
+        (home / ".config").mkdir()
+        target_dir = home / ".config" / "toolbox"
+        # Create a dangling symlink at the target path
+        target_dir.symlink_to(tmp_path / "nowhere")
+        config_file = repo / "dotfiles.json"
+        config_file.write_text(
+            json.dumps({"links": {str(target_dir) + "/": "toolbox/*"}})
+        )
+
+        result = _run_dot(config_file, tmp_path)
+
+        # Should error with returncode 1
+        assert result.returncode == 1
+        # Should show the clean error message
+        assert "not a directory" in (result.stdout + result.stderr)
+        # Should NOT have a Python traceback
+        assert "Traceback" not in result.stderr
+
+
+class TestReleaseHygiene:
+    """Guards against version and manifest drift (polish-pr findings)"""
+
+    def test_dot_version_matches_pyproject(self):
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "pyproject.toml")) as f:
+            pyproject = f.read()
+        match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, re.MULTILINE)
+        assert match, "no version field found in pyproject.toml"
+        assert match.group(1) == dot.VERSION
+
+    def test_host_manifests_links_in_sync(self):
+        yaml_mod = pytest.importorskip("yaml")
+        root = os.path.join(os.path.dirname(__file__), "..")
+        with open(os.path.join(root, "dotfiles.json")) as f:
+            json_links = json.load(f)["links"]
+        with open(os.path.join(root, "dotfiles.yaml")) as f:
+            yaml_links = yaml_mod.safe_load(f)["links"]
+        assert (
+            json_links == yaml_links
+        ), "dotfiles.json and dotfiles.yaml link maps have drifted"
