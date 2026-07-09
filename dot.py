@@ -236,9 +236,17 @@ def cmd_link(args, config):
                             _target, old_source, _source
                         )
                     )
-                    os.unlink(_target)
-                    os.symlink(_source, _target)
-                    print_success("Created symlink: {} --> {}".format(_target, _source))
+                    # Repoint atomically: build the new link under a temp
+                    # name and rename over the target, so an interrupt never
+                    # leaves the target missing.
+                    _tmp_link = "{}.dot-relink-tmp".format(_target)
+                    if os.path.lexists(_tmp_link):
+                        os.unlink(_tmp_link)
+                    os.symlink(_source, _tmp_link)
+                    os.rename(_tmp_link, _target)
+                    print_success(
+                        "Repointed symlink: {} --> {}".format(_target, _source)
+                    )
                 else:
                     print_warning(
                         "Symlink {} exists but points to {}, not {}. "
