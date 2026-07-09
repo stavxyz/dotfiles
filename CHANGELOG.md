@@ -53,6 +53,18 @@ All notable changes to this project will be documented in this file.
 - Rationale: Lazy loading broke direnv's core auto-loading feature
 - Performance impact: ~4-5ms overhead per command (negligible)
 
+### Fixed
+
+**Completions actually register now**:
+- Lazy mode sourced completion files in a backgrounded subshell and eager mode inside a
+  command substitution — in both cases the `complete` registrations were made in a child
+  process and silently lost. Lazy mode now loads via a one-shot `PROMPT_COMMAND` hook in
+  the parent shell at first prompt (startup stays fast); eager mode sources directly
+- `install.sh` now fetches the completion scripts (`bin/fetch_autocompleters.sh` was never
+  wired in, so fresh machines had no git/docker/brew completions to load)
+- Validation tests exercise the mechanism hermetically plus a real end-to-end login-shell
+  test; fixed the `autocomplete/.gitignore` whitelist naming the wrong file
+
 ### Removed
 
 **BREAKING — Claude Code config moved to a private extension**:

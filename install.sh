@@ -52,6 +52,24 @@ if [[ -f "${script_dir}/.gitmodules" ]] && command -v git &>/dev/null; then
 fi
 
 # ============================================================================
+# Shell Completions
+# ============================================================================
+
+# Completion scripts (git, docker, brew, ...) are fetched, not vendored
+# (autocomplete/.gitignore). Without this a fresh clone has no completions
+# for the shell to load.
+if [[ -f "${script_dir}/autocomplete/git-completion.bash" ]]; then
+    echo "✓ Autocomplete scripts already fetched"
+else
+    echo "Fetching autocomplete scripts..."
+    if "${script_dir}/bin/fetch_autocompleters.sh"; then
+        echo "✓ Autocomplete scripts fetched"
+    else
+        echo "⚠️  Some autocomplete scripts failed to fetch (offline?); continuing"
+    fi
+fi
+
+# ============================================================================
 # Vim Plugin Manager
 # ============================================================================
 

@@ -55,9 +55,43 @@ setup() {
     [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
 }
 
-@test "completions work after changes" {
-    run bash -l -c 'complete -p git'
+# The completion tests assert on `apex` (autocomplete/apex.bash is the one
+# tracked completion file, present on every checkout). Fetched completions
+# (git, docker, ...) are covered by the skip-gated end-to-end test below.
+
+@test "completions register at first prompt (deferred/lazy mode)" {
+    # Lazy completions load via a one-shot PROMPT_COMMAND hook, which only
+    # fires in an interactive shell — drive one through a pipe (the hook
+    # runs before the first command executes). Hermetic: sources the module
+    # directly so it works on CI runners where dotfiles aren't linked.
+    rcfile="$(mktemp)"
+    cat > "$rcfile" <<EOF
+export DOTFILES_DIR="$DOTFILES_DIR"
+export DOTFILES_LAZY_COMPLETIONS=true
+debug() { :; }
+source "$DOTFILES_DIR/modules/static/50-autocomplete-lazy.sh"
+load_completions
+EOF
+    run bash -c "echo 'complete -p apex' | bash --noprofile --rcfile '$rcfile' -i 2>/dev/null"
+    rm -f "$rcfile"
     [ "$status" -eq 0 ]
+    [[ "$output" == *apex* ]]
+}
+
+@test "completions register at startup (eager mode)" {
+    run bash --noprofile --norc -c "export DOTFILES_DIR='$DOTFILES_DIR'; export DOTFILES_LAZY_COMPLETIONS=false; debug() { :; }; source '$DOTFILES_DIR/modules/static/50-autocomplete-lazy.sh'; load_completions; complete -p apex"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *apex* ]]
+}
+
+@test "login shell registers fetched completions end-to-end (lazy)" {
+    # Real-machine test: full bash_profile chain + fetched git completion.
+    [ -f "$DOTFILES_DIR/autocomplete/git-completion.bash" ] || \
+        skip "autocomplete scripts not fetched (run bin/fetch_autocompleters.sh)"
+    [ -L ~/.bash_profile ] || skip "dotfiles not linked into HOME"
+    run bash -c "echo 'complete -p git' | bash -li 2>/dev/null"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *git* ]]
 }
 
 @test "pyenv works if installed" {
