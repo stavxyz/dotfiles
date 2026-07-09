@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+**Dot Extensions** (`lib/dot-extensions.sh`):
+- Extensions are repos cloned (or symlinked) into `~/.dot/extensions/<name>/` that mirror
+  this repo's shape — manifest, modules, optional `install.sh`, payload — every part
+  optional. Discovered in lexical order and loaded *after* the host (last writer wins)
+- `bash_profile` loads extension modules via the shared `load_dotfiles_modules` loader
+  (which also replaced the four duplicated host module-loading loops); `install.sh`
+  bootstraps and links every extension idempotently, isolating per-extension failures so
+  one broken extension never blocks the rest
+- `run_if_changed` state names support per-extension subdirectories
+  (`~/.dot/state/<ext>/<module>.hash`); host state names unchanged
+- See the README "Extensions" section for the contract, load order, override semantics,
+  and trust model
+
 **Tmux Plugin Bootstrap**:
 - `install.sh` now installs TPM (Tmux Plugin Manager) into `~/.tmux/plugins/tpm` if missing,
   so the plugins declared in `tmux.conf` actually load (run `prefix + I` to install them)
@@ -40,6 +53,15 @@ All notable changes to this project will be documented in this file.
 - Rationale: Lazy loading broke direnv's core auto-loading feature
 - Performance impact: ~4-5ms overhead per command (negligible)
 
+### Removed
+
+**BREAKING — Claude Code config moved to a private extension**:
+- `claude/` (settings.json, global CLAUDE.md, skills/, agents/, commands/) and its
+  symlink-guard module no longer live in this public repo; they moved to the private
+  `dotfiles-private` extension. On a machine that pulls this change, the five
+  `~/.claude/*` symlinks dangle until you clone your private extension to
+  `~/.dot/extensions/private` and re-run `./install.sh`
+
 ## [dot 1.1.0] - 2026-07-07
 
 - Relative link sources now resolve against the manifest: the `dotfiles`
@@ -52,6 +74,13 @@ All notable changes to this project will be documented in this file.
   warning. Without the flag such symlinks are warned about and skipped;
   previously they aborted the entire run.
 - Targets that exist as regular files or directories remain hard refusals.
+- Glob-target directories that don't exist yet are now created on first link
+  (previously "already exists and is not a directory" aborted a fresh bootstrap).
+- A dangling symlink at a glob-target path now aborts with the clean error
+  (`lexists`) instead of an unhandled traceback.
+- Repointing under `--force-relink` is atomic (temp symlink + rename), so an
+  interrupt can never leave the target missing.
+- Packaging version in `pyproject.toml` synced to 1.1.0 (guarded by a test).
 
 ## [2.0.0] - 2025-11-25
 
