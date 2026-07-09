@@ -112,9 +112,12 @@ load_dotfiles_modules() {
 # Bootstrap every extension: run its install.sh, then link its manifest.
 # $1 = path to dot.py. --force-relink is the deliberate policy that
 # extension links may repoint host-owned symlinks (warned loudly).
+# Extensions are independent layers: one extension's failure is reported
+# loudly but never blocks the others (or the caller — always returns 0,
+# so install.sh's set -e completes the rest of the bootstrap).
 dot_bootstrap_extensions() {
   local dot_py="$1"
-  local ext ext_name manifest
+  local ext ext_name manifest failed_exts=""
   while IFS= read -r ext; do
     if [[ -z "$ext" ]]; then
       continue
@@ -123,13 +126,23 @@ dot_bootstrap_extensions() {
     echo "Extension: ${ext_name}"
     if [[ -x "$ext/install.sh" ]]; then
       echo "Running ${ext_name}/install.sh..."
-      "$ext/install.sh"
+      if ! "$ext/install.sh"; then
+        echo "dot-extensions: ${ext_name}/install.sh failed; skipping its manifest" >&2
+        failed_exts="${failed_exts} ${ext_name}"
+        continue
+      fi
     fi
     manifest="$(dot_extension_manifest "$ext")"
     if [[ -n "$manifest" ]]; then
       echo "Linking ${ext_name} manifest..."
-      python3 "$dot_py" --config "$manifest" link --yes --force-relink
+      if ! python3 "$dot_py" --config "$manifest" link --yes --force-relink; then
+        echo "dot-extensions: linking ${ext_name} manifest failed" >&2
+        failed_exts="${failed_exts} ${ext_name}"
+      fi
     fi
   done < <(dot_list_extensions)
+  if [[ -n "$failed_exts" ]]; then
+    echo "dot-extensions: WARNING — failed extension(s):${failed_exts}" >&2
+  fi
   return 0
 }

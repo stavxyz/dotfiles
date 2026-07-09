@@ -146,3 +146,33 @@ teardown() {
 
   [ -f "$TEST_DIR/.dot/state/priv/mod.hash" ]
 }
+
+@test "dot_bootstrap_extensions: one failing extension does not block later ones" {
+  mkdir -p "$DOTFILES_EXTENSIONS_DIR/10-bad" \
+    "$DOTFILES_EXTENSIONS_DIR/20-good/payload" "$TEST_DIR/home"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$DOTFILES_EXTENSIONS_DIR/10-bad/install.sh"
+  chmod +x "$DOTFILES_EXTENSIONS_DIR/10-bad/install.sh"
+  echo "# payload" > "$DOTFILES_EXTENSIONS_DIR/20-good/payload/rc"
+  printf '{"links": {"%s/home/.rc2": "payload/rc"}}\n' "$TEST_DIR" \
+    > "$DOTFILES_EXTENSIONS_DIR/20-good/dotfiles.json"
+
+  run dot_bootstrap_extensions "$REPO_ROOT/dot.py"
+  [ "$status" -eq 0 ]
+  [ -L "$TEST_DIR/home/.rc2" ]
+  [[ "$output" == *"10-bad/install.sh failed"* ]]
+  [[ "$output" == *"failed extension(s): 10-bad"* ]]
+}
+
+@test "dot_bootstrap_extensions: failing install.sh skips that extension's own manifest" {
+  mkdir -p "$DOTFILES_EXTENSIONS_DIR/bad/payload" "$TEST_DIR/home"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "$DOTFILES_EXTENSIONS_DIR/bad/install.sh"
+  chmod +x "$DOTFILES_EXTENSIONS_DIR/bad/install.sh"
+  echo "# payload" > "$DOTFILES_EXTENSIONS_DIR/bad/payload/rc"
+  printf '{"links": {"%s/home/.badrc": "payload/rc"}}\n' "$TEST_DIR" \
+    > "$DOTFILES_EXTENSIONS_DIR/bad/dotfiles.json"
+
+  run dot_bootstrap_extensions "$REPO_ROOT/dot.py"
+  [ "$status" -eq 0 ]
+  [ ! -e "$TEST_DIR/home/.badrc" ]
+  [ ! -L "$TEST_DIR/home/.badrc" ]
+}
