@@ -103,6 +103,9 @@ jobs:
       - name: Run Python tests
         id: pytest
         run: |
+          # pipefail: without it, tee masks the test exit code and failures
+          # cannot fail the build
+          set -o pipefail
           echo "## Python Tests (dot.py)" >> $GITHUB_STEP_SUMMARY
           pytest tests/ -v --tb=short | tee pytest-output.txt
           echo '```' >> $GITHUB_STEP_SUMMARY
@@ -112,6 +115,7 @@ jobs:
       - name: Run validation tests
         id: validate
         run: |
+          set -o pipefail
           echo "## Validation Tests" >> $GITHUB_STEP_SUMMARY
           bats tests/test-validate.bats | tee validation-output.txt
           echo '```' >> $GITHUB_STEP_SUMMARY
@@ -121,6 +125,7 @@ jobs:
       - name: Run benchmark
         id: benchmark
         run: |
+          set -o pipefail
           echo "## Performance Benchmark" >> $GITHUB_STEP_SUMMARY
           bats tests/test-benchmark.bats | tee benchmark-output.txt
 

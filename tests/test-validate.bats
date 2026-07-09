@@ -44,6 +44,8 @@ setup() {
 }
 
 @test "PATH contains expected directories" {
+    # Asserts dotfiles PATH setup — meaningless where dotfiles aren't linked
+    [ -L ~/.bash_profile ] || skip "dotfiles not linked into HOME"
     run bash -l -c 'echo "$PATH"'
     [ "$status" -eq 0 ]
     [[ "$output" =~ "homebrew" ]]
