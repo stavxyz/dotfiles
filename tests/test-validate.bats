@@ -147,3 +147,19 @@ EOF
     [[ "$output" == *pyenv-stub* ]]
     [[ "$output" == *workon:demo* ]]
 }
+
+@test "pyenv lazy wrappers survive a function snapshot without underscore-prefixed helpers" {
+    # Claude Code's Bash tool rebuilds the shell from a snapshot of the login
+    # shell's functions that omits every function whose name starts with "_",
+    # so the public wrappers must not depend on underscore-prefixed helpers.
+    tmp="$(mktemp -d)"
+    make_stub_pyenv "$tmp/pyenv"
+    snapshot="$(env HOME="$tmp" PATH="$tmp/pyenv/bin:$PATH" bash --noprofile --norc -c "source '$DOTFILES_DIR/modules/static/10-utils.sh'; source '$DOTFILES_DIR/modules/static/41-python.sh'; for f in \$(declare -F | awk '\$3 !~ /^_/ {print \$3}'); do declare -f \"\$f\"; done")"
+    run env HOME="$tmp" PATH="$tmp/pyenv/bin:$PATH" FUNCNEST=50 \
+        bash --noprofile --norc -c "$snapshot
+pyenv --version && workon demo"
+    rm -rf "$tmp"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *pyenv-stub* ]]
+    [[ "$output" == *workon:demo* ]]
+}

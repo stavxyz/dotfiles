@@ -12,15 +12,25 @@ export WORKON_HOME="$HOME/.virtualenvs"
 [[ -d "$PYENV_ROOT/shims" ]] && export PATH="$PYENV_ROOT/shims:$PATH"
 [[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
-# Helper function to load virtualenvwrapper via pyenv plugin
-_load_pyenv_virtualenvwrapper() {
+# Function: load_pyenv_virtualenvwrapper
+# Description: Load virtualenvwrapper through the pyenv-virtualenvwrapper plugin
+# Usage: load_pyenv_virtualenvwrapper
+# Returns: 0 (no-op when the plugin is not installed)
+# No leading underscore on this helper or lazy_load_pyenv: Claude Code rebuilds
+# its tool shell from a snapshot of the login shell's functions that drops
+# every underscore-prefixed name, and the public wrappers below call these.
+load_pyenv_virtualenvwrapper() {
     if [[ -d "$(command pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
         eval "$(command pyenv sh-virtualenvwrapper_lazy)"
     fi
 }
 
-# Shared lazy loader for pyenv - can be triggered by any command
-_lazy_load_pyenv() {
+# Function: lazy_load_pyenv
+# Description: Initialize pyenv and virtualenvwrapper in this shell, once; the
+#              pyenv/python/pip/workon wrappers call it on first use
+# Usage: lazy_load_pyenv
+# Returns: 0 once pyenv is initialized in this shell
+lazy_load_pyenv() {
     # Only load once
     if [[ -n "${PYENV_LAZY_LOADED:-}" ]]; then
         return 0
@@ -36,7 +46,7 @@ _lazy_load_pyenv() {
     eval "$(command pyenv init - "$shell_type")"
 
     # Load virtualenvwrapper
-    _load_pyenv_virtualenvwrapper
+    load_pyenv_virtualenvwrapper
 
     # Mark as loaded. Not exported: the flag describes this shell's function
     # table, and a child shell starts over with the wrappers redefined.
@@ -53,15 +63,15 @@ setup_python() {
         # parent shell's environment is wrong here: it would skip loading and
         # make every wrapper call itself until bash segfaults.
         unset PYENV_LAZY_LOADED
-        pyenv() { _lazy_load_pyenv && pyenv "$@"; }
-        python() { _lazy_load_pyenv && python "$@"; }
-        pip() { _lazy_load_pyenv && pip "$@"; }
+        pyenv() { lazy_load_pyenv && pyenv "$@"; }
+        python() { lazy_load_pyenv && python "$@"; }
+        pip() { lazy_load_pyenv && pip "$@"; }
 
         # Virtualenvwrapper commands (if plugin is installed)
         if [[ -d "$(command pyenv root)/plugins/pyenv-virtualenvwrapper" ]]; then
-            workon() { _lazy_load_pyenv && workon "$@"; }
-            mkvirtualenv() { _lazy_load_pyenv && mkvirtualenv "$@"; }
-            deactivate() { _lazy_load_pyenv && deactivate "$@"; }
+            workon() { lazy_load_pyenv && workon "$@"; }
+            mkvirtualenv() { lazy_load_pyenv && mkvirtualenv "$@"; }
+            deactivate() { lazy_load_pyenv && deactivate "$@"; }
         fi
     elif command_exists pyenv; then
         # Eager mode: load everything immediately
@@ -71,7 +81,7 @@ setup_python() {
         eval "$(command pyenv init - "$shell_type")"
 
         # Load virtualenvwrapper via pyenv plugin if available
-        _load_pyenv_virtualenvwrapper
+        load_pyenv_virtualenvwrapper
     fi
     
     # Fallback to raw virtualenvwrapper if pyenv plugin is not available
