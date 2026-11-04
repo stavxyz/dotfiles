@@ -57,7 +57,11 @@ All user-facing functions must be documented:
 - Module files: `NN-descriptive-name.sh` (static) or `descriptive-name.sh` (dynamic)
 - Functions: `lowercase_with_underscores`
 - Variables: `UPPERCASE_FOR_EXPORTS`, `lowercase_for_locals`
-- Private functions: Prefix with `_` (e.g., `_internal_helper()`)
+- Private functions: Prefix with `_` (e.g., `_internal_helper()`), unless a public
+  function calls the helper at runtime. Claude Code rebuilds its tool shell from a
+  snapshot of the login shell's functions that drops every underscore-prefixed name,
+  so such a helper keeps a plain name (see `lazy_load_pyenv` in
+  `modules/static/41-python.sh`)
 
 ## Testing Requirements
 
