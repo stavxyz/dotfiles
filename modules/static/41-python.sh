@@ -15,7 +15,8 @@ export WORKON_HOME="$HOME/.virtualenvs"
 # Function: load_pyenv_virtualenvwrapper
 # Description: Load virtualenvwrapper through the pyenv-virtualenvwrapper plugin
 # Usage: load_pyenv_virtualenvwrapper
-# Returns: 0 (no-op when the plugin is not installed)
+# Returns: the plugin init script's status, or 0 when the plugin is not installed
+# Example: load_pyenv_virtualenvwrapper
 # No leading underscore on this helper or lazy_load_pyenv: Claude Code rebuilds
 # its tool shell from a snapshot of the login shell's functions that drops
 # every underscore-prefixed name, and the public wrappers below call these.
@@ -29,13 +30,9 @@ load_pyenv_virtualenvwrapper() {
 # Description: Initialize pyenv and virtualenvwrapper in this shell, once; the
 #              pyenv/python/pip/workon wrappers call it on first use
 # Usage: lazy_load_pyenv
-# Returns: 0 once pyenv is initialized in this shell
+# Returns: 0 (always; a failing pyenv init is not propagated)
+# Example: lazy_load_pyenv
 lazy_load_pyenv() {
-    # Only load once
-    if [[ -n "${PYENV_LAZY_LOADED:-}" ]]; then
-        return 0
-    fi
-
     # Unset all lazy wrapper functions
     unset -f pyenv python pip workon mkvirtualenv deactivate 2>/dev/null
 
@@ -48,9 +45,10 @@ lazy_load_pyenv() {
     # Load virtualenvwrapper
     load_pyenv_virtualenvwrapper
 
-    # Mark as loaded. Not exported: the flag describes this shell's function
-    # table, and a child shell starts over with the wrappers redefined.
-    PYENV_LAZY_LOADED=1
+    # Loaded. The guard lives in the function table, not in a variable: a
+    # variable can arrive from a parent shell's environment or outlive a
+    # snapshot, a function definition cannot.
+    lazy_load_pyenv() { return 0; }
 }
 
 setup_python() {
@@ -59,10 +57,6 @@ setup_python() {
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
         # Lazy load pyenv: defer full initialization to first use for faster startup
         # Create wrapper functions that trigger initialization on first use
-        # The wrappers are fresh in this shell, so a loaded flag inherited from a
-        # parent shell's environment is wrong here: it would skip loading and
-        # make every wrapper call itself until bash segfaults.
-        unset PYENV_LAZY_LOADED
         pyenv() { lazy_load_pyenv && pyenv "$@"; }
         python() { lazy_load_pyenv && python "$@"; }
         pip() { lazy_load_pyenv && pip "$@"; }

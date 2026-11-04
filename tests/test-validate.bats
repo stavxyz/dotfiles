@@ -181,3 +181,16 @@ pyenv --version && workon demo"
     [ "${lines[0]}" = "pyenv-stub-version" ]
     [ "${lines[1]}" = "workon-stub:demo" ]
 }
+
+@test "pyenv lazy wrappers load from a snapshot when a stale PYENV_LAZY_LOADED is inherited" {
+    # A tool shell rebuilt from a snapshot never runs setup_python, so nothing
+    # there can clear a flag inherited from a parent shell that ran the old
+    # module. The loaded guard must live where no environment can carry it.
+    make_stub_pyenv "$STUB_ROOT/pyenv"
+    snapshot="$(snapshot_without_underscore_functions)"
+    run stub_bash PYENV_LAZY_LOADED=1 "$snapshot
+pyenv --version && workon demo"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "pyenv-stub-version" ]
+    [ "${lines[1]}" = "workon-stub:demo" ]
+}
