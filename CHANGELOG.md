@@ -55,6 +55,17 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+**pyenv lazy wrappers no longer break in child shells or tool shells**:
+- The lazy loader (then `_lazy_load_pyenv`) exported its loaded flag, so every shell
+  spawned after pyenv had loaded (tmux pane, nested bash, nvim terminal) inherited it,
+  skipped loading, and recursed into its own `workon`/`python`/`pip`/`pyenv` wrapper
+  until bash segfaulted. The guard now lives in the function table (the loader
+  redefines itself as a no-op once done), which no environment can carry into a child
+  shell or a tool-shell snapshot
+- The helpers lost their underscore prefix: Claude Code rebuilds its tool shell from a
+  snapshot of the login shell's functions that drops underscore-prefixed names, which
+  left the wrappers calling a missing `_lazy_load_pyenv` ("command not found")
+
 **Completions actually register now**:
 - Lazy mode sourced completion files in a backgrounded subshell and eager mode inside a
   command substitution — in both cases the `complete` registrations were made in a child
