@@ -38,8 +38,9 @@ _lazy_load_pyenv() {
     # Load virtualenvwrapper
     _load_pyenv_virtualenvwrapper
 
-    # Mark as loaded
-    export PYENV_LAZY_LOADED=1
+    # Mark as loaded. Not exported: the flag describes this shell's function
+    # table, and a child shell starts over with the wrappers redefined.
+    PYENV_LAZY_LOADED=1
 }
 
 setup_python() {
@@ -48,6 +49,10 @@ setup_python() {
     if [[ "$lazy_mode" == "true" ]] && command_exists pyenv; then
         # Lazy load pyenv: defer full initialization to first use for faster startup
         # Create wrapper functions that trigger initialization on first use
+        # The wrappers are fresh in this shell, so a loaded flag inherited from a
+        # parent shell's environment is wrong here: it would skip loading and
+        # make every wrapper call itself until bash segfaults.
+        unset PYENV_LAZY_LOADED
         pyenv() { _lazy_load_pyenv && pyenv "$@"; }
         python() { _lazy_load_pyenv && python "$@"; }
         pip() { _lazy_load_pyenv && pip "$@"; }

@@ -55,6 +55,12 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+**pyenv lazy wrappers no longer break in child shells or tool shells**:
+- `lazy_load_pyenv` exported its loaded flag, so every shell spawned after pyenv had
+  loaded (tmux pane, nested bash, nvim terminal) inherited it, skipped loading, and
+  recursed into its own `workon`/`python`/`pip`/`pyenv` wrapper until bash segfaulted.
+  The flag is now per shell and cleared when the wrappers are defined
+
 **Completions actually register now**:
 - Lazy mode sourced completion files in a backgrounded subshell and eager mode inside a
   command substitution — in both cases the `complete` registrations were made in a child

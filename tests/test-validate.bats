@@ -113,3 +113,37 @@ EOF
         skip "direnv not installed"
     fi
 }
+
+# The pyenv lazy-wrapper tests run against a stub pyenv so they are hermetic
+# (CI runners have no pyenv). The stub answers only the subcommands
+# 41-python.sh issues while loading; anything else fails loudly.
+make_stub_pyenv() {
+    local root="$1"
+    mkdir -p "$root/bin" "$root/plugins/pyenv-virtualenvwrapper"
+    cat > "$root/bin/pyenv" <<EOF
+#!/usr/bin/env bash
+case "\$1" in
+    root) echo "$root" ;;
+    init) echo 'pyenv() { command pyenv "\$@"; }' ;;
+    sh-virtualenvwrapper_lazy) echo 'workon() { echo "workon:\$*"; }' ;;
+    --version) echo "pyenv-stub" ;;
+    *) echo "pyenv-stub: unexpected subcommand: \$*" >&2; exit 1 ;;
+esac
+EOF
+    chmod +x "$root/bin/pyenv"
+}
+
+@test "pyenv lazy wrappers load in a child shell that inherits PYENV_LAZY_LOADED" {
+    # A shell that has loaded pyenv used to export PYENV_LAZY_LOADED=1, so every
+    # shell it spawned (tmux pane, nested bash, nvim terminal) started with the
+    # flag set, skipped loading, and recursed into its own wrapper until bash
+    # segfaulted. FUNCNEST turns that recursion into a plain error exit.
+    tmp="$(mktemp -d)"
+    make_stub_pyenv "$tmp/pyenv"
+    run env HOME="$tmp" PATH="$tmp/pyenv/bin:$PATH" PYENV_LAZY_LOADED=1 FUNCNEST=50 \
+        bash --noprofile --norc -c "source '$DOTFILES_DIR/modules/static/10-utils.sh'; source '$DOTFILES_DIR/modules/static/41-python.sh'; pyenv --version && workon demo"
+    rm -rf "$tmp"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *pyenv-stub* ]]
+    [[ "$output" == *workon:demo* ]]
+}
